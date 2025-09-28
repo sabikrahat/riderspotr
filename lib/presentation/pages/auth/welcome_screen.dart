@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:ridespotr/core/extensions.dart';
 import 'package:ridespotr/presentation/widgets/shared/back.dart';
+import 'package:ridespotr/presentation/widgets/shared/dropdown_textfield.dart';
 import 'package:ridespotr/presentation/widgets/shared/logo.dart';
 import 'package:ridespotr/presentation/widgets/shared/long_button.dart';
 import 'package:ridespotr/presentation/widgets/shared/page_padding.dart';
@@ -26,6 +27,7 @@ class WelcomeScreen extends StatelessWidget {
             TextFormField(decoration: InputDecoration(labelText: 'Email')),
             LongButton(text: 'Continue'),
             Back(),
+            DropdownTextfield(),
           ],
         ),
       ),
