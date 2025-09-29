@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ridespotr/config/constants.dart';
-import 'package:ridespotr/config/router.dart';
-import 'package:ridespotr/config/theme.dart';
+import 'config/constants.dart';
+import 'config/router.dart';
+import 'config/theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toastification/toastification.dart';
 
@@ -19,7 +19,12 @@ class Ridespotr extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ToastificationWrapper(
-      child: MaterialApp.router(theme: theme(context), routerConfig: router),
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        showSemanticsDebugger: false,
+        theme: theme(context),
+        routerConfig: router,
+      ),
     );
   }
 }

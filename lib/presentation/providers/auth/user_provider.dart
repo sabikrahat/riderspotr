@@ -1,4 +1,4 @@
-import 'package:ridespotr/models/auth/user_model.dart';
+import '../../../models/auth/user_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'user_provider.g.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ridespotr/core/extensions.dart';
+import '../core/extensions.dart';
 
 ThemeData theme(BuildContext context) {
   return ThemeData(
