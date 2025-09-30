@@ -13,6 +13,8 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, leading: Back()),
+      extendBodyBehindAppBar: true,
       body: Stack(
         children: [
           Image.asset(
@@ -25,7 +27,6 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Back(),
                 Expanded(
                   child: Center(
                     child: SingleChildScrollView(

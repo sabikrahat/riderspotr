@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/extensions.dart';
-import '../../widgets/shared/page_padding.dart';
 
+import '../../../core/extensions.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/long_button.dart';
+import '../../widgets/shared/page_padding.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -13,6 +13,8 @@ class RegisterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, leading: Back()),
+      extendBodyBehindAppBar: true,
       body: Stack(
         children: [
           Image.asset(
@@ -25,7 +27,6 @@ class RegisterScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Back(),
                 Expanded(
                   child: Center(
                     child: SingleChildScrollView(
