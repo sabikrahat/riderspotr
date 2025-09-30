@@ -18,6 +18,10 @@ class AuthService {
 
   Future<void> login({required String email}) async {
     try {
+      final user = await UserService().getUserByEmail(email: email);
+      if (user == null) {
+        throw KException('No user found with this email. Please register first.', code: '404');
+      }
       await _client.auth.signInWithOtp(email: email, shouldCreateUser: true);
       debugPrint('Supabase login successful');
       return;

@@ -19,8 +19,9 @@ class AuthProvider extends Notifier {
     ld.show();
     try {
       await AuthService().login(email: email);
-      if (context.mounted)
+      if (context.mounted) {
         context.push('/otp/${Uri.encodeComponent(email)}?shouldCreateUser=false');
+      }
       return;
     } on KException catch (e) {
       debugPrint('Login error: $e');
