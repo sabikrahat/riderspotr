@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:pinput/pinput.dart';
 
 import '../../../core/extensions.dart';
+import '../../providers/auth/auth_provider.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
 
-class OtpScreen extends StatelessWidget {
-  const OtpScreen({super.key});
+class OtpScreen extends ConsumerStatefulWidget {
+  final String email;
+  final bool shouldCreateUser;
+  const OtpScreen({super.key, required this.email, this.shouldCreateUser = false});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _OtpScreenState();
+}
+
+class _OtpScreenState extends ConsumerState<OtpScreen> {
+  String? pin;
 
   @override
   Widget build(BuildContext context) {
+    final notifier = ref.read(authProvider.notifier);
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, leading: Back()),
       extendBodyBehindAppBar: true,
@@ -67,13 +79,24 @@ class OtpScreen extends StatelessWidget {
                                 ),
                               ),
                               textInputAction: TextInputAction.done,
-                              onCompleted: (pin) {
-                                debugPrint("Entered PIN: $pin");
-                              },
+                              onChanged: (value) => setState(() => pin = value),
+                              onCompleted: (pin) => setState(() => this.pin = pin),
                             ),
                           ),
                           Gap(24),
-                          LongButton(text: 'Continue', onPressed: () {}),
+                          LongButton(
+                            text: 'Continue',
+                            onPressed: pin != null && pin!.length == 6
+                                ? () async {
+                                    await notifier.verifyOtp(
+                                      context: context,
+                                      email: widget.email,
+                                      token: pin!,
+                                      shouldCreateUser: widget.shouldCreateUser,
+                                    );
+                                  }
+                                : null,
+                          ),
                           Gap(16),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -81,7 +104,11 @@ class OtpScreen extends StatelessWidget {
                               Text('Didn\'t get a code?'),
                               Gap(4),
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () async => await notifier.resendOtp(
+                                  context: context,
+                                  email: widget.email,
+                                  shouldCreateUser: widget.shouldCreateUser,
+                                ),
                                 child: Text(
                                   'Resend',
                                   style: TextStyle(

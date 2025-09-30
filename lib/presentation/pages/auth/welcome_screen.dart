@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/extensions.dart';
-import '../../widgets/shared/page_padding.dart';
 
+import '../../../core/extensions.dart';
 import '../../widgets/shared/logo.dart';
 import '../../widgets/shared/long_button.dart';
+import '../../widgets/shared/page_padding.dart';
 import '../../widgets/shared/video_player.dart';
 
 class WelcomeScreen extends StatelessWidget {
