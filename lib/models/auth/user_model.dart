@@ -1,10 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:json_annotation/json_annotation.dart';
+part 'user_model.ext.dart';
 
-part 'user_model.g.dart';
-
-@JsonSerializable(fieldRename: FieldRename.snake)
 class UserModel {
   final String id;
   final String email;
@@ -32,43 +29,31 @@ class UserModel {
     required this.createdAt,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+    id: json[_Json.id] as String,
+    email: json[_Json.email] as String,
+    firstName: json[_Json.firstName] as String?,
+    lastName: json[_Json.lastName] as String?,
+    username: json[_Json.username] as String?,
+    dob: json[_Json.dob] == null ? null : DateTime.parse(json[_Json.dob] as String).toLocal(),
+    knowledgeLevel: json[_Json.knowledgeLevel] as String?,
+    experience: json[_Json.experience] as String?,
+    location: json[_Json.location] as String?,
+    locationLatLng: json[_Json.locationLatLng]?.toString(),
+    createdAt: DateTime.parse(json[_Json.createdAt] as String).toLocal(),
+  );
+}
 
-  Map<String, dynamic> toJson() => _$UserModelToJson(this);
-
-  // extract longitude from locationLatLng which is coming from the supabase
-  double get longitude {
-    String wkbHex = locationLatLng.toString();
-    Uint8List bytes = _hexToBytes(wkbHex);
-
-    // Extract longitude and latitude from the binary data
-    double longitude = _byteDataToDouble(bytes.sublist(9, 17));
-    return longitude;
-  }
-
-  // extract latitude from locationLatLng which is coming from the supabase
-  double get latitude {
-    String wkbHex = locationLatLng.toString();
-    Uint8List bytes = _hexToBytes(wkbHex);
-
-    // Extract longitude and latitude from the binary data
-    double latitude = _byteDataToDouble(bytes.sublist(17, 25));
-    return latitude;
-  }
-
-  // Convert hex string to byte array
-  Uint8List _hexToBytes(String hex) {
-    return Uint8List.fromList(
-      List<int>.generate(
-        hex.length ~/ 2,
-        (i) => int.parse(hex.substring(i * 2, i * 2 + 2), radix: 16),
-      ),
-    );
-  }
-
-  // Convert 8-byte array to double
-  double _byteDataToDouble(List<int> bytes) {
-    ByteData byteData = ByteData.sublistView(Uint8List.fromList(bytes));
-    return byteData.getFloat64(0, Endian.little);
-  }
+class _Json {
+  static const String id = 'id';
+  static const String email = 'email';
+  static const String firstName = 'first_name';
+  static const String lastName = 'last_name';
+  static const String username = 'username';
+  static const String dob = 'dob';
+  static const String knowledgeLevel = 'knowledge_level';
+  static const String experience = 'experience';
+  static const String location = 'location';
+  static const String locationLatLng = 'location_lat_lng';
+  static const String createdAt = 'created_at';
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:ridespotr/services/auth/user_service.dart';
+import '../../../services/auth/user_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -67,6 +67,7 @@ class UserNotifier extends _$UserNotifier {
     ld.show();
     try {
       await AuthService().signout();
+      await refreshUser();
       router.refresh();
     } on KException catch (e) {
       debugPrint('Signout error: $e');
@@ -86,6 +87,8 @@ class UserNotifier extends _$UserNotifier {
     ld.show();
     try {
       await AuthService().verifyOtp(email: email, token: token, shouldCreateUser: shouldCreateUser);
+      await refreshUser();
+      router.refresh();
     } on KException catch (e) {
       debugPrint('Verify OTP error: $e');
       showErrorMessage(e.message);
@@ -106,6 +109,20 @@ class UserNotifier extends _$UserNotifier {
       showSuccessMessage('OTP has been resent to your email');
     } on KException catch (e) {
       debugPrint('Resend OTP error: $e');
+      showErrorMessage(e.message);
+    } finally {
+      ld.hide();
+    }
+  }
+
+  Future<void> updateUser({required BuildContext context, required UserModel user}) async {
+    final ld = context.loaderOverlay;
+    ld.show();
+    try {
+      await UserService().update(user: user);
+      await refreshUser();
+    } on KException catch (e) {
+      debugPrint('Update user error: $e');
       showErrorMessage(e.message);
     } finally {
       ld.hide();

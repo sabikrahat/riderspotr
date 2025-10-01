@@ -128,14 +128,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ],
             ),
           ),
-          // Back(),
-          // Text('REGISTER', style: context.textTheme.headlineSmall),
-          // TextFormField(decoration: InputDecoration(labelText: 'Email')),
-          // LongButton(text: 'Get Started', onPressed: () {}),
-          // Text(
-          //   'By creating an account, I agree to the Privacy Policy and Terms of Service of RIDESPOTR.',
-          // ),
-          // Back(),
         ],
       ),
     );

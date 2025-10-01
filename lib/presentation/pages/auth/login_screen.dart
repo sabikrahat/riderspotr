@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../core/extensions.dart';
 import '../../providers/auth/user_provider.dart';
-import '../../widgets/shared/page_padding.dart';
-
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/long_button.dart';
+import '../../widgets/shared/page_padding.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -124,14 +124,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ],
             ),
           ),
-          // Back(),
-          // Text('REGISTER', style: context.textTheme.headlineSmall),
-          // TextFormField(decoration: InputDecoration(labelText: 'Email')),
-          // LongButton(text: 'Get Started', onPressed: () {}),
-          // Text(
-          //   'By creating an account, I agree to the Privacy Policy and Terms of Service of RIDESPOTR.',
-          // ),
-          // Back(),
         ],
       ),
     );
