@@ -20,7 +20,7 @@ extension UserModelExtension on UserModel {
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       username: username ?? this.username,
-      dob: dob ?? dob,
+      dob: dob ?? this.dob,
       knowledgeLevel: knowledgeLevel ?? this.knowledgeLevel,
       experience: experience ?? this.experience,
       location: location ?? this.location,
