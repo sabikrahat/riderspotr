@@ -4,7 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:pinput/pinput.dart';
 
 import '../../../core/extensions.dart';
-import '../../providers/auth/auth_provider.dart';
+import '../../providers/auth/user_provider.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
@@ -23,7 +23,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final notifier = ref.read(authProvider.notifier);
+    final notifier = ref.read(userProvider.notifier);
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, leading: Back()),
       extendBodyBehindAppBar: true,

@@ -4,7 +4,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/extensions.dart';
-import '../../providers/auth/auth_provider.dart';
+import '../../providers/auth/user_provider.dart';
 import '../../widgets/shared/page_padding.dart';
 
 import '../../widgets/shared/back.dart';
@@ -28,7 +28,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final notifier = ref.read(authProvider.notifier);
+    final notifier = ref.read(userProvider.notifier);
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, leading: Back()),
       extendBodyBehindAppBar: true,

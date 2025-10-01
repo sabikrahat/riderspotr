@@ -17,7 +17,7 @@ class UserService {
   Future<UserModel?> getUserById({String? uid}) async {
     try {
       final id = uid ?? _client.auth.currentUser?.id;
-      if (id == null) throw KException('User ID is null');
+      if (id == null) return null;
       final res = await _client.from(usersTbl).select().eq('id', id).maybeSingle();
       if (res == null) return null;
       return UserModel.fromJson(res);
