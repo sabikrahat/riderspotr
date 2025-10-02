@@ -13,6 +13,8 @@ import '../../widgets/shared/page_padding.dart';
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
+  static const String name = 'login';
+
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _LoginScreenState();
 }

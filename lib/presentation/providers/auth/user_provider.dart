@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:ridespotr/presentation/pages/auth/otp_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -36,7 +37,7 @@ class UserNotifier extends _$UserNotifier {
     try {
       await AuthService().login(email: email);
       if (context.mounted) {
-        context.push('/otp/${Uri.encodeComponent(email)}?shouldCreateUser=false');
+        context.push('/${OtpScreen.name}/${Uri.encodeComponent(email)}?shouldCreateUser=false');
       }
       return;
     } on KException catch (e) {
@@ -52,7 +53,9 @@ class UserNotifier extends _$UserNotifier {
     ld.show();
     try {
       await AuthService().register(email: email);
-      if (context.mounted) context.push('/otp/${Uri.encodeComponent(email)}?shouldCreateUser=true');
+      if (context.mounted) {
+        context.push('/${OtpScreen.name}/${Uri.encodeComponent(email)}?shouldCreateUser=true');
+      }
       return;
     } on KException catch (e) {
       debugPrint('Register error: $e');

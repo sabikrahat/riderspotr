@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridespotr/presentation/pages/auth/register_screen.dart';
 
 import '../../../core/extensions.dart';
 import '../../widgets/shared/logo.dart';
@@ -10,6 +11,8 @@ import '../../widgets/shared/video_player.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
+
+  static const String name = 'welcome';
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +42,10 @@ class WelcomeScreen extends StatelessWidget {
                       "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                     ),
                     Gap(16),
-                    LongButton(text: 'Continue', onPressed: () => context.push('/register')),
+                    LongButton(
+                      text: 'Continue',
+                      onPressed: () => context.pushNamed(RegisterScreen.name),
+                    ),
                     Gap(16),
                   ],
                 ),

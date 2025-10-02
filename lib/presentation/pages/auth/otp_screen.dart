@@ -10,9 +10,12 @@ import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
 
 class OtpScreen extends ConsumerStatefulWidget {
+  static const String name = 'otp';
+
+  const OtpScreen({super.key, required this.email, this.shouldCreateUser = false});
+
   final String email;
   final bool shouldCreateUser;
-  const OtpScreen({super.key, required this.email, this.shouldCreateUser = false});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _OtpScreenState();
