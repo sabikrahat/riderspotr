@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridespotr/presentation/pages/auth/register_screen.dart';
+import 'register_screen.dart';
 
 import '../../../core/extensions.dart';
 import '../../widgets/shared/logo.dart';

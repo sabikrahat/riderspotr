@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:ridespotr/presentation/pages/auth/otp_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -11,6 +10,7 @@ import '../../../core/toastification.dart';
 import '../../../models/auth/user_model.dart';
 import '../../../services/auth/auth_service.dart';
 import '../../../services/auth/user_service.dart';
+import '../../pages/auth/otp_screen.dart';
 
 part 'user_provider.g.dart';
 

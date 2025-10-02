@@ -1,8 +1,10 @@
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridespotr/core/enums.dart';
-import 'package:ridespotr/models/auth/user_model.dart';
+import '../../../core/enums.dart';
+import '../../../models/auth/user_model.dart';
+import '../../pages/camera/camera.dart';
 
 import '../../pages/auth/about_you_screen.dart';
 import '../../pages/auth/your_experience_screen.dart';
@@ -41,6 +43,13 @@ class KScaffold extends ConsumerWidget {
               child: Scaffold(
                 body: body,
                 bottomNavigationBar: KBottomNavbar(selectedNavItem: selectedDrawer),
+                floatingActionButton: FloatingActionButton(
+                  backgroundColor: Colors.grey.shade900,
+                  shape: const CircleBorder(),
+                  child: const Icon(Icons.camera, size: 40, color: Colors.white),
+                  onPressed: () => context.goNamed(CameraScreen.name),
+                ),
+                floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
               ),
             );
           },
@@ -58,25 +67,44 @@ class KBottomNavbar extends StatelessWidget {
     final idx = KNavItem.values.indexWhere((e) => e == selectedNavItem);
     return ClipRRect(
       borderRadius: BorderRadius.all(Radius.circular(45)),
-      child: BottomNavigationBar(
-        currentIndex: idx,
-        items: List.generate(
-          KNavItem.values.length,
-          (i) => kBottomNavBarItem(context, KNavItem.values[i]),
-        ),
+      child: AnimatedBottomNavigationBar(
+        icons: KNavItem.values.map((e) => e.icon).toList(),
+        activeIndex: idx,
+        backgroundColor: Colors.grey.shade900,
+        gapLocation: GapLocation.center,
+        notchSmoothness: NotchSmoothness.smoothEdge,
+        activeColor: Colors.white,
+        inactiveColor: Colors.white38,
+        height: 55,
+        notchMargin: 8,
+        safeAreaValues: const SafeAreaValues(bottom: false),
         onTap: (i) async {
           if (idx == i) return;
           context.goNamed(KNavItem.values[i].route);
         },
       ),
     );
+    //   return ClipRRect(
+    //     borderRadius: BorderRadius.all(Radius.circular(45)),
+    //     child: BottomNavigationBar(
+    //       currentIndex: idx,
+    //       items: List.generate(
+    //         KNavItem.values.length,
+    //         (i) => kBottomNavBarItem(context, KNavItem.values[i]),
+    //       ),
+    //       onTap: (i) async {
+    //         if (idx == i) return;
+    //         context.goNamed(KNavItem.values[i].route);
+    //       },
+    //     ),
+    //   );
   }
 
-  BottomNavigationBarItem kBottomNavBarItem(BuildContext context, KNavItem data) {
-    return BottomNavigationBarItem(
-      label: data.title,
-      activeIcon: Icon(data.icon),
-      icon: Icon(data.icon),
-    );
-  }
+  // BottomNavigationBarItem kBottomNavBarItem(BuildContext context, KNavItem data) {
+  //   return BottomNavigationBarItem(
+  //     label: data.title,
+  //     activeIcon: Icon(data.icon),
+  //     icon: Icon(data.icon),
+  //   );
+  // }
 }
