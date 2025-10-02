@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../../models/auth/user_model.dart';
 
 import '../../../core/extensions.dart';
+import '../../../models/auth/user_model.dart';
 import '../../providers/auth/user_provider.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/long_button.dart';

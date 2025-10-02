@@ -9,7 +9,7 @@ import '../presentation/pages/auth/login_screen.dart';
 import '../presentation/pages/auth/otp_screen.dart';
 import '../presentation/pages/auth/register_screen.dart';
 import '../presentation/pages/auth/welcome_screen.dart';
-import '../presentation/pages/camera/camera.dart';
+import '../presentation/pages/camera/camera_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
 import '../presentation/widgets/shared/scaffold.dart';
 
@@ -73,12 +73,12 @@ final router = GoRouter(
           name: ProfileScreen.name,
           builder: (_, _) => ProfileScreen(),
         ),
-        GoRoute(
-          path: '/${CameraScreen.name}',
-          name: CameraScreen.name,
-          builder: (_, _) => CameraScreen(),
-        ),
       ],
+    ),
+    GoRoute(
+      path: '/${CameraScreen.name}',
+      name: CameraScreen.name,
+      builder: (_, _) => CameraScreen(),
     ),
   ],
   redirect: (context, state) {

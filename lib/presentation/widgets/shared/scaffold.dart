@@ -2,13 +2,13 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../core/enums.dart';
 import '../../../models/auth/user_model.dart';
-import '../../pages/camera/camera.dart';
-
 import '../../pages/auth/about_you_screen.dart';
 import '../../pages/auth/your_experience_screen.dart';
 import '../../pages/auth/your_location_screen.dart';
+import '../../pages/camera/camera_screen.dart';
 import '../../providers/auth/user_provider.dart';
 
 class KScaffold extends ConsumerWidget {
@@ -47,7 +47,7 @@ class KScaffold extends ConsumerWidget {
                   backgroundColor: Colors.grey.shade900,
                   shape: const CircleBorder(),
                   child: const Icon(Icons.camera, size: 40, color: Colors.white),
-                  onPressed: () => context.goNamed(CameraScreen.name),
+                  onPressed: () => context.pushNamed(CameraScreen.name),
                 ),
                 floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
               ),
