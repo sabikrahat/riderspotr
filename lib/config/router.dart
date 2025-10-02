@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../presentation/pages/graph/graph_screen.dart';
-import '../presentation/pages/map/map_screen.dart';
-import '../presentation/pages/profile/profile_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../presentation/pages/auth/login_screen.dart';
@@ -10,7 +7,10 @@ import '../presentation/pages/auth/otp_screen.dart';
 import '../presentation/pages/auth/register_screen.dart';
 import '../presentation/pages/auth/welcome_screen.dart';
 import '../presentation/pages/camera/camera_screen.dart';
+import '../presentation/pages/graph/graph_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
+import '../presentation/pages/map/map_screen.dart';
+import '../presentation/pages/profile/profile_screen.dart';
 import '../presentation/widgets/shared/scaffold.dart';
 
 const _nonAuthRoutes = [
