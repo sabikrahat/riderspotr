@@ -9,33 +9,33 @@ part of 'user_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(UserProvider)
-const userProviderProvider = UserProviderProvider._();
+@ProviderFor(UserNotifier)
+const userProvider = UserNotifierProvider._();
 
-final class UserProviderProvider
-    extends $AsyncNotifierProvider<UserProvider, UserModel?> {
-  const UserProviderProvider._()
+final class UserNotifierProvider
+    extends $AsyncNotifierProvider<UserNotifier, UserModel?> {
+  const UserNotifierProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'userProviderProvider',
+        name: r'userProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$userProviderHash();
+  String debugGetCreateSourceHash() => _$userNotifierHash();
 
   @$internal
   @override
-  UserProvider create() => UserProvider();
+  UserNotifier create() => UserNotifier();
 }
 
-String _$userProviderHash() => r'3dd961411dfa06a3bca4498ae9317cdb2da8b4b4';
+String _$userNotifierHash() => r'4edf036ae6a86a11fe79651b816e706e2b0768d4';
 
-abstract class _$UserProvider extends $AsyncNotifier<UserModel?> {
+abstract class _$UserNotifier extends $AsyncNotifier<UserModel?> {
   FutureOr<UserModel?> build();
   @$mustCallSuper
   @override

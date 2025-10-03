@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class DropdownTextfield extends StatefulWidget {
-  const DropdownTextfield({super.key});
+  const DropdownTextfield({
+    super.key,
+    required this.items,
+    required this.labelText,
+    this.initialValue,
+    this.onChanged,
+  });
+
+  final String labelText;
+  final String? initialValue;
+  final List<String> items;
+  final ValueChanged<String>? onChanged;
 
   @override
   State<DropdownTextfield> createState() => _DropdownTextfieldState();
@@ -12,10 +22,16 @@ class _DropdownTextfieldState extends State<DropdownTextfield> {
   bool _isDropdownOpen = false;
   final GlobalKey _dropdownKey = GlobalKey();
   OverlayEntry? _overlayEntry;
+  late String? _selectedValue;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedValue = widget.initialValue;
+  }
 
   void _showDropdown() {
-    final renderBox =
-        _dropdownKey.currentContext!.findRenderObject() as RenderBox;
+    final renderBox = _dropdownKey.currentContext!.findRenderObject() as RenderBox;
 
     final position = renderBox.localToGlobal(Offset.zero);
     final size = renderBox.size;
@@ -50,7 +66,20 @@ class _DropdownTextfieldState extends State<DropdownTextfield> {
                           color: Colors.grey.shade900,
                         ),
                         child: ListView(
-                          children: [ListTile(title: Text('Item 1'))],
+                          padding: EdgeInsets.zero,
+                          children: List.generate(widget.items.length, (index) {
+                            final item = widget.items[index];
+                            return ListTile(
+                              title: Text(item, style: TextStyle(color: Colors.white)),
+                              onTap: () {
+                                setState(() {
+                                  _selectedValue = item;
+                                });
+                                widget.onChanged?.call(item);
+                                _closeDropdown();
+                              },
+                            );
+                          }),
                         ),
                       ),
                     ),
@@ -91,7 +120,9 @@ class _DropdownTextfieldState extends State<DropdownTextfield> {
         key: _dropdownKey,
         onTap: () => _showDropdown(),
         readOnly: true,
+        controller: TextEditingController(text: _selectedValue),
         decoration: InputDecoration(
+          labelText: widget.labelText,
           suffixIcon: Icon(Icons.arrow_drop_down_rounded, color: Colors.white),
         ),
       ),

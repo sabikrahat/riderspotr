@@ -12,7 +12,6 @@ class Logo extends StatelessWidget {
     switch (variant) {
       case LogoVariant.full:
         return SvgPicture.asset('assets/logo/logo-full.svg');
-      // TODO: Implement icon variant
       case LogoVariant.icon:
         return Placeholder();
     }

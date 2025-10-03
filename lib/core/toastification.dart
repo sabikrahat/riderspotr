@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
@@ -14,10 +13,7 @@ void showErrorMessage(String message) {
 void showSuccessMessage(String message, {String? title}) {
   toastification.show(
     type: ToastificationType.success,
-    title: Text(
-      title ?? 'Success!',
-      style: TextStyle(fontWeight: FontWeight.bold),
-    ),
+    title: Text(title ?? 'Success!', style: TextStyle(fontWeight: FontWeight.bold)),
     description: Text(message, style: TextStyle(fontWeight: FontWeight.normal)),
     autoCloseDuration: Duration(seconds: 5),
   );

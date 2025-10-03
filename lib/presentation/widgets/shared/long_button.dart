@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:ridespotr/core/extensions.dart';
+
+import '../../../core/extensions.dart';
 
 class LongButton extends StatelessWidget {
   final String? text;
