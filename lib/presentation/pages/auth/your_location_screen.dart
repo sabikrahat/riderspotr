@@ -76,7 +76,7 @@ class _YourLocationScreenState extends ConsumerState<YourLocationScreen> {
                         Text('Where are you baed?'),
                         Gap(24),
                         AddressTextField(
-                          hint: 'Search suburb',
+                          labelText: 'Search suburb',
                           initialValue: notifier.user?.address,
                           optionsBuilder: (t) async {
                             _locationController.text = t.text;

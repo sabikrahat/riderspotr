@@ -10,7 +10,8 @@ class AddressTextField extends StatefulWidget {
   optionsBuilder;
   final void Function(MapPredictionModel) onSelected;
   final String Function(MapPredictionModel) displayStringForOption;
-  final String hint;
+  // final String hint;
+  final String labelText;
   final String? Function(String?)? validator;
   final String? initialValue;
   final AutocompleteOptionsViewBuilder<MapPredictionModel>? optionsViewBuilder;
@@ -20,7 +21,8 @@ class AddressTextField extends StatefulWidget {
     required this.optionsBuilder,
     required this.onSelected,
     required this.displayStringForOption,
-    required this.hint,
+    // required this.hint,
+    required this.labelText,
     this.validator,
     this.optionsViewBuilder,
     this.initialValue,
@@ -71,7 +73,7 @@ class _AddressTextFieldState extends State<AddressTextField> {
 
             return CustomTextField(
               controller: fieldTextEditingController,
-              decoration: InputDecoration(hintText: widget.hint),
+              decoration: InputDecoration(labelText: widget.labelText),
               focusNode: fieldFocusNode,
               validator: widget.validator,
               onFieldSubmitted: (_) => onFieldSubmitted(),

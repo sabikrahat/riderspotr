@@ -62,17 +62,17 @@ final router = GoRouter(
     ),
     GoRoute(
       path: AboutYouScreen.routeName,
-      redirect: authHandler,
+      // redirect: authHandler,
       builder: (_, _) => AboutYouScreen(),
     ),
     GoRoute(
       path: YourExperienceScreen.routeName,
-      redirect: authHandler,
+      // redirect: authHandler,
       builder: (_, _) => YourExperienceScreen(),
     ),
     GoRoute(
       path: YourLocationScreen.routeName,
-      redirect: authHandler,
+      // redirect: authHandler,
       builder: (_, _) => YourLocationScreen(),
     ),
     ShellRoute(

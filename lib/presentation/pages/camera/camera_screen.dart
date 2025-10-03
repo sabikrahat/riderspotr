@@ -58,23 +58,29 @@ class _CameraScreenState extends State<CameraScreen> {
     super.dispose();
   }
 
-  Future<void> _captureImage() async {
-    try {
-      await _initializeControllerFuture;
-      final image = await _controller!.takePicture();
+  // Future<void> _captureImage() async {
+  //   try {
+  //     await _initializeControllerFuture;
+  //     final image = await _controller!.takePicture();
 
-      if (mounted) {
-        // Process this XFile as needed
-        debugPrint('Image captured: ${image.path}');
-      }
-    } catch (e) {
-      debugPrint('Error capturing image: $e');
-    }
-  }
+  //     if (mounted) {
+  //       // Process this XFile as needed
+  //       debugPrint('Image captured: ${image.path}');
+  //     }
+  //   } catch (e) {
+  //     debugPrint('Error capturing image: $e');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: Back(),
+      ),
+      extendBodyBehindAppBar: true,
       body: Stack(
         children: [
           // Camera Preview
@@ -98,86 +104,53 @@ class _CameraScreenState extends State<CameraScreen> {
                 style: TextStyle(color: Colors.white),
               ),
             ),
-
-          // Overlay with frame
-          CustomPaint(
-            size: Size.infinite,
-            painter: CameraOverlayPainter(),
-          ),
-
-          // Top Section
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 20,
-                ),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.black.withValues(alpha: 0.7),
-                      Colors.transparent,
+          Stack(
+            children: [
+              // The painter overlay
+              CustomPaint(
+                size: Size.infinite,
+                painter: CameraOverlayPainter(),
+              ),
+              // Widget above the camera view
+              Positioned(
+                top: 80,
+                left: 0,
+                right: 0,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: [
+                      Text('CAPTURE', style: context.textTheme.headlineMedium),
+                      SizedBox(height: 4),
+                      Text(
+                        'Keep the car within the boundaries of the frame',
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white70,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ],
                   ),
-                ),
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Back(),
-                    ),
-                    Text('CAPTURE', style: context.textTheme.headlineLarge),
-                    SizedBox(height: 4),
-                    Text(
-                      'Keep the car within the boundaries of the frame',
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white70,
-                      ),
-                    ),
-                  ],
                 ),
               ),
-            ),
-          ),
-
-          // Bottom Capture Button
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 24,
-                ),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [
-                      Colors.black.withValues(alpha: 0.7),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
+              // Widget below the camera view
+              Positioned(
+                bottom: 20,
+                left: 0,
+                right: 0,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     GestureDetector(
-                      onTap: _captureImage,
+                      onTap: () {
+                        // TODO: Implement capture functionality
+                      },
                       child: Container(
-                        width: 100,
-                        height: 30,
+                        width: 80,
+                        height: 80,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(45),
+                          shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.white.withValues(alpha: 0.3),
@@ -202,7 +175,7 @@ class _CameraScreenState extends State<CameraScreen> {
                   ],
                 ),
               ),
-            ),
+            ],
           ),
         ],
       ),
