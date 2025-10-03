@@ -1,83 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:loader_overlay/loader_overlay.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../config/router.dart';
-import '../../../core/exception.dart';
-import '../../../core/toastification.dart';
 import '../../../models/auth/user_model.dart';
 import '../../../services/auth/auth_service.dart';
 import '../../../services/auth/user_service.dart';
-import '../../pages/auth/otp_screen.dart';
 
 part 'user_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class UserNotifier extends _$UserNotifier {
   UserModel? _user;
 
   @override
   FutureOr<UserModel?> build() async {
-    _user = await UserService().getUserById(uid: Supabase.instance.client.auth.currentUser?.id);
+    _user = await UserService().getUser();
     return _user;
   }
 
   UserModel? get user => _user;
 
   Future<void> refreshUser() async {
-    _user = await UserService().getUserById(uid: Supabase.instance.client.auth.currentUser?.id);
+    _user = await UserService().getUser();
     state = AsyncValue.data(_user);
   }
 
-  Future<void> login({required BuildContext context, required String email}) async {
-    final ld = context.loaderOverlay;
-    ld.show();
-    try {
-      await AuthService().login(email: email);
-      if (context.mounted) {
-        context.push('/${OtpScreen.name}/${Uri.encodeComponent(email)}?shouldCreateUser=false');
-      }
-      return;
-    } on KException catch (e) {
-      debugPrint('Login error: $e');
-      showErrorMessage(e.message);
-    } finally {
-      ld.hide();
-    }
+  Future<void> login({
+    required BuildContext context,
+    required String email,
+  }) async {
+    await AuthService().login(email: email);
   }
 
-  Future<void> register({required BuildContext context, required String email}) async {
-    final ld = context.loaderOverlay;
-    ld.show();
-    try {
-      await AuthService().register(email: email);
-      if (context.mounted) {
-        context.push('/${OtpScreen.name}/${Uri.encodeComponent(email)}?shouldCreateUser=true');
-      }
-      return;
-    } on KException catch (e) {
-      debugPrint('Register error: $e');
-      showErrorMessage(e.message);
-    } finally {
-      ld.hide();
-    }
+  Future<void> register({
+    required BuildContext context,
+    required String email,
+  }) async {
+    await AuthService().register(email: email);
   }
 
   Future<void> signOut({required BuildContext context}) async {
-    final ld = context.loaderOverlay;
-    ld.show();
-    try {
-      await AuthService().signout();
-      await refreshUser();
-      router.refresh();
-    } on KException catch (e) {
-      debugPrint('Signout error: $e');
-      showErrorMessage(e.message);
-    } finally {
-      ld.hide();
-    }
+    await AuthService().signout();
+    await refreshUser();
   }
 
   Future<void> verifyOtp({
@@ -86,18 +49,14 @@ class UserNotifier extends _$UserNotifier {
     required String token,
     required bool shouldCreateUser,
   }) async {
-    final ld = context.loaderOverlay;
-    ld.show();
-    try {
-      await AuthService().verifyOtp(email: email, token: token, shouldCreateUser: shouldCreateUser);
-      await refreshUser();
-      router.refresh();
-    } on KException catch (e) {
-      debugPrint('Verify OTP error: $e');
-      showErrorMessage(e.message);
-    } finally {
-      ld.hide();
+    await AuthService().verifyOtp(
+      email: email,
+      token: token,
+    );
+    if (shouldCreateUser) {
+      await UserService().createUser();
     }
+    await refreshUser();
   }
 
   Future<void> resendOtp({
@@ -105,30 +64,16 @@ class UserNotifier extends _$UserNotifier {
     required String email,
     required bool shouldCreateUser,
   }) async {
-    final ld = context.loaderOverlay;
-    ld.show();
-    try {
-      await AuthService().resendOtp(email: email, shouldCreateUser: shouldCreateUser);
-      showSuccessMessage('OTP has been resent to your email');
-    } on KException catch (e) {
-      debugPrint('Resend OTP error: $e');
-      showErrorMessage(e.message);
-    } finally {
-      ld.hide();
-    }
+    await AuthService().resendOtp(
+      email: email,
+      shouldCreateUser: shouldCreateUser,
+    );
   }
 
-  Future<void> updateUser({required BuildContext context, required UserModel user}) async {
-    final ld = context.loaderOverlay;
-    ld.show();
-    try {
-      await UserService().update(user: user);
-      await refreshUser();
-    } on KException catch (e) {
-      debugPrint('Update user error: $e');
-      showErrorMessage(e.message);
-    } finally {
-      ld.hide();
-    }
+  Future<void> updateUser({
+    required UserModel user,
+  }) async {
+    await UserService().update(user: user);
+    await refreshUser();
   }
 }

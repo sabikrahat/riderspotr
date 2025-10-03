@@ -7,7 +7,7 @@ import '../../widgets/shared/back.dart';
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
 
-  static const String name = 'camera';
+  static const String routeName = '/camera';
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
@@ -112,7 +112,10 @@ class _CameraScreenState extends State<CameraScreen> {
             right: 0,
             child: SafeArea(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 20,
+                ),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
@@ -133,7 +136,9 @@ class _CameraScreenState extends State<CameraScreen> {
                     SizedBox(height: 4),
                     Text(
                       'Keep the car within the boundaries of the frame',
-                      style: context.textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: Colors.white70,
+                      ),
                     ),
                   ],
                 ),
@@ -148,7 +153,10 @@ class _CameraScreenState extends State<CameraScreen> {
             right: 0,
             child: SafeArea(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 24,
+                ),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
@@ -178,13 +186,18 @@ class _CameraScreenState extends State<CameraScreen> {
                             ),
                           ],
                         ),
-                        child: const Icon(Icons.camera_alt, color: Colors.black),
+                        child: const Icon(
+                          Icons.camera_alt,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
                     Text(
                       'Tap to capture',
-                      style: context.textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: Colors.white70,
+                      ),
                     ),
                   ],
                 ),

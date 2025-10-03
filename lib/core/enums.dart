@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
-import '../presentation/pages/graph/graph_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
 import '../presentation/pages/map/map_screen.dart';
+import '../presentation/pages/graph/graph_screen.dart';
 import '../presentation/pages/profile/profile_screen.dart';
 
 enum KNavItem { home, map, graph, profile }
@@ -30,10 +29,10 @@ extension KDrawerExtension on KNavItem {
   };
 
   String get route => switch (this) {
-    KNavItem.home => HomeScreen.name,
-    KNavItem.map => MapScreen.name,
-    KNavItem.graph => GraphScreen.name,
-    KNavItem.profile => ProfileScreen.name,
+    KNavItem.home => HomeScreen.routeName,
+    KNavItem.map => MapScreen.routeName,
+    KNavItem.graph => GraphScreen.routeName,
+    KNavItem.profile => ProfileScreen.routeName,
   };
 
   bool get isHome => this == KNavItem.home;

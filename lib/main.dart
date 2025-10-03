@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
-import 'package:loader_overlay/loader_overlay.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toastification/toastification.dart';
 
@@ -24,17 +23,12 @@ class Ridespotr extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlobalLoaderOverlay(
-      duration: Durations.medium4,
-      reverseDuration: Durations.medium4,
-      overlayColor: Colors.grey.withValues(alpha: 0.8),
-      child: ToastificationWrapper(
-        child: MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          showSemanticsDebugger: false,
-          theme: theme(context),
-          routerConfig: router,
-        ),
+    return ToastificationWrapper(
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        showSemanticsDebugger: false,
+        theme: theme(context),
+        routerConfig: router,
       ),
     );
   }

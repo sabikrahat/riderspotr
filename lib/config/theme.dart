@@ -100,5 +100,67 @@ ThemeData theme(BuildContext context) {
         textStyle: TextStyle(fontWeight: FontWeight.w500),
       ),
     ),
+
+    // Date picker theme
+    datePickerTheme: DatePickerThemeData(
+      backgroundColor: Colors.grey.shade900,
+      headerBackgroundColor: Colors.grey.shade800,
+      headerForegroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return Colors.black;
+        }
+        return Colors.white;
+      }),
+      dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return Colors.white;
+        }
+        return Colors.transparent;
+      }),
+      yearForegroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return Colors.black;
+        }
+        return Colors.white;
+      }),
+      yearBackgroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return Colors.white;
+        }
+        return Colors.transparent;
+      }),
+      weekdayStyle: TextStyle(
+        color: Colors.white70,
+        fontWeight: FontWeight.w500,
+      ),
+      dayStyle: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.w400,
+      ),
+      yearStyle: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.w400,
+      ),
+      rangeSelectionOverlayColor: WidgetStateProperty.all(
+        Colors.white.withOpacity(0.1),
+      ),
+      rangeSelectionBackgroundColor: Colors.white.withOpacity(0.1),
+      todayForegroundColor: WidgetStateProperty.all(
+        Colors.white,
+      ),
+      todayBackgroundColor: WidgetStateProperty.all(
+        Colors.white.withOpacity(0.1),
+      ),
+      cancelButtonStyle: TextButton.styleFrom(
+        foregroundColor: Colors.white,
+        textStyle: TextStyle(fontWeight: FontWeight.w500),
+      ),
+      confirmButtonStyle: TextButton.styleFrom(
+        foregroundColor: Colors.white,
+        textStyle: TextStyle(fontWeight: FontWeight.w500),
+      ),
+    ),
   );
 }
