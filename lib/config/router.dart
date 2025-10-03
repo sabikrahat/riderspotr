@@ -50,7 +50,7 @@ final router = GoRouter(
       builder: (context, state, child) {
         final path = state.fullPath?.split('/').last.toLowerCase();
         debugPrint('ShellRoute Path: $path');
-        return KScaffold(path: path, body: child);
+        return CustomScaffold(path: path, body: child);
       },
       routes: [
         GoRoute(

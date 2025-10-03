@@ -11,8 +11,8 @@ import '../../pages/auth/your_location_screen.dart';
 import '../../pages/camera/camera_screen.dart';
 import '../../providers/auth/user_provider.dart';
 
-class KScaffold extends ConsumerWidget {
-  const KScaffold({super.key, required this.path, required this.body});
+class CustomScaffold extends ConsumerWidget {
+  const CustomScaffold({super.key, required this.path, required this.body});
 
   final String? path;
   final Widget body;
