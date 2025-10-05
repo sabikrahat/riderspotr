@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/enums.dart';
-import '../pages/camera/camera_screen.dart';
+import 'capture/camera_screen.dart';
 
 class NavScreen extends StatelessWidget {
   const NavScreen({super.key, required this.path, required this.body});

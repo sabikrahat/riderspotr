@@ -1,5 +1,8 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ridespotr/presentation/pages/capture/scan_deatil_screen.dart';
+import 'package:ridespotr/presentation/widgets/capture/scanner.dart';
 import '../../../core/extensions.dart';
 
 import '../../widgets/shared/back.dart';
@@ -58,20 +61,6 @@ class _CameraScreenState extends State<CameraScreen> {
     super.dispose();
   }
 
-  // Future<void> _captureImage() async {
-  //   try {
-  //     await _initializeControllerFuture;
-  //     final image = await _controller!.takePicture();
-
-  //     if (mounted) {
-  //       // Process this XFile as needed
-  //       debugPrint('Image captured: ${image.path}');
-  //     }
-  //   } catch (e) {
-  //     debugPrint('Error capturing image: $e');
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,36 +95,39 @@ class _CameraScreenState extends State<CameraScreen> {
             ),
           Stack(
             children: [
-              // The painter overlay
-              CustomPaint(
-                size: Size.infinite,
-                painter: CameraOverlayPainter(),
-              ),
-              // Widget above the camera view
+              Scanner(),
               Positioned(
-                top: 80,
-                left: 0,
-                right: 0,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    children: [
-                      Text('CAPTURE', style: context.textTheme.headlineMedium),
-                      SizedBox(height: 4),
-                      Text(
-                        'Keep the car within the boundaries of the frame',
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          color: Colors.white70,
+                child: SizedBox(
+                  height: context.height * 0.225,
+                  width: context.width,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 24,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          'CAPTURE',
+                          style: context.textTheme.headlineMedium,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                        SizedBox(height: 8),
+                        Text(
+                          'Keep the car within the boundaries of the frame',
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            color: Colors.white70,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
               // Widget below the camera view
               Positioned(
-                bottom: 20,
+                top: context.height * 0.775 + 24,
                 left: 0,
                 right: 0,
                 child: Column(
@@ -143,7 +135,7 @@ class _CameraScreenState extends State<CameraScreen> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        // TODO: Implement capture functionality
+                        context.push(ScanDeatilScreen.routeName);
                       },
                       child: Container(
                         width: 80,
@@ -181,62 +173,4 @@ class _CameraScreenState extends State<CameraScreen> {
       ),
     );
   }
-}
-
-class CameraOverlayPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.5)
-      ..style = PaintingStyle.fill;
-
-    final framePaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.3)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-
-    // Frame dimensions
-    final frameWidth = size.width * 0.85;
-    final frameHeight = size.height * 0.55;
-    final frameLeft = (size.width - frameWidth) / 2;
-    final frameTop = (size.height - frameHeight) / 2;
-
-    final frameRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(frameLeft, frameTop, frameWidth, frameHeight),
-      const Radius.circular(30),
-    );
-
-    // Draw dark overlay outside the frame
-    final path = Path()
-      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..addRRect(frameRect)
-      ..fillType = PathFillType.evenOdd;
-
-    canvas.drawPath(path, paint);
-
-    // Draw frame border
-    canvas.drawRRect(frameRect, framePaint);
-
-    // Draw center circle guide
-    final centerX = size.width / 2;
-    final centerY = size.height / 2;
-    final circleRadius = 60.0;
-
-    final circlePaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.4)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-
-    canvas.drawCircle(Offset(centerX, centerY), circleRadius, circlePaint);
-
-    // Draw center dot
-    final dotPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(Offset(centerX, centerY), 6, dotPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

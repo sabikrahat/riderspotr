@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ridespotr/presentation/pages/auth/about_you_screen.dart';
 import 'package:ridespotr/presentation/pages/auth/your_experience_screen.dart';
 import 'package:ridespotr/presentation/pages/auth/your_location_screen.dart';
+import 'package:ridespotr/presentation/pages/capture/scan_deatil_screen.dart';
 import 'package:ridespotr/presentation/pages/nav_screen.dart';
 import 'package:ridespotr/services/auth/user_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -11,7 +12,7 @@ import '../presentation/pages/auth/login_screen.dart';
 import '../presentation/pages/auth/otp_screen.dart';
 import '../presentation/pages/auth/register_screen.dart';
 import '../presentation/pages/auth/welcome_screen.dart';
-import '../presentation/pages/camera/camera_screen.dart';
+import '../presentation/pages/capture/camera_screen.dart';
 import '../presentation/pages/graph/graph_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
 import '../presentation/pages/map/map_screen.dart';
@@ -75,6 +76,7 @@ final router = GoRouter(
       // redirect: authHandler,
       builder: (_, _) => YourLocationScreen(),
     ),
+
     ShellRoute(
       redirect: authHandler,
       builder: (context, state, child) {
@@ -104,6 +106,11 @@ final router = GoRouter(
       path: CameraScreen.routeName,
       redirect: authHandler,
       builder: (_, _) => CameraScreen(),
+    ),
+    GoRoute(
+      path: ScanDeatilScreen.routeName,
+      redirect: authHandler,
+      builder: (_, _) => ScanDeatilScreen(),
     ),
   ],
 );
