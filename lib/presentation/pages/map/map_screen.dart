@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class MapScreen extends StatelessWidget {
   const MapScreen({super.key});
 
-  static const String name = 'map';
+  static const String routeName = '/map';
 
   @override
   Widget build(BuildContext context) {

@@ -12,7 +12,7 @@ import 'register_screen.dart';
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
-  static const String name = 'welcome';
+  static const String routeName = '/welcome';
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,11 @@ class WelcomeScreen extends StatelessWidget {
               height: context.height * 0.5,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.transparent, Colors.black.withValues(alpha: 0.5), Colors.black],
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.5),
+                    Colors.black,
+                  ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -44,7 +48,7 @@ class WelcomeScreen extends StatelessWidget {
                     Gap(16),
                     LongButton(
                       text: 'Continue',
-                      onPressed: () => context.pushNamed(RegisterScreen.name),
+                      onPressed: () => context.push(RegisterScreen.routeName),
                     ),
                     Gap(16),
                   ],
@@ -52,13 +56,6 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
           ),
-          // Logo(),
-          // Text('WELCOME TO RIDESPOTR', style: context.textTheme.headlineSmall),
-          // Text("This is a simple app that allows you to find rides in your area."),
-          // TextFormField(decoration: InputDecoration(labelText: 'Email')),
-          // LongButton(text: 'Continue'),
-          // Back(),
-          // DropdownTextfield(),
         ],
       ),
     );

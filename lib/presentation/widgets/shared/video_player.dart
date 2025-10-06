@@ -22,6 +22,7 @@ class _ShowVideoState extends State<ShowVideo> {
             videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
           )
           ..initialize().then((_) {
+            _videoPlayerController.setVolume(0);
             _videoPlayerController.setLooping(false);
             _videoPlayerController.play();
             if (mounted) setState(() {});
@@ -36,7 +37,10 @@ class _ShowVideoState extends State<ShowVideo> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_videoPlayerController.value.isInitialized) return const SizedBox.shrink();
+    if (!_videoPlayerController.value.isInitialized) {
+      return const SizedBox.shrink();
+    }
+
     return SizedBox.expand(
       child: ClipRRect(
         child: FittedBox(

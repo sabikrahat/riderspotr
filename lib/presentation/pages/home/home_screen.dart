@@ -49,7 +49,7 @@ import '../../providers/auth/user_provider.dart';
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  static const String name = 'home';
+  static const String routeName = '/home';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
