@@ -160,9 +160,7 @@ class _CameraScreenState extends State<CameraScreen> {
                     const SizedBox(height: 12),
                     Text(
                       'Tap to capture',
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white70,
-                      ),
+                      style: context.textTheme.bodyMedium?.copyWith(color: Colors.white70),
                     ),
                   ],
                 ),
