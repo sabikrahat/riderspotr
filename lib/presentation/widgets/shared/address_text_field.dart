@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
 import '../../../core/extensions.dart';
 import '../../../models/google_maps/map_prediction_model.dart';
 import 'custom_text_field.dart';

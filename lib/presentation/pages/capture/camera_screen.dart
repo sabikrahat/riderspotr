@@ -1,11 +1,11 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'scan_deatil_screen.dart';
-import '../../widgets/capture/scanner.dart';
-import '../../../core/extensions.dart';
 
+import '../../../core/extensions.dart';
+import '../../widgets/capture/scanner.dart';
 import '../../widgets/shared/back.dart';
+import 'scan_deatil_screen.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});

@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/exception.dart';
-import '../../../core/toastification.dart';
-import 'login_screen.dart';
-import 'your_experience_screen.dart';
-import '../../widgets/shared/loading_overlay.dart';
 
+import '../../../core/exception.dart';
 import '../../../core/extensions.dart';
+import '../../../core/toastification.dart';
 import '../../providers/auth/user_provider.dart';
 import '../../widgets/shared/back.dart';
+import '../../widgets/shared/custom_text_field.dart';
+import '../../widgets/shared/loading_overlay.dart';
 import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
-import '../../widgets/shared/custom_text_field.dart';
+import 'login_screen.dart';
+import 'your_experience_screen.dart';
 
 class AboutYouScreen extends ConsumerStatefulWidget {
   static const String routeName = '/about-you';
