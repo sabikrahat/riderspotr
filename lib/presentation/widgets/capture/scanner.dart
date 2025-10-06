@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ridespotr/core/extensions.dart';
+import '../../../core/extensions.dart';
 
 class Scanner extends StatefulWidget {
   const Scanner({super.key});

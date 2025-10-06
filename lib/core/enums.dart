@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
+import '../presentation/pages/graph/graph_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
 import '../presentation/pages/map/map_screen.dart';
-import '../presentation/pages/graph/graph_screen.dart';
 import '../presentation/pages/profile/profile_screen.dart';
 
 enum KNavItem { home, map, graph, profile }

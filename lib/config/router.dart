@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridespotr/presentation/pages/auth/about_you_screen.dart';
-import 'package:ridespotr/presentation/pages/auth/your_experience_screen.dart';
-import 'package:ridespotr/presentation/pages/auth/your_location_screen.dart';
-import 'package:ridespotr/presentation/pages/capture/scan_deatil_screen.dart';
-import 'package:ridespotr/presentation/pages/nav_screen.dart';
-import 'package:ridespotr/services/auth/user_service.dart';
+import '../presentation/pages/auth/about_you_screen.dart';
+import '../presentation/pages/auth/your_experience_screen.dart';
+import '../presentation/pages/auth/your_location_screen.dart';
+import '../presentation/pages/capture/scan_deatil_screen.dart';
+import '../presentation/pages/nav_screen.dart';
+import '../services/auth/user_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../presentation/pages/auth/login_screen.dart';

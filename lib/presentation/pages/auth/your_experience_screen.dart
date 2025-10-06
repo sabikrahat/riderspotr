@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridespotr/core/exception.dart';
-import 'package:ridespotr/presentation/pages/auth/your_location_screen.dart';
-import 'package:ridespotr/presentation/widgets/shared/loading_overlay.dart';
+import '../../../core/exception.dart';
+import 'your_location_screen.dart';
+import '../../widgets/shared/loading_overlay.dart';
 
 import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';

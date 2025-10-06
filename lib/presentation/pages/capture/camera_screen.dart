@@ -1,8 +1,8 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridespotr/presentation/pages/capture/scan_deatil_screen.dart';
-import 'package:ridespotr/presentation/widgets/capture/scanner.dart';
+import 'scan_deatil_screen.dart';
+import '../../widgets/capture/scanner.dart';
 import '../../../core/extensions.dart';
 
 import '../../widgets/shared/back.dart';

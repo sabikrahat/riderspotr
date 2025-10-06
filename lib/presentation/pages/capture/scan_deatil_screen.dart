@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:ridespotr/core/extensions.dart';
-import 'package:ridespotr/presentation/widgets/capture/scan_detail_container.dart';
-import 'package:ridespotr/presentation/widgets/shared/back.dart';
-import 'package:ridespotr/presentation/widgets/shared/page_padding.dart';
+import '../../../core/extensions.dart';
+import '../../widgets/capture/scan_detail_container.dart';
+import '../../widgets/shared/back.dart';
+import '../../widgets/shared/page_padding.dart';
 
 class ScanDeatilScreen extends StatelessWidget {
   static const String routeName = '/scan-detail';
@@ -25,7 +25,7 @@ class ScanDeatilScreen extends StatelessWidget {
           SizedBox(
             width: context.width,
             height: context.height,
-            child: Image.asset('assets/demo.png', fit: BoxFit.cover),
+            child: Image.asset('assets/images/demo.png', fit: BoxFit.cover),
           ),
           // Title and rarity
           Positioned(
@@ -163,12 +163,15 @@ class ScanDeatilScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: LinearProgressIndicator(
-                          value: 0.4,
-                          backgroundColor: Colors.grey.withValues(alpha: 0.3),
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.purpleAccent),
-                          minHeight: 5,
+                        child: ClipRRect(
                           borderRadius: BorderRadius.circular(45),
+                          child: LinearProgressIndicator(
+                            value: 0.4,
+                            backgroundColor: Colors.grey.withValues(alpha: 0.3),
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.purpleAccent),
+                            minHeight: 5,
+                            borderRadius: BorderRadius.circular(45),
+                          ),
                         ),
                       ),
                       Spacer(),
