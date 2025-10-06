@@ -33,17 +33,11 @@ class NavScreen extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         body: body,
-        bottomNavigationBar: KBottomNavbar(
-          selectedNavItem: _getSelectedNavItem(path),
-        ),
+        bottomNavigationBar: KBottomNavbar(selectedNavItem: _getSelectedNavItem(path)),
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.grey.shade900,
           shape: const CircleBorder(),
-          child: const Icon(
-            Icons.camera,
-            size: 40,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.camera, size: 40, color: Colors.white),
           onPressed: () => context.push(CameraScreen.routeName),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -75,7 +69,7 @@ class KBottomNavbar extends StatelessWidget {
         safeAreaValues: const SafeAreaValues(bottom: false),
         onTap: (i) async {
           if (idx == i) return;
-          context.goNamed(KNavItem.values[i].route);
+          context.go(KNavItem.values[i].route);
         },
       ),
     );

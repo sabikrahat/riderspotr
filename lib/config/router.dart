@@ -76,7 +76,6 @@ final router = GoRouter(
       // redirect: authHandler,
       builder: (_, _) => YourLocationScreen(),
     ),
-
     ShellRoute(
       redirect: authHandler,
       builder: (context, state, child) {
