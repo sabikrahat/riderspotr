@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:ridespotr/core/extensions.dart';
 import 'package:ridespotr/presentation/widgets/capture/scan_detail_container.dart';
@@ -59,7 +57,7 @@ class ScanDeatilScreen extends StatelessWidget {
                           border: Border.all(color: Colors.purpleAccent),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.purpleAccent.withOpacity(0.25),
+                              color: Colors.purpleAccent.withValues(alpha: 0.25),
                               blurRadius: 10,
                               spreadRadius: 2,
                             ),
@@ -138,12 +136,11 @@ class ScanDeatilScreen extends StatelessWidget {
                               icon: Icon(Icons.check),
                               label: Text(
                                 'CLAIM',
-                                style: context.textTheme.headlineSmall
-                                    ?.copyWith(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                style: context.textTheme.headlineSmall?.copyWith(
+                                  fontSize: 14,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),

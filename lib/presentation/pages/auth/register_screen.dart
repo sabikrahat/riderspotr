@@ -94,6 +94,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                         context: context,
                                         email: _emailController.text,
                                       );
+                                      if (!context.mounted) return;
                                       context.push(
                                         OtpScreen.routeName,
                                         extra: OtpScreenParams(
@@ -145,8 +146,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             ],
                             color: Colors.transparent,
                             decoration: TextDecoration.underline,
-                            decorationColor:
-                                context.textTheme.bodySmall!.color!,
+                            decorationColor: context.textTheme.bodySmall!.color!,
                             decorationThickness: 1,
                             decorationStyle: TextDecorationStyle.solid,
                           ),

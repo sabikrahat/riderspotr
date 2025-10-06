@@ -93,6 +93,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         context: context,
                                         email: _emailController.text,
                                       );
+                                      if (!context.mounted) return;
                                       context.push(
                                         OtpScreen.routeName,
                                         extra: OtpScreenParams(
@@ -139,8 +140,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ],
                             color: Colors.transparent,
                             decoration: TextDecoration.underline,
-                            decorationColor:
-                                context.textTheme.bodySmall!.color!,
+                            decorationColor: context.textTheme.bodySmall!.color!,
                             decorationThickness: 1,
                             decorationStyle: TextDecorationStyle.solid,
                           ),
