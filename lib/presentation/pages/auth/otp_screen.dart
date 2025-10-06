@@ -4,16 +4,16 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pinput/pinput.dart';
-import '../../../core/exception.dart';
-import '../../../core/toastification.dart';
-import 'about_you_screen.dart';
-import '../../widgets/shared/loading_overlay.dart';
 
+import '../../../core/exception.dart';
 import '../../../core/extensions.dart';
+import '../../../core/toastification.dart';
 import '../../providers/auth/user_provider.dart';
 import '../../widgets/shared/back.dart';
+import '../../widgets/shared/loading_overlay.dart';
 import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
+import 'about_you_screen.dart';
 
 class OtpScreenParams {
   final String email;

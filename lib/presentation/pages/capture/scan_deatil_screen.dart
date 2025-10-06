@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../../core/extensions.dart';
 import '../../widgets/capture/scan_detail_container.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/page_padding.dart';
+import 'car_deatil_screen.dart';
 
 class ScanDeatilScreen extends StatelessWidget {
   static const String routeName = '/scan-detail';
@@ -200,7 +203,9 @@ class ScanDeatilScreen extends StatelessWidget {
                                   fixedSize: WidgetStatePropertyAll(Size(double.infinity, 40)),
                                   foregroundColor: WidgetStatePropertyAll(Colors.white),
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  context.push(CarDeatilScreen.routeName);
+                                },
                                 icon: Icon(Icons.check),
                                 label: Text(
                                   'CLAIM',

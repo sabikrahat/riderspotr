@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../presentation/pages/capture/car_deatil_screen.dart';
 import '../presentation/pages/auth/about_you_screen.dart';
 import '../presentation/pages/auth/your_experience_screen.dart';
 import '../presentation/pages/auth/your_location_screen.dart';
@@ -110,6 +111,11 @@ final router = GoRouter(
       path: ScanDeatilScreen.routeName,
       redirect: authHandler,
       builder: (_, _) => ScanDeatilScreen(),
+    ),
+    GoRoute(
+      path: CarDeatilScreen.routeName,
+      redirect: authHandler,
+      builder: (_, _) => CarDeatilScreen(),
     ),
   ],
 );

@@ -3,20 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 import '../../../core/exception.dart';
+import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
 import '../../../models/auth/user_model.dart';
-import '../home/home_screen.dart';
-import '../../widgets/shared/loading_overlay.dart';
-
-import '../../../core/extensions.dart';
+import '../../../models/google_maps/map_prediction_model.dart';
+import '../../../services/google_maps/google_maps_service.dart';
 import '../../providers/auth/user_provider.dart';
+import '../../widgets/shared/address_text_field.dart';
 import '../../widgets/shared/back.dart';
+import '../../widgets/shared/loading_overlay.dart';
 import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
-import '../../widgets/shared/address_text_field.dart';
-import '../../../services/google_maps/google_maps_service.dart';
-import '../../../models/google_maps/map_prediction_model.dart';
+import '../home/home_screen.dart';
 
 class YourLocationScreen extends ConsumerStatefulWidget {
   static const String routeName = '/your-location';
