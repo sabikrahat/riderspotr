@@ -55,10 +55,26 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(userProvider);
     final notifier = ref.read(userProvider.notifier);
+    final size = MediaQuery.sizeOf(context);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Container(
+            width: size.width,
+            height: size.height * 0.7,
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/images/map-preview.png"),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Text(
+              'Profile Complete',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
           Text('Welcome to the Home Screen!'),
           Gap(16),
           ElevatedButton(
