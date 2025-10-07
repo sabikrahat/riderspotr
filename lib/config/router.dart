@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../presentation/pages/capture/car_deatil_screen.dart';
-import '../presentation/pages/auth/about_you_screen.dart';
-import '../presentation/pages/auth/your_experience_screen.dart';
-import '../presentation/pages/auth/your_location_screen.dart';
-import '../presentation/pages/capture/scan_deatil_screen.dart';
-import '../presentation/pages/nav_screen.dart';
-import '../services/auth/user_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../presentation/pages/auth/about_you_screen.dart';
 import '../presentation/pages/auth/login_screen.dart';
 import '../presentation/pages/auth/otp_screen.dart';
 import '../presentation/pages/auth/register_screen.dart';
 import '../presentation/pages/auth/welcome_screen.dart';
+import '../presentation/pages/auth/your_experience_screen.dart';
+import '../presentation/pages/auth/your_location_screen.dart';
 import '../presentation/pages/capture/camera_screen.dart';
+import '../presentation/pages/capture/car_deatil_screen.dart';
+import '../presentation/pages/capture/scan_deatil_screen.dart';
 import '../presentation/pages/graph/graph_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
 import '../presentation/pages/map/map_screen.dart';
+import '../presentation/pages/nav_screen.dart';
 import '../presentation/pages/profile/profile_screen.dart';
+import '../services/auth/user_service.dart';
 
 Future<String?> authHandler(BuildContext context, GoRouterState state) async {
   // final currentPath = state.matchedLocation;

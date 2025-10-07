@@ -22,6 +22,19 @@ class _CarDeatilScreenState extends State<CarDeatilScreen> with TickerProviderSt
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this, initialIndex: selectedIndex);
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging || _tabController.index != selectedIndex) {
+        setState(() {
+          selectedIndex = _tabController.index;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
