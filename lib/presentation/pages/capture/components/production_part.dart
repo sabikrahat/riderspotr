@@ -67,7 +67,6 @@ class ProductionPart extends StatelessWidget {
             ),
           ),
           Gap(16),
-          // TODO: Replace with actual design
           // SizedBox(
           //   height: 200,
           //   child: Center(
