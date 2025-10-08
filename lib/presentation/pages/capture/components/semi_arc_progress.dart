@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 /// Semi-circular progress bar with two arrow markers (MSRP=blue, Current=white)

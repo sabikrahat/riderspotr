@@ -12,8 +12,7 @@ class Location {
     required this.longitude,
   });
 
-  factory Location.fromJson(Map<String, dynamic> json) =>
-      _$LocationFromJson(json);
+  factory Location.fromJson(Map<String, dynamic> json) => _$LocationFromJson(json);
 
   Map<String, dynamic> toJson() => _$LocationToJson(this);
 }
@@ -26,6 +25,7 @@ class UserModel {
   String? lastName;
   String? username;
   DateTime? dob;
+  String? measurement;
   String? knowledgeLevel;
   String? experience;
   String? address;
@@ -39,6 +39,7 @@ class UserModel {
     this.lastName,
     this.username,
     this.dob,
+    this.measurement,
     this.knowledgeLevel,
     this.experience,
     this.address,
@@ -46,8 +47,7 @@ class UserModel {
     required this.createdAt,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) =>
-      _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserModelToJson(this);
 
@@ -62,6 +62,7 @@ class UserModel {
     String? lastName,
     String? username,
     DateTime? dob,
+    String? measurement,
     String? knowledgeLevel,
     String? experience,
     String? address,
@@ -73,6 +74,7 @@ class UserModel {
     lastName: lastName ?? this.lastName,
     username: username ?? this.username,
     dob: dob ?? this.dob,
+    measurement: measurement ?? this.measurement,
     knowledgeLevel: knowledgeLevel ?? this.knowledgeLevel,
     experience: experience ?? this.experience,
     location: location ?? this.location,

@@ -46,3 +46,12 @@ extension KDrawerExtension on KNavItem {
   bool get isNotGraph => !isGraph;
   bool get isNotProfile => !isProfile;
 }
+
+enum Measurement { metric, imperial }
+
+extension MeasurementUnitExtension on Measurement {
+  String get title => switch (this) {
+    Measurement.metric => 'Metric',
+    Measurement.imperial => 'Imperial',
+  };
+}

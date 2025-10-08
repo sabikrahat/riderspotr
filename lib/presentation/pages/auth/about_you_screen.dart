@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/enums.dart';
 import '../../../core/exception.dart';
 import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
 import '../../providers/auth/user_provider.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/custom_text_field.dart';
+import '../../widgets/shared/dropdown_textfield.dart';
 import '../../widgets/shared/loading_overlay.dart';
 import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
@@ -30,6 +32,7 @@ class _AboutYouScreenState extends ConsumerState<AboutYouScreen> {
   final _usernameController = TextEditingController();
   final _dobController = TextEditingController();
   DateTime? _dateOfBirth;
+  String? _measurement;
 
   bool isLoading = false;
 
@@ -144,6 +147,17 @@ class _AboutYouScreenState extends ConsumerState<AboutYouScreen> {
                             return null;
                           },
                         ),
+                        Gap(8),
+                        DropdownTextfield(
+                          labelText: 'Measurement',
+                          items: Measurement.values.map((e) => e.title).toList(),
+                          onChanged: (val) => setState(() {
+                            final idx = Measurement.values.indexWhere(
+                              (element) => element.title == val,
+                            );
+                            _measurement = idx != -1 ? Measurement.values[idx].name : null;
+                          }),
+                        ),
                         Gap(24),
                         LongButton(
                           text: 'Continue',
@@ -159,6 +173,7 @@ class _AboutYouScreenState extends ConsumerState<AboutYouScreen> {
                                     lastName: _lastNameController.text.trim(),
                                     username: _usernameController.text.trim(),
                                     dob: _dateOfBirth!,
+                                    measurement: _measurement!,
                                   ),
                                 );
                                 if (context.mounted) {
