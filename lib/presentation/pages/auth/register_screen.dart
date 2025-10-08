@@ -51,10 +51,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         body: Stack(
           children: [
             Image.asset(
-              'assets/onboarding/register.png',
+              'assets/carbon/49.jpg',
               fit: BoxFit.cover,
               width: double.infinity,
-              height: context.height * 0.36,
+              height: context.height * 0.5,
             ),
             PagePadding(
               child: Column(
@@ -146,7 +146,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             ],
                             color: Colors.transparent,
                             decoration: TextDecoration.underline,
-                            decorationColor: context.textTheme.bodySmall!.color!,
+                            decorationColor:
+                                context.textTheme.bodySmall!.color!,
                             decorationThickness: 1,
                             decorationStyle: TextDecorationStyle.solid,
                           ),

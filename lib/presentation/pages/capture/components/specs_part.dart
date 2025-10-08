@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:ridespotr/presentation/pages/capture/components/performance_gauge.dart';
 
 import '../../../../core/extensions.dart';
 
@@ -13,21 +14,22 @@ class SpecsPart extends StatelessWidget {
       child: Column(
         children: [
           Gap(8),
+          PerformanceGaugeWidget(),
           // TODO: Replace with actual design
-          SizedBox(
-            height: 200,
-            child: Center(
-              child: Text(
-                'Speed Meter Type Design Coming Soon!',
-                style: context.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Colors.grey,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ),
-          ),
+          // SizedBox(
+          //   height: 200,
+          //   child: Center(
+          //     child: Text(
+          //       'Speed Meter Type Design Coming Soon!',
+          //       style: context.textTheme.bodyMedium?.copyWith(
+          //         fontWeight: FontWeight.bold,
+          //         fontSize: 16,
+          //         color: Colors.grey,
+          //         fontStyle: FontStyle.italic,
+          //       ),
+          //     ),
+          //   ),
+          // ),
           // PerformanceGaugeWidget(
           //   accel1: 2.8,
           //   accel2: 2.8,

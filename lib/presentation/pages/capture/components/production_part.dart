@@ -67,20 +67,6 @@ class ProductionPart extends StatelessWidget {
             ),
           ),
           Gap(16),
-          // SizedBox(
-          //   height: 200,
-          //   child: Center(
-          //     child: Text(
-          //       'Speed Meter Type Design Coming Soon!',
-          //       style: context.textTheme.bodyMedium?.copyWith(
-          //         fontWeight: FontWeight.bold,
-          //         fontSize: 16,
-          //         color: Colors.grey,
-          //         fontStyle: FontStyle.italic,
-          //       ),
-          //     ),
-          //   ),
-          // ),
           Stack(
             children: [
               ArcProgressBar(
@@ -143,11 +129,17 @@ class ProductionPart extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: ProductionCard(title: 'TOTAL PRODUCED', subtitle: '500'),
+                child: ProductionCard(
+                  title: 'TOTAL PRODUCED',
+                  subtitle: '500',
+                ),
               ),
               Gap(16),
               Expanded(
-                child: ProductionCard(title: 'EST. IN CIRCULATION', subtitle: '300'),
+                child: ProductionCard(
+                  title: 'EST. IN CIRCULATION',
+                  subtitle: '300',
+                ),
               ),
             ],
           ),
@@ -220,7 +212,7 @@ class ProductionCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey.shade300, width: 0.8),
+        border: Border.all(color: Colors.grey.shade900, width: 0.8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
