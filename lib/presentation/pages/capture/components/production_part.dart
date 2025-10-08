@@ -1,3 +1,4 @@
+import 'package:arc_progress_bar_new/arc_progress_bar_new.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
@@ -65,35 +66,81 @@ class ProductionPart extends StatelessWidget {
               fontSize: 14,
             ),
           ),
+          Gap(16),
           // TODO: Replace with actual design
-          SizedBox(
-            height: 200,
-            child: Center(
-              child: Text(
-                'Speed Meter Type Design Coming Soon!',
-                style: context.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Colors.grey,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ),
-          ),
-          // TweenAnimationBuilder<double>(
-          //   tween: Tween(begin: 0, end: 0.82),
-          //   duration: const Duration(milliseconds: 900),
-          //   builder: (_, value, __) => ArcProgressBar(
-          //     progress: value, // length of blue arc (0..1)
-          //     msrp: 0.76, // blue pointer position (0..1)
-          //     current: 0.84, // white pointer position (0..1)
-          //     size: const Size(420, 220),
-          //     bgColor: Colors.grey,
-          //     primary: Colors.red,
-          //     secondary: Colors.green,
-          //     stroke: 4,
+          // SizedBox(
+          //   height: 200,
+          //   child: Center(
+          //     child: Text(
+          //       'Speed Meter Type Design Coming Soon!',
+          //       style: context.textTheme.bodyMedium?.copyWith(
+          //         fontWeight: FontWeight.bold,
+          //         fontSize: 16,
+          //         color: Colors.grey,
+          //         fontStyle: FontStyle.italic,
+          //       ),
+          //     ),
           //   ),
           // ),
+          Stack(
+            children: [
+              ArcProgressBar(
+                percentage: 85,
+                backgroundColor: Colors.grey.shade800,
+                foregroundColor: Colors.white,
+                arcThickness: 5,
+                handleSize: 20,
+                centerWidget: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '\$',
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 35,
+                      ),
+                    ),
+                    Gap(12),
+                    Text(
+                      'EST. Value',
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Gap(12),
+                    Text(
+                      '\$1,200,000 - \$2,000,000',
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ArcProgressBar(
+                percentage: 70,
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.blue,
+                arcThickness: 5,
+                handleSize: 20,
+              ),
+            ],
+          ),
+          // TweenAnimationBuilder<double>(
+          //   tween: Tween(begin: 0.0, end: 1.0),
+          //   duration: const Duration(milliseconds: 1500),
+          //   curve: Curves.easeOutCubic,
+          //   builder: (_, value, __) => ArcProgressBar(
+          //     progress: value, // Animated progress (0.0 to 1.0)
+          //     msrp: 0.65, // MSRP marker at ~65%
+          //     current: 0.85, // Current marker at ~85%
+          //     size: const Size(380, 200),
+          //     stroke: 5.0,
+          //   ),
+          // ),
+          Gap(16),
           Row(
             children: [
               Expanded(

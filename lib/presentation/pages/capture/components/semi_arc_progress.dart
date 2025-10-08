@@ -1,174 +1,219 @@
-import 'dart:math';
+// import 'dart:math';
+// import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
+// /// Semi-circular arc progress bar with dual value indicators (MSRP & Current)
+// class ArcProgressBar extends StatelessWidget {
+//   const ArcProgressBar({
+//     super.key,
+//     required this.progress,
+//     required this.msrp,
+//     required this.current,
+//     this.size = const Size(420, 220),
+//     this.stroke = 4.0,
+//     this.bgColor = const Color(0xFF2A2D35),
+//     this.primary = const Color(0xFF3B82F6),
+//     this.secondary = const Color(0xFF60A5FA),
+//   });
 
-/// Semi-circular progress bar with two arrow markers (MSRP=blue, Current=white)
-class ArcProgressBar extends StatelessWidget {
-  const ArcProgressBar({
-    super.key,
-    required this.progress, // 0..1
-    required this.msrp, // 0..1
-    required this.current, // 0..1
-    this.size = const Size(420, 220),
-    this.stroke = 10,
-    this.bgColor = const Color(0xFF5A5E66),
-    this.primary = const Color(0xFF3B82F6),
-    this.secondary = const Color(0xFF93C5FD),
-    this.tickColor = const Color(0xFF8C8F96),
-  });
+//   final double progress; // Animated progress value (0.0 to 1.0)
+//   final double msrp; // MSRP marker position (0.0 to 1.0)
+//   final double current; // Current value marker position (0.0 to 1.0)
+//   final Size size;
+//   final double stroke;
+//   final Color bgColor;
+//   final Color primary;
+//   final Color secondary;
 
-  final double progress;
-  final double msrp;
-  final double current;
+//   @override
+//   Widget build(BuildContext context) {
+//     return CustomPaint(
+//       size: size,
+//       painter: _ArcProgressPainter(
+//         progress: progress.clamp(0.0, 1.0),
+//         msrp: msrp.clamp(0.0, 1.0),
+//         current: current.clamp(0.0, 1.0),
+//         stroke: stroke,
+//         bgColor: bgColor,
+//         primary: primary,
+//         secondary: secondary,
+//       ),
+//     );
+//   }
+// }
 
-  final Size size;
-  final double stroke;
-  final Color bgColor;
-  final Color primary;
-  final Color secondary;
-  final Color tickColor;
+// class _ArcProgressPainter extends CustomPainter {
+//   _ArcProgressPainter({
+//     required this.progress,
+//     required this.msrp,
+//     required this.current,
+//     required this.stroke,
+//     required this.bgColor,
+//     required this.primary,
+//     required this.secondary,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: size,
-      painter: _ArcPainter(
-        progress: progress.clamp(0, 1),
-        msrp: msrp.clamp(0, 1),
-        current: current.clamp(0, 1),
-        stroke: stroke,
-        bgColor: bgColor,
-        primary: primary,
-        secondary: secondary,
-        tickColor: tickColor,
-      ),
-    );
-  }
-}
+//   final double progress;
+//   final double msrp;
+//   final double current;
+//   final double stroke;
+//   final Color bgColor;
+//   final Color primary;
+//   final Color secondary;
 
-class _ArcPainter extends CustomPainter {
-  _ArcPainter({
-    required this.progress,
-    required this.msrp,
-    required this.current,
-    required this.stroke,
-    required this.bgColor,
-    required this.primary,
-    required this.secondary,
-    required this.tickColor,
-  });
+//   // Arc starts at left (π) and sweeps π radians (180°)
+//   static const double _startAngle = pi;
+//   static const double _sweepAngle = pi;
 
-  final double progress;
-  final double msrp;
-  final double current;
-  final double stroke;
-  final Color bgColor;
-  final Color primary;
-  final Color secondary;
-  final Color tickColor;
+//   @override
+//   void paint(Canvas canvas, Size size) {
+//     final center = Offset(size.width / 2, size.height);
+//     final radius = min(size.width / 2, size.height) * 0.9;
+//     final rect = Rect.fromCircle(center: center, radius: radius);
 
-  // Half circle: start on the left (π) and sweep 180°
-  static const double _start = pi;
-  static const double _sweep = pi;
+//     // 1. Draw background arc (gray) - full semicircle
+//     final bgPaint = Paint()
+//       ..style = PaintingStyle.stroke
+//       ..strokeWidth = stroke
+//       ..strokeCap = StrokeCap.round
+//       ..color = bgColor;
+//     canvas.drawArc(rect, _startAngle, _sweepAngle, false, bgPaint);
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Put the circle's center at bottom middle so we draw a semi-arc above it
-    final center = Offset(size.width / 2, size.height);
-    final radius = min(size.width, size.height * 2) * 0.45;
-    final rect = Rect.fromCircle(center: center, radius: radius);
+//     // 2. Draw MSRP segment (darker blue) - from 0 to msrp
+//     final animatedMsrp = msrp * progress;
+//     if (animatedMsrp > 0) {
+//       final msrpPaint = Paint()
+//         ..style = PaintingStyle.stroke
+//         ..strokeWidth = stroke
+//         ..strokeCap = StrokeCap.round
+//         ..color = primary;
 
-    // 1) Full base arc (grey background)
-    final base = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = stroke
-      ..color = bgColor;
-    canvas.drawArc(rect, _start, _sweep, false, base);
+//       canvas.drawArc(
+//         rect,
+//         _startAngle,
+//         _sweepAngle * animatedMsrp,
+//         false,
+//         msrpPaint,
+//       );
+//     }
 
-    // 2) Primary progress (from start to msrp)
-    if (msrp > 0) {
-      final primaryPaint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeWidth = stroke
-        ..color = primary;
-      canvas.drawArc(rect, _start, _sweep * msrp, false, primaryPaint);
-    }
+//     // 3. Draw Current segment (lighter blue) - from msrp to current
+//     final animatedCurrent = current * progress;
+//     if (animatedCurrent > animatedMsrp) {
+//       final currentPaint = Paint()
+//         ..style = PaintingStyle.stroke
+//         ..strokeWidth = stroke
+//         ..strokeCap = StrokeCap.round
+//         ..color = secondary;
 
-    // 3) Secondary progress (from msrp to current)
-    if (current > msrp) {
-      final secondaryPaint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeWidth = stroke
-        ..color = secondary;
-      canvas.drawArc(
-        rect,
-        _start + _sweep * msrp,
-        _sweep * (current - msrp),
-        false,
-        secondaryPaint,
-      );
-    }
+//       canvas.drawArc(
+//         rect,
+//         _startAngle + (_sweepAngle * animatedMsrp),
+//         _sweepAngle * (animatedCurrent - animatedMsrp),
+//         false,
+//         currentPaint,
+//       );
+//     }
 
-    // 4) 100% end tick (small inward line at end of arc)
-    _drawEndTick(canvas, center, radius);
+//     // 4. Draw MSRP marker (blue triangle)
+//     if (msrp > 0 && progress > 0) {
+//       _drawArrowMarker(
+//         canvas,
+//         center,
+//         radius,
+//         animatedMsrp,
+//         primary,
+//         'MSRP',
+//       );
+//     }
 
-    // 5) Markers
-    _drawTriangleMarker(canvas, rect, t: msrp, color: primary); // MSRP
-    _drawTriangleMarker(canvas, rect, t: current, color: Colors.white); // CURRENT
-  }
+//     // 5. Draw Current marker (white triangle)
+//     if (current > 0 && progress > 0) {
+//       _drawArrowMarker(
+//         canvas,
+//         center,
+//         radius,
+//         animatedCurrent,
+//         Colors.white,
+//         'CURRENT',
+//       );
+//     }
+//   }
 
-  void _drawEndTick(Canvas canvas, Offset c, double r) {
-    final a = _start + _sweep; // 100% end angle
-    final p = Offset(c.dx + r * cos(a), c.dy + r * sin(a));
-    final outward = Offset(cos(a), sin(a)); // away from center
-    final tickPaint = Paint()
-      ..color = tickColor
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
+//   void _drawArrowMarker(
+//     Canvas canvas,
+//     Offset center,
+//     double radius,
+//     double position,
+//     Color color,
+//     String label,
+//   ) {
+//     // Calculate angle for the marker
+//     final angle = _startAngle + (_sweepAngle * position);
 
-    canvas.drawLine(p + outward * 8, p + outward * 22, tickPaint);
-  }
+//     // Point on the arc
+//     final arcPoint = Offset(
+//       center.dx + radius * cos(angle),
+//       center.dy + radius * sin(angle),
+//     );
 
-  void _drawTriangleMarker(Canvas canvas, Rect rect, {required double t, required Color color}) {
-    final center = rect.center;
-    final radius = rect.width / 2;
-    final a = _start + _sweep * t;
+//     // Draw triangle arrow pointing OUTWARD from the arc
+//     final trianglePath = Path();
+//     final arrowSize = 8.0;
+//     final arrowHeight = 14.0;
 
-    final tip = Offset(center.dx + radius * cos(a), center.dy + radius * sin(a));
-    final toCenter = (center - tip);
-    final len = toCenter.distance == 0.0 ? 1.0 : toCenter.distance;
-    final dir = toCenter / len.toDouble(); // inward (radial) unit vector
-    final normal = Offset(-dir.dy, dir.dx); // perpendicular for base width
+//     // Direction vector (pointing OUTWARD from center)
+//     final radialDir = Offset(cos(angle), sin(angle));
+//     final perpDir = Offset(-radialDir.dy, radialDir.dx);
 
-    const baseLen = 16.0;
-    const halfWidth = 7.0;
+//     // Triangle vertices - pointing outward
+//     final tip = arcPoint + radialDir * arrowHeight; // Tip points away from arc
+//     final base1 = arcPoint + perpDir * arrowSize;
+//     final base2 = arcPoint - perpDir * arrowSize;
 
-    final baseCenter = tip + dir * baseLen;
-    final p1 = tip;
-    final p2 = baseCenter + normal * halfWidth;
-    final p3 = baseCenter - normal * halfWidth;
+//     trianglePath.moveTo(tip.dx, tip.dy);
+//     trianglePath.lineTo(base1.dx, base1.dy);
+//     trianglePath.lineTo(base2.dx, base2.dy);
+//     trianglePath.close();
 
-    final paint = Paint()..color = color;
-    final path = Path()
-      ..moveTo(p1.dx, p1.dy)
-      ..lineTo(p2.dx, p2.dy)
-      ..lineTo(p3.dx, p3.dy)
-      ..close();
+//     final trianglePaint = Paint()
+//       ..color = color
+//       ..style = PaintingStyle.fill;
 
-    canvas.drawPath(path, paint);
-  }
+//     canvas.drawPath(trianglePath, trianglePaint);
 
-  @override
-  bool shouldRepaint(covariant _ArcPainter o) =>
-      o.progress != progress ||
-      o.msrp != msrp ||
-      o.current != current ||
-      o.stroke != stroke ||
-      o.bgColor != bgColor ||
-      o.primary != primary ||
-      o.secondary != secondary ||
-      o.tickColor != tickColor;
-}
+//     // Draw label text outside the arrow
+//     final textPainter = TextPainter(
+//       text: TextSpan(
+//         text: label,
+//         style: TextStyle(
+//           color: color,
+//           fontSize: 11,
+//           fontWeight: FontWeight.w600,
+//           letterSpacing: 0.5,
+//         ),
+//       ),
+//       textDirection: TextDirection.ltr,
+//     );
+
+//     textPainter.layout();
+
+//     // Position label outside the triangle
+//     final labelOffset = Offset(
+//       tip.dx - textPainter.width / 2,
+//       tip.dy + 5,
+//     );
+
+//     textPainter.paint(canvas, labelOffset);
+//   }
+
+//   @override
+//   bool shouldRepaint(_ArcProgressPainter oldDelegate) {
+//     return oldDelegate.progress != progress ||
+//         oldDelegate.msrp != msrp ||
+//         oldDelegate.current != current ||
+//         oldDelegate.stroke != stroke ||
+//         oldDelegate.bgColor != bgColor ||
+//         oldDelegate.primary != primary ||
+//         oldDelegate.secondary != secondary;
+//   }
+// }
