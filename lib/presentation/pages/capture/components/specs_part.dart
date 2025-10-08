@@ -28,6 +28,13 @@ class SpecsPart extends StatelessWidget {
               ),
             ),
           ),
+          // PerformanceGaugeWidget(
+          //   accel1: 2.8,
+          //   accel2: 2.8,
+          //   accel3: 2.8,
+          //   topSpeed: 200.0,
+          //   speedUnit: 'km/h',
+          // ),
           Gap(8),
           Align(
             alignment: Alignment.centerLeft,

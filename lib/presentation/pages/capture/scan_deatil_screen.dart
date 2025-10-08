@@ -109,7 +109,9 @@ class ScanDeatilScreen extends StatelessWidget {
                 child: ScanDetailContainer(
                   title: 'LEVEL UP',
                   buttonText: 'DETAILS',
-                  onButtonPressed: () {},
+                  onButtonPressed: () {
+                    context.push(CarDeatilScreen.routeName);
+                  },
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -203,9 +205,7 @@ class ScanDeatilScreen extends StatelessWidget {
                                   fixedSize: WidgetStatePropertyAll(Size(double.infinity, 40)),
                                   foregroundColor: WidgetStatePropertyAll(Colors.white),
                                 ),
-                                onPressed: () {
-                                  context.push(CarDeatilScreen.routeName);
-                                },
+                                onPressed: () {},
                                 icon: Icon(Icons.check),
                                 label: Text(
                                   'CLAIM',
