@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/extensions.dart';
+import '../../widgets/capture/history_part.dart';
+import '../../widgets/capture/production_part.dart';
+import '../../widgets/capture/specs_part.dart';
 import '../../widgets/shared/back.dart';
-import 'components/history_part.dart';
-import 'components/production_part.dart';
-import 'components/specs_part.dart';
 
 class CarDeatilScreen extends StatefulWidget {
   static const String routeName = '/car-detail';

@@ -2,7 +2,7 @@ import 'package:arc_progress_bar_new/arc_progress_bar_new.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-import '../../../../core/extensions.dart';
+import '../../../core/extensions.dart';
 
 class ProductionPart extends StatelessWidget {
   const ProductionPart({super.key});

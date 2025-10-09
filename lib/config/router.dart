@@ -14,7 +14,7 @@ import '../presentation/pages/capture/car_deatil_screen.dart';
 import '../presentation/pages/capture/scan_deatil_screen.dart';
 import '../presentation/pages/graph/graph_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
-import '../presentation/pages/map/map_screen.dart';
+import '../presentation/pages/garage/garage_screen.dart';
 import '../presentation/pages/nav_screen.dart';
 import '../presentation/pages/profile/profile_screen.dart';
 import '../services/auth/user_service.dart';
@@ -89,8 +89,8 @@ final router = GoRouter(
           builder: (_, _) => HomeScreen(),
         ),
         GoRoute(
-          path: MapScreen.routeName,
-          builder: (_, _) => MapScreen(),
+          path: GarageScreen.routeName,
+          builder: (_, _) => GarageScreen(),
         ),
         GoRoute(
           path: GraphScreen.routeName,
