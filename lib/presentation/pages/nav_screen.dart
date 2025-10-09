@@ -19,8 +19,8 @@ class NavScreen extends StatelessWidget {
         return KNavItem.home;
       case 'garage':
         return KNavItem.garage;
-      case 'graph':
-        return KNavItem.graph;
+      case 'leaderboard':
+        return KNavItem.leaderboard;
       case 'profile':
         return KNavItem.profile;
       default:

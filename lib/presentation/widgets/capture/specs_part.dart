@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'performance_gauge.dart';
 
 import '../../../core/extensions.dart';
+import 'performance_gauge.dart';
 
 class SpecsPart extends StatelessWidget {
   const SpecsPart({super.key});

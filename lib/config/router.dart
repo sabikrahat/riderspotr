@@ -12,7 +12,7 @@ import '../presentation/pages/auth/your_location_screen.dart';
 import '../presentation/pages/capture/camera_screen.dart';
 import '../presentation/pages/capture/car_deatil_screen.dart';
 import '../presentation/pages/capture/scan_deatil_screen.dart';
-import '../presentation/pages/graph/graph_screen.dart';
+import '../presentation/pages/leaderboard/leaderboard_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
 import '../presentation/pages/garage/garage_screen.dart';
 import '../presentation/pages/nav_screen.dart';
@@ -93,8 +93,8 @@ final router = GoRouter(
           builder: (_, _) => GarageScreen(),
         ),
         GoRoute(
-          path: GraphScreen.routeName,
-          builder: (_, _) => GraphScreen(),
+          path: LeaderboardScreen.routeName,
+          builder: (_, _) => LeaderboardScreen(),
         ),
         GoRoute(
           path: ProfileScreen.routeName,

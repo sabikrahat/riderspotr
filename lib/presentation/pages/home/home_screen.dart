@@ -48,6 +48,7 @@ import 'package:ridespotr/core/extensions.dart';
 
 import '../../providers/auth/user_provider.dart';
 import '../../widgets/capture/scan_detail_container.dart';
+import '../../widgets/shared/car_card.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -114,60 +115,7 @@ class HomeScreen extends ConsumerWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Stack(
-                  children: [
-                    Card(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.asset(
-                          'assets/images/lamborghini-hurcan.png',
-                          height: 200,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 16,
-                      right: 16,
-                      child: Text(
-                        'MELBOURNE, VIC, AUSTRALIA',
-                        style: context.textTheme.bodyLarge?.copyWith(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 16,
-                      left: 16,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'LAMBORGHINI',
-                            style: context.textTheme.headlineSmall?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            'HURACAN',
-                            style: context.textTheme.bodyLarge?.copyWith(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            child: CarCard(),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
