@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/extensions.dart';
 
 class AnimatedPrivacyToggle extends StatelessWidget {

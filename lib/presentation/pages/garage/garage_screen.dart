@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+
 import '../../../core/extensions.dart';
+import '../../widgets/garage/animated_privacy_toggle.dart';
 import '../../widgets/shared/car_card.dart';
 import '../../widgets/shared/page_padding.dart';
-
-import '../../widgets/garage/animated_privacy_toggle.dart';
 
 class GarageScreen extends StatefulWidget {
   const GarageScreen({super.key});
