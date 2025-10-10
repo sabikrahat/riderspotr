@@ -41,7 +41,7 @@ class AnimatedPrivacyToggle extends StatelessWidget {
                   child: const Icon(
                     Icons.lock,
                     color: Colors.black,
-                    size: 18,
+                    size: 15,
                   ),
                 ),
               ),
@@ -55,7 +55,7 @@ class AnimatedPrivacyToggle extends StatelessWidget {
               duration: const Duration(milliseconds: 300),
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 15,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
                 fontFamily: context.textTheme.bodySmall?.fontFamily,
               ),
@@ -82,7 +82,7 @@ class AnimatedPrivacyToggle extends StatelessWidget {
                   child: const Icon(
                     Icons.lock_open,
                     color: Colors.black,
-                    size: 18,
+                    size: 15,
                   ),
                 ),
               ),

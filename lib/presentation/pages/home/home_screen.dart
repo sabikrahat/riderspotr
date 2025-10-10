@@ -1,50 +1,8 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:gap/gap.dart';
-// import '../../../models/auth/user_model.dart';
-
-// import '../../providers/auth/user_provider.dart';
-// import '../auth/about_you_screen.dart';
-// import '../auth/your_experience_screen.dart';
-// import '../auth/your_location_screen.dart';
-
-// class HomeScreen extends ConsumerWidget {
-//   const HomeScreen({super.key});
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     ref.watch(userProvider);
-//     final notifier = ref.read(userProvider.notifier);
-//     if (notifier.user == null) {
-//       Future.microtask(() async => await notifier.refreshUser());
-//       return Scaffold(body: Center(child: CircularProgressIndicator()));
-//     }
-//     if (!notifier.user!.isProfileComplete) return AboutYouScreen();
-//     if (!notifier.user!.isExperienceComplete) return YourExperienceScreen();
-//     if (!notifier.user!.isLocationComplete) return YourLocationScreen();
-//     return Scaffold(
-//       body: Center(
-//         child: Column(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             Text('Welcome to the Home Screen!'),
-//             Gap(16),
-//             ElevatedButton(
-//               onPressed: () async => await notifier.signOut(context: context),
-//               child: Text('Logout'),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
-import 'package:ridespotr/core/extensions.dart';
+import '../../../core/extensions.dart';
 
 import '../../providers/auth/user_provider.dart';
 import '../../widgets/capture/scan_detail_container.dart';
@@ -59,7 +17,6 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(userProvider);
     final notifier = ref.read(userProvider.notifier);
-    final size = MediaQuery.sizeOf(context);
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -67,12 +24,12 @@ class HomeScreen extends ConsumerWidget {
             children: [
               Image.asset(
                 'assets/images/map-preview.png',
-                width: size.width,
-                height: size.height * 0.6,
+                width: context.width,
+                height: context.height * 0.6,
                 fit: BoxFit.fill,
               ),
               Positioned(
-                top: 16,
+                top: MediaQuery.viewPaddingOf(context).top + 8,
                 left: 16,
                 child: SvgPicture.asset(
                   'assets/logo/logo-full.svg',

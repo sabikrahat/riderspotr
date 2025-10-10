@@ -30,18 +30,18 @@ class NavScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: body,
-        bottomNavigationBar: KBottomNavbar(selectedNavItem: _getSelectedNavItem(path)),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.grey.shade900,
-          shape: const CircleBorder(),
-          child: const Icon(Icons.camera, size: 40, color: Colors.white),
-          onPressed: () => context.push(CameraScreen.routeName),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      body: body,
+      bottomNavigationBar: KBottomNavbar(selectedNavItem: _getSelectedNavItem(path)),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.grey.shade900,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.camera, size: 40, color: Colors.white),
+        onPressed: () => context.push(CameraScreen.routeName),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
