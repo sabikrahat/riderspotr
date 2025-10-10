@@ -73,7 +73,10 @@ class _GarageScreenState extends State<GarageScreen> {
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             hintText: 'Search your cars',
-                            hintStyle: TextStyle(color: Colors.white, fontSize: 14),
+                            hintStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
                             filled: true,
                             fillColor: Colors.grey[900],
                             prefixIcon: Icon(Icons.search, color: Colors.white),
@@ -83,15 +86,24 @@ class _GarageScreenState extends State<GarageScreen> {
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[800]!, width: 1),
+                              borderSide: BorderSide(
+                                color: Colors.grey[800]!,
+                                width: 1,
+                              ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[800]!, width: 1),
+                              borderSide: BorderSide(
+                                color: Colors.grey[800]!,
+                                width: 1,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[800]!, width: 1),
+                              borderSide: BorderSide(
+                                color: Colors.grey[800]!,
+                                width: 1,
+                              ),
                             ),
                           ),
                         ),
@@ -102,9 +114,15 @@ class _GarageScreenState extends State<GarageScreen> {
                         decoration: BoxDecoration(
                           color: Colors.grey[900],
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[800]!, width: 1),
+                          border: Border.all(
+                            color: Colors.grey[800]!,
+                            width: 1,
+                          ),
                         ),
-                        child: const Icon(Icons.tune_rounded, color: Colors.white),
+                        child: const Icon(
+                          Icons.tune_rounded,
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   ),
@@ -128,7 +146,9 @@ class _GarageScreenState extends State<GarageScreen> {
                             },
                             labelStyle: TextStyle(
                               color: isSelected ? Colors.black : Colors.white,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                               fontSize: 14,
                             ),
                             backgroundColor: Colors.grey[900],
@@ -136,11 +156,16 @@ class _GarageScreenState extends State<GarageScreen> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                               side: BorderSide(
-                                color: isSelected ? Colors.white : Colors.grey[800]!,
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.grey[800]!,
                                 width: 1,
                               ),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                           ),
                         );
                       }).toList(),
@@ -151,15 +176,15 @@ class _GarageScreenState extends State<GarageScreen> {
                   // Sort Options
                   Row(
                     children: [
-                      Icon(Icons.swap_vert_rounded, color: Colors.white, size: 22),
+                      Icon(
+                        Icons.swap_vert_rounded,
+                        color: Colors.white,
+                        size: 16,
+                      ),
                       Gap(4),
                       Text(
                         'Sort by',
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: context.textTheme.bodyMedium,
                       ),
                       Gap(16),
                       DropdownButton<String>(
@@ -174,7 +199,11 @@ class _GarageScreenState extends State<GarageScreen> {
                         },
                         underline: const SizedBox.shrink(),
                         dropdownColor: Colors.grey[900],
-                        icon: const Icon(Icons.arrow_drop_down, color: Colors.white, size: 20),
+                        icon: const Icon(
+                          Icons.arrow_drop_down,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                         style: context.textTheme.bodyMedium?.copyWith(
                           color: Colors.white,
                           fontSize: 15,
@@ -185,7 +214,10 @@ class _GarageScreenState extends State<GarageScreen> {
                             value: option,
                             child: Text(
                               option,
-                              style: const TextStyle(color: Colors.white, fontSize: 14),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
                             ),
                           );
                         }).toList(),

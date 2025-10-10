@@ -157,7 +157,11 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                         );
 
                                     if (context.mounted) {
-                                      context.push(AboutYouScreen.routeName);
+                                      if (widget.params.shouldCreateUser) {
+                                        context.push(AboutYouScreen.routeName);
+                                      } else {
+                                        context.push('/');
+                                      }
                                     }
                                   } on KException catch (e) {
                                     showErrorMessage(e.message);
