@@ -7,114 +7,235 @@ class CarCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        CircleAvatar(
-          backgroundColor: Colors.white,
-          radius: 30,
-        ),
-        SizedBox(
-          height: context.height * 0.25,
-          width: context.width,
-          child: CustomPaint(
-            painter: CardShape(),
-          ),
+        Stack(
+          children: [
+            Positioned(
+              child: CircleAvatar(
+                backgroundColor: Colors.grey.shade800,
+                radius: 26,
+              ),
+            ),
+            SizedBox(
+              height: context.height * 0.25,
+              width: context.width,
+              child: Stack(
+                children: [
+                  // Clipped background
+                  ClipPath(
+                    clipper: CircleClipper(
+                      circleRadius: 30,
+                      borderRadius: 24,
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage(
+                            'assets/images/lamborghini-hurcan.png',
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Border drawn on top
+                  CustomPaint(
+                    painter: CircleBorderPainter(
+                      circleRadius: 30,
+                      borderRadius: 24,
+                      borderColor: Colors.grey.shade800,
+                      borderWidth: 1,
+                    ),
+                    child: Container(),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 }
 
-class CardShape extends CustomPainter {
+class CircleClipper extends CustomClipper<Path> {
+  final double circleRadius;
+  final double borderRadius;
+
+  CircleClipper({
+    this.circleRadius = 0,
+    this.borderRadius = 0,
+  });
+
+  @override
+  Path getClip(Size size) {
+    var path = Path();
+
+    // Small transition radius for smooth connection
+    final double transitionRadius = circleRadius / 1;
+
+    // Start after the circle cutout and transition on the top edge
+    path.moveTo(circleRadius * 2 + transitionRadius, 0);
+
+    // Top edge to top-right corner
+    path.lineTo(size.width - borderRadius, 0);
+
+    // Top-right rounded corner
+    path.arcToPoint(
+      Offset(size.width, borderRadius),
+      radius: Radius.circular(borderRadius),
+      clockwise: true,
+    );
+
+    // Right edge
+    path.lineTo(size.width, size.height - borderRadius);
+
+    // Bottom-right rounded corner
+    path.arcToPoint(
+      Offset(size.width - borderRadius, size.height),
+      radius: Radius.circular(borderRadius),
+      clockwise: true,
+    );
+
+    // Bottom edge
+    path.lineTo(borderRadius, size.height);
+
+    // Bottom-left rounded corner
+    path.arcToPoint(
+      Offset(0, size.height - borderRadius),
+      radius: Radius.circular(borderRadius),
+      clockwise: true,
+    );
+
+    // Left edge up to just before the circle cutout
+    path.lineTo(0, circleRadius * 2 + transitionRadius);
+
+    // Smooth transition from left edge into the circle cutout
+    path.arcToPoint(
+      Offset(transitionRadius, circleRadius * 2),
+      radius: Radius.circular(transitionRadius),
+      // clockwise: false,
+    );
+
+    // Create the circular cutout at top-left
+    // This creates a concave (inward) circle
+    path.arcToPoint(
+      Offset(circleRadius * 2, transitionRadius),
+      radius: Radius.circular(circleRadius),
+      clockwise: false, // Counter-clockwise for inward curve
+    );
+
+    // Smooth transition from circle cutout to top edge
+    path.arcToPoint(
+      Offset(circleRadius * 2 + transitionRadius, 0),
+      radius: Radius.circular(transitionRadius),
+      // clockwise: false,
+    );
+
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
+    return oldClipper is! CircleClipper ||
+        oldClipper.circleRadius != circleRadius ||
+        oldClipper.borderRadius != borderRadius;
+  }
+}
+
+class CircleBorderPainter extends CustomPainter {
+  final double circleRadius;
+  final double borderRadius;
+  final Color borderColor;
+  final double borderWidth;
+
+  CircleBorderPainter({
+    required this.circleRadius,
+    required this.borderRadius,
+    required this.borderColor,
+    required this.borderWidth,
+  });
+
   @override
   void paint(Canvas canvas, Size size) {
-    const double cornerRadius = 24.0;
-    const double cutoutWidth = 65.0;
-    const double cutoutHeight = 65.0;
-    const double cutoutRadius = 35.0;
+    final paint = Paint()
+      ..color = borderColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth;
 
     final path = Path();
 
-    // Start from left edge, below the cutout area
-    path.moveTo(0, cutoutHeight + cornerRadius);
+    // Small transition radius for smooth connection
+    final double transitionRadius = circleRadius / 1;
 
-    // Left edge down to bottom-left corner
-    path.lineTo(0, size.height - cornerRadius);
+    // Start after the circle cutout and transition on the top edge
+    path.moveTo(circleRadius * 2 + transitionRadius, 0);
 
-    // Bottom-left corner
-    path.quadraticBezierTo(0, size.height, cornerRadius, size.height);
+    // Top edge to top-right corner
+    path.lineTo(size.width - borderRadius, 0);
+
+    // Top-right rounded corner
+    path.arcToPoint(
+      Offset(size.width, borderRadius),
+      radius: Radius.circular(borderRadius),
+      clockwise: true,
+    );
+
+    // Right edge
+    path.lineTo(size.width, size.height - borderRadius);
+
+    // Bottom-right rounded corner
+    path.arcToPoint(
+      Offset(size.width - borderRadius, size.height),
+      radius: Radius.circular(borderRadius),
+      clockwise: true,
+    );
 
     // Bottom edge
-    path.lineTo(size.width - cornerRadius, size.height);
+    path.lineTo(borderRadius, size.height);
 
-    // Bottom-right corner
-    path.quadraticBezierTo(
-      size.width,
-      size.height,
-      size.width,
-      size.height - cornerRadius,
+    // Bottom-left rounded corner
+    path.arcToPoint(
+      Offset(0, size.height - borderRadius),
+      radius: Radius.circular(borderRadius),
+      clockwise: true,
     );
 
-    // Right edge up to top-right corner
-    path.lineTo(size.width, cornerRadius);
+    // Left edge up to just before the circle cutout
+    path.lineTo(0, circleRadius * 2 + transitionRadius);
 
-    // Top-right corner
-    path.quadraticBezierTo(size.width, 0, size.width - cornerRadius, 0);
-
-    // Top edge from right to the cutout area
-    path.lineTo(cutoutWidth + cutoutRadius, 0);
-
-    // First inward curve (top-right of cutout)
-    path.quadraticBezierTo(
-      cutoutWidth,
-      0,
-      cutoutWidth,
-      cutoutRadius,
+    // Smooth transition from left edge into the circle cutout
+    path.arcToPoint(
+      Offset(transitionRadius, circleRadius * 2),
+      radius: Radius.circular(transitionRadius),
+      // clockwise: false,
     );
 
-    // Right edge of cutout going down
-    // path.lineTo(cutoutWidth, cutoutHeight - cutoutRadius);
-
-    // Second inward curve (bottom-right of cutout)
-    path.quadraticBezierTo(
-      cutoutWidth,
-      cutoutHeight,
-      cutoutWidth - cutoutRadius,
-      cutoutHeight,
+    // Create the circular cutout at top-left
+    // This creates a concave (inward) circle
+    path.arcToPoint(
+      Offset(circleRadius * 2, transitionRadius),
+      radius: Radius.circular(circleRadius),
+      clockwise: false, // Counter-clockwise for inward curve
     );
 
-    // Bottom edge of cutout going left
-    // path.lineTo(cutoutRadius, cutoutHeight);
-
-    // Third inward curve (bottom-left of cutout)
-    path.quadraticBezierTo(
-      0,
-      cutoutHeight,
-      0,
-      cutoutHeight + cornerRadius,
+    // Smooth transition from circle cutout to top edge
+    path.arcToPoint(
+      Offset(circleRadius * 2 + transitionRadius, 0),
+      radius: Radius.circular(transitionRadius),
+      // clockwise: false,
     );
 
-    // Close the path (will connect back to start point)
     path.close();
-
-    // Fill painter
-    final bodyPainter = Paint()
-      ..color = Colors
-          .white //charcol
-      ..style = PaintingStyle.fill;
-
-    canvas.drawPath(path, bodyPainter);
-
-    // // Border painter
-    final borderPainter = Paint()
-      ..color = Colors
-          .green //borderGrey
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
-
-    canvas.drawPath(path, borderPainter);
+    canvas.drawPath(path, paint);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
+    return oldDelegate is! CircleBorderPainter ||
+        oldDelegate.circleRadius != circleRadius ||
+        oldDelegate.borderRadius != borderRadius ||
+        oldDelegate.borderColor != borderColor ||
+        oldDelegate.borderWidth != borderWidth;
   }
 }
