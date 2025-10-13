@@ -3,9 +3,7 @@ import 'package:gap/gap.dart';
 import '../../../core/extensions.dart';
 
 class LeaderboardSummaryCard extends StatelessWidget {
-  const LeaderboardSummaryCard({
-    super.key,
-  });
+  const LeaderboardSummaryCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -80,12 +78,12 @@ class _Tile extends StatelessWidget {
         Icon(icon, color: Colors.white, size: 28),
         Gap(8),
         Text(
-          title,
+          title.toUpperCase(),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: context.textTheme.bodyMedium?.copyWith(
             color: Colors.white70,
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -97,7 +95,7 @@ class _Tile extends StatelessWidget {
           style: context.textTheme.bodyMedium?.copyWith(
             color: Colors.white,
             fontSize: 22,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ],

@@ -42,7 +42,7 @@ class SpecsPart extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Text(
               'ENGINE SPECS',
-              style: context.textTheme.headlineMedium,
+              style: context.textTheme.headlineSmall,
             ),
           ),
           Gap(16),

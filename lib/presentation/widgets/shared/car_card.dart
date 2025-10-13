@@ -3,7 +3,21 @@ import 'package:flutter/material.dart';
 import '../../../core/extensions.dart';
 
 class CarCard extends StatelessWidget {
-  const CarCard({super.key});
+  const CarCard({
+    super.key,
+    this.badgePath = 'assets/images/lamborghini.png',
+    this.imgPath = 'assets/images/lamborghini-hurcan.png',
+    this.location = 'MELBOURNE, VIC, AUSTRALIA',
+    this.brand = 'LAMBORGHINI',
+    this.model = 'HURACAN',
+  });
+
+  final String badgePath;
+  final String imgPath;
+  final String location;
+  final String brand;
+  final String model;
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -14,6 +28,7 @@ class CarCard extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: Colors.grey.shade800,
                 radius: 26,
+                child: Image.asset(badgePath),
               ),
             ),
             SizedBox(
@@ -30,9 +45,7 @@ class CarCard extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage(
-                            'assets/images/lamborghini-hurcan.png',
-                          ),
+                          image: AssetImage(imgPath),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -47,6 +60,40 @@ class CarCard extends StatelessWidget {
                       borderWidth: 1,
                     ),
                     child: Container(),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              top: 12,
+              right: 12,
+              child: Text(
+                location,
+                style: context.textTheme.bodyLarge?.copyWith(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 12,
+              left: 12,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    brand,
+                    style: context.textTheme.headlineSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    model,
+                    style: context.textTheme.bodyLarge?.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),

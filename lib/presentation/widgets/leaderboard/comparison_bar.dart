@@ -199,10 +199,6 @@ class LeaderboardComparisonBar extends StatelessWidget {
             height: 80,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white,
-                width: 3,
-              ),
               image: DecorationImage(
                 image: _getImageProvider(image),
                 fit: BoxFit.cover,

@@ -207,7 +207,7 @@ class HomeScreen extends ConsumerWidget {
               ],
             ),
           ),
-          Gap(30),
+          Gap(200),
         ],
       ),
     );

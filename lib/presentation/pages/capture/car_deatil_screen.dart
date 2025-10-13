@@ -52,15 +52,27 @@ class _CarDeatilScreenState extends State<CarDeatilScreen> with TickerProviderSt
             // Background Image
             Stack(
               children: [
-                SizedBox(
+                Container(
                   width: context.width,
                   height: context.height * 0.5,
-                  child: ClipRRect(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 1),
+                        Colors.black.withValues(alpha: 0.8),
+                        Colors.black.withValues(alpha: 0),
+                      ],
+                    ),
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(30),
                       bottomRight: Radius.circular(30),
                     ),
-                    child: Image.asset('assets/images/lamborghini-hurcan.png', fit: BoxFit.cover),
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/lamborghini-hurcan.png'),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ), // Title and rarity
                 Positioned(

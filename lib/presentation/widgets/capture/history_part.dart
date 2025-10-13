@@ -27,13 +27,7 @@ class HistoryPart extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'SIGNIFICANCE',
-                        style: context.textTheme.headlineMedium?.copyWith(
-                          color: Colors.white,
-                          backgroundColor: Colors.black.withValues(alpha: 0.5),
-                        ),
-                      ),
+                      Text('SIGNIFICANCE', style: context.textTheme.headlineSmall),
                       Gap(8),
                       Text(
                         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam id efficitur ligula. Vivamus quis ligula urna. Nullam suscipit magna quis eleifend ultrices.',
@@ -66,10 +60,7 @@ class HistoryPart extends StatelessWidget {
                     children: [
                       Text(
                         'MOTORSPORT HERITAGE',
-                        style: context.textTheme.headlineMedium?.copyWith(
-                          color: Colors.white,
-                          backgroundColor: Colors.black.withValues(alpha: 0.5),
-                        ),
+                        style: context.textTheme.headlineSmall,
                       ),
                       Gap(8),
                       Text(
@@ -83,10 +74,7 @@ class HistoryPart extends StatelessWidget {
                       Gap(48),
                       Text(
                         'FUN FACTS',
-                        style: context.textTheme.headlineMedium?.copyWith(
-                          color: Colors.white,
-                          backgroundColor: Colors.black.withValues(alpha: 0.5),
-                        ),
+                        style: context.textTheme.headlineSmall,
                       ),
                     ],
                   ),

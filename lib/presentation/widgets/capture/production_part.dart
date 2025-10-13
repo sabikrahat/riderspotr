@@ -36,13 +36,7 @@ class ProductionPart extends StatelessWidget {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          'Description',
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                        ),
+                        child: Text('Description', style: context.textTheme.headlineSmall),
                       ),
                     ],
                   ),
@@ -73,8 +67,19 @@ class ProductionPart extends StatelessWidget {
                 percentage: 85,
                 backgroundColor: Colors.grey.shade800,
                 foregroundColor: Colors.white,
-                arcThickness: 5,
-                handleSize: 20,
+                arcThickness: 2,
+                handleSize: 70,
+                handleWidget: Padding(
+                  padding: const EdgeInsets.only(left: 15.0),
+                  child: RotatedBox(
+                    quarterTurns: 1,
+                    child: Icon(
+                      Icons.arrow_drop_down,
+                      size: 40,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
                 centerWidget: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -87,10 +92,11 @@ class ProductionPart extends StatelessWidget {
                     ),
                     Gap(12),
                     Text(
-                      'EST. Value',
+                      'EST. VALUE',
                       style: context.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 12,
+                        color: Colors.white.withValues(alpha: 0.5),
                       ),
                     ),
                     Gap(12),
@@ -108,8 +114,19 @@ class ProductionPart extends StatelessWidget {
                 percentage: 70,
                 backgroundColor: Colors.transparent,
                 foregroundColor: Colors.blue,
-                arcThickness: 5,
-                handleSize: 20,
+                arcThickness: 2,
+                handleSize: 70,
+                handleWidget: Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: RotatedBox(
+                    quarterTurns: 1,
+                    child: Icon(
+                      Icons.arrow_drop_down,
+                      size: 45,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
