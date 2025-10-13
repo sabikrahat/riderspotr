@@ -3,99 +3,240 @@ import 'package:flutter/material.dart';
 import '../../../core/extensions.dart';
 
 class CarCard extends StatelessWidget {
-  const CarCard({
-    super.key,
-    this.imgPath = 'assets/images/lamborghini-hurcan.png',
-    this.address = 'MELBOURNE, VIC, AUSTRALIA',
-    this.brand = 'LAMBORGHINI',
-    this.model = 'HURACAN',
-    this.badgePath = 'assets/images/lamborghini.png',
-  });
-
-  final String imgPath;
-  final String address;
-  final String brand;
-  final String model;
-  final String badgePath;
-
+  const CarCard({super.key});
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Stack(
       children: [
         Stack(
           children: [
-            Card(
-              margin: EdgeInsets.zero,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image.asset(
-                  imgPath,
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+            Positioned(
+              child: CircleAvatar(
+                backgroundColor: Colors.grey.shade800,
+                radius: 26,
               ),
             ),
-            Positioned(
-              top: 16,
-              right: 16,
-              child: Text(
-                address,
-                style: context.textTheme.bodyLarge?.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 16,
-              left: 16,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            SizedBox(
+              height: context.height * 0.25,
+              width: context.width,
+              child: Stack(
                 children: [
-                  Text(
-                    brand,
-                    style: context.textTheme.headlineSmall?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                  // Clipped background
+                  ClipPath(
+                    clipper: CircleClipper(
+                      circleRadius: 30,
+                      borderRadius: 24,
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage(
+                            'assets/images/lamborghini-hurcan.png',
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                   ),
-                  Text(
-                    model,
-                    style: context.textTheme.bodyLarge?.copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                  // Border drawn on top
+                  CustomPaint(
+                    painter: CircleBorderPainter(
+                      circleRadius: 30,
+                      borderRadius: 24,
+                      borderColor: Colors.grey.shade800,
+                      borderWidth: 1,
                     ),
+                    child: Container(),
                   ),
                 ],
-              ),
-            ),
-            Positioned(
-              left: 8,
-              top: 8,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.7),
-                  borderRadius: BorderRadius.circular(45),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.white.withValues(alpha: 0.6),
-                      blurRadius: 6,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Image.asset(
-                  badgePath,
-                  height: 60,
-                  width: 60,
-                ),
               ),
             ),
           ],
         ),
       ],
     );
+  }
+}
+
+class CircleClipper extends CustomClipper<Path> {
+  final double circleRadius;
+  final double borderRadius;
+
+  CircleClipper({
+    this.circleRadius = 0,
+    this.borderRadius = 0,
+  });
+
+  @override
+  Path getClip(Size size) {
+    var path = Path();
+
+    // Small transition radius for smooth connection
+    final double transitionRadius = circleRadius / 1;
+
+    // Start after the circle cutout and transition on the top edge
+    path.moveTo(circleRadius * 2 + transitionRadius, 0);
+
+    // Top edge to top-right corner
+    path.lineTo(size.width - borderRadius, 0);
+
+    // Top-right rounded corner
+    path.arcToPoint(
+      Offset(size.width, borderRadius),
+      radius: Radius.circular(borderRadius),
+      clockwise: true,
+    );
+
+    // Right edge
+    path.lineTo(size.width, size.height - borderRadius);
+
+    // Bottom-right rounded corner
+    path.arcToPoint(
+      Offset(size.width - borderRadius, size.height),
+      radius: Radius.circular(borderRadius),
+      clockwise: true,
+    );
+
+    // Bottom edge
+    path.lineTo(borderRadius, size.height);
+
+    // Bottom-left rounded corner
+    path.arcToPoint(
+      Offset(0, size.height - borderRadius),
+      radius: Radius.circular(borderRadius),
+      clockwise: true,
+    );
+
+    // Left edge up to just before the circle cutout
+    path.lineTo(0, circleRadius * 2 + transitionRadius);
+
+    // Smooth transition from left edge into the circle cutout
+    path.arcToPoint(
+      Offset(transitionRadius, circleRadius * 2),
+      radius: Radius.circular(transitionRadius),
+      // clockwise: false,
+    );
+
+    // Create the circular cutout at top-left
+    // This creates a concave (inward) circle
+    path.arcToPoint(
+      Offset(circleRadius * 2, transitionRadius),
+      radius: Radius.circular(circleRadius),
+      clockwise: false, // Counter-clockwise for inward curve
+    );
+
+    // Smooth transition from circle cutout to top edge
+    path.arcToPoint(
+      Offset(circleRadius * 2 + transitionRadius, 0),
+      radius: Radius.circular(transitionRadius),
+      // clockwise: false,
+    );
+
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
+    return oldClipper is! CircleClipper ||
+        oldClipper.circleRadius != circleRadius ||
+        oldClipper.borderRadius != borderRadius;
+  }
+}
+
+class CircleBorderPainter extends CustomPainter {
+  final double circleRadius;
+  final double borderRadius;
+  final Color borderColor;
+  final double borderWidth;
+
+  CircleBorderPainter({
+    required this.circleRadius,
+    required this.borderRadius,
+    required this.borderColor,
+    required this.borderWidth,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = borderColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth;
+
+    final path = Path();
+
+    // Small transition radius for smooth connection
+    final double transitionRadius = circleRadius / 1;
+
+    // Start after the circle cutout and transition on the top edge
+    path.moveTo(circleRadius * 2 + transitionRadius, 0);
+
+    // Top edge to top-right corner
+    path.lineTo(size.width - borderRadius, 0);
+
+    // Top-right rounded corner
+    path.arcToPoint(
+      Offset(size.width, borderRadius),
+      radius: Radius.circular(borderRadius),
+      clockwise: true,
+    );
+
+    // Right edge
+    path.lineTo(size.width, size.height - borderRadius);
+
+    // Bottom-right rounded corner
+    path.arcToPoint(
+      Offset(size.width - borderRadius, size.height),
+      radius: Radius.circular(borderRadius),
+      clockwise: true,
+    );
+
+    // Bottom edge
+    path.lineTo(borderRadius, size.height);
+
+    // Bottom-left rounded corner
+    path.arcToPoint(
+      Offset(0, size.height - borderRadius),
+      radius: Radius.circular(borderRadius),
+      clockwise: true,
+    );
+
+    // Left edge up to just before the circle cutout
+    path.lineTo(0, circleRadius * 2 + transitionRadius);
+
+    // Smooth transition from left edge into the circle cutout
+    path.arcToPoint(
+      Offset(transitionRadius, circleRadius * 2),
+      radius: Radius.circular(transitionRadius),
+      // clockwise: false,
+    );
+
+    // Create the circular cutout at top-left
+    // This creates a concave (inward) circle
+    path.arcToPoint(
+      Offset(circleRadius * 2, transitionRadius),
+      radius: Radius.circular(circleRadius),
+      clockwise: false, // Counter-clockwise for inward curve
+    );
+
+    // Smooth transition from circle cutout to top edge
+    path.arcToPoint(
+      Offset(circleRadius * 2 + transitionRadius, 0),
+      radius: Radius.circular(transitionRadius),
+      // clockwise: false,
+    );
+
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return oldDelegate is! CircleBorderPainter ||
+        oldDelegate.circleRadius != circleRadius ||
+        oldDelegate.borderRadius != borderRadius ||
+        oldDelegate.borderColor != borderColor ||
+        oldDelegate.borderWidth != borderWidth;
   }
 }
