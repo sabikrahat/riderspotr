@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridespotr/presentation/pages/explore/explore.dart';
+import '../presentation/pages/explore/explore.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../presentation/pages/auth/about_you_screen.dart';
