@@ -109,9 +109,7 @@ class ScanDeatilScreen extends StatelessWidget {
                 child: ScanDetailContainer(
                   title: 'LEVEL UP',
                   buttonText: 'DETAILS',
-                  onButtonPressed: () {
-                    context.push(CarDeatilScreen.routeName);
-                  },
+                  onButtonPressed: () async => await context.push(CarDeatilScreen.routeName),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

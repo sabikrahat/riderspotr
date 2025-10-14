@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
-import '../../../core/extensions.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ridespotr/presentation/pages/explore/explore.dart';
 
-import '../../providers/auth/user_provider.dart';
+import '../../../core/extensions.dart';
 import '../../widgets/capture/scan_detail_container.dart';
 import '../../widgets/shared/car_card.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   static const String routeName = '/home';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(userProvider);
-    final notifier = ref.read(userProvider.notifier);
+  Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -59,10 +57,7 @@ class HomeScreen extends ConsumerWidget {
                     ),
                     Gap(4),
                     ElevatedButton(
-                      onPressed: () async {
-                        // TODO: Temporary --- IGNORE ---
-                        await notifier.signOut(context: context);
-                      },
+                      onPressed: () async => await context.push(ExploreScreen.routeName),
                       child: Text('View Map'),
                     ),
                   ],

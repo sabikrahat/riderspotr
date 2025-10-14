@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridespotr/presentation/pages/explore/explore.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../presentation/pages/auth/about_you_screen.dart';
@@ -76,6 +77,11 @@ final router = GoRouter(
       path: YourLocationScreen.routeName,
       // redirect: authHandler,
       builder: (_, _) => YourLocationScreen(),
+    ),
+    GoRoute(
+      path: ExploreScreen.routeName,
+      // redirect: authHandler,
+      builder: (_, _) => ExploreScreen(),
     ),
     ShellRoute(
       redirect: authHandler,

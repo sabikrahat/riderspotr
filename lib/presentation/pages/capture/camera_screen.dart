@@ -134,9 +134,7 @@ class _CameraScreenState extends State<CameraScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        context.push(ScanDeatilScreen.routeName);
-                      },
+                      onTap: () async => await context.push(ScanDeatilScreen.routeName),
                       child: Container(
                         width: 80,
                         height: 80,
