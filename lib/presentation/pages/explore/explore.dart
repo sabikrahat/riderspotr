@@ -6,7 +6,6 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import '../../../core/extensions.dart';
 import '../../../models/map/map_marker_model.dart';
 import '../../widgets/shared/back.dart';
-import '../../widgets/shared/car_card.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -56,7 +55,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      darkMapStyle = await rootBundle.loadString('assets/json/map-dark-mode.json');
+      darkMapStyle = await rootBundle.loadString(
+        'assets/json/map-dark-mode.json',
+      );
       setState(() {});
     });
   }
@@ -70,7 +71,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
     if (mapboxMap == null) return;
 
     // Create circle annotation manager
-    circleAnnotationManager = await mapboxMap!.annotations.createCircleAnnotationManager();
+    circleAnnotationManager = await mapboxMap!.annotations
+        .createCircleAnnotationManager();
 
     // Listen to tap events
     circleAnnotationManager!.tapEvents(
@@ -97,7 +99,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
     // Add circles for each marker
     for (var marker in markers) {
       final circleAnnotationOptions = CircleAnnotationOptions(
-        geometry: Point(coordinates: Position(marker.longitude, marker.latitude)),
+        geometry: Point(
+          coordinates: Position(marker.longitude, marker.latitude),
+        ),
         circleRadius: marker.radius,
         circleColor: marker.colorToInt(marker.borderColor),
         circleStrokeWidth: 3.0,
@@ -133,7 +137,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
             key: const ValueKey('mapbox-explore'),
             styleUri: MapboxStyles.DARK,
             cameraOptions: CameraOptions(
-              center: Point(coordinates: Position(90.43102689655147, 23.772386586668123)),
+              center: Point(
+                coordinates: Position(90.43102689655147, 23.772386586668123),
+              ),
               zoom: 13.0,
             ),
             onMapCreated: _onMapCreated,
@@ -168,21 +174,28 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     children: List.generate(
                       availableTimes.length,
                       (index) {
-                        final isSelected = availableTimes[index] == selectedTime;
+                        final isSelected =
+                            availableTimes[index] == selectedTime;
                         return Expanded(
                           child: GestureDetector(
-                            onTap: () => setState(() => selectedTime = availableTimes[index]),
+                            onTap: () => setState(
+                              () => selectedTime = availableTimes[index],
+                            ),
                             child: Container(
                               margin: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                color: isSelected ? Colors.white : Colors.transparent,
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.transparent,
                                 borderRadius: BorderRadius.circular(25.0),
                               ),
                               alignment: Alignment.center,
                               child: Text(
                                 availableTimes[index],
                                 style: context.textTheme.bodyMedium?.copyWith(
-                                  color: isSelected ? Colors.black : Colors.white,
+                                  color: isSelected
+                                      ? Colors.black
+                                      : Colors.white,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 0.5,
                                 ),
@@ -237,13 +250,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ],
             ),
           ),
-          //
-          Positioned(
-            bottom: 32,
-            left: 16,
-            right: 16,
-            child: CarCard(),
-          ),
+          // TODO: Implement
+          // Positioned(
+          //   bottom: 32,
+          //   left: 16,
+          //   right: 16,
+          //   child: CarCard(),
+          // ),
         ],
       ),
     );

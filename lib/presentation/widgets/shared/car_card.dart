@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:ridespotr/models/car/car_spot_model.dart';
 
 import '../../../core/extensions.dart';
 
 class CarCard extends StatelessWidget {
+  final CarSpotModel carSpot;
   const CarCard({
+    required this.carSpot,
     super.key,
-    this.badgePath,
-    this.imgPath,
-    this.location,
-    this.brand,
-    this.model,
+
+    // this.badgePath,
+    // this.imgPath,
+    // this.location,
+    // this.brand,
+    // this.model,
   });
 
-  final String? badgePath;
-  final String? imgPath;
-  final String? location;
-  final String? brand;
-  final String? model;
+  // final String? badgePath;
+  // final String? imgPath;
+  // final String? location;
+  // final String? brand;
+  // final String? model;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +32,12 @@ class CarCard extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: Colors.grey.shade800,
                 radius: 26,
-                child: Image.asset(badgePath ?? 'assets/images/lamborghini.png'),
+                child: ClipRRect(
+                  borderRadius: BorderRadiusGeometry.circular(269),
+                  child: Image.network(
+                    carSpot.car?.make?.logoUrl ?? '',
+                  ),
+                ),
               ),
             ),
             SizedBox(
@@ -46,14 +55,14 @@ class CarCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: NetworkImage(
-                            imgPath ??
-                                'https://images.unsplash.com/photo-1502877338535-766e1452684a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+                            carSpot.imageUrl,
                           ),
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
                   ),
+
                   // Border drawn on top
                   CustomPaint(
                     painter: CircleBorderPainter(
@@ -64,38 +73,70 @@ class CarCard extends StatelessWidget {
                     ),
                     child: Container(),
                   ),
-                ],
-              ),
-            ),
-            Positioned(
-              top: 12,
-              right: 12,
-              child: Text(
-                location ?? 'MELBOURNE, VIC, AUSTRALIA',
-                style: context.textTheme.bodyLarge?.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 12,
-              left: 12,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    brand ?? 'LAMBORGHINI',
-                    style: context.textTheme.headlineSmall?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+
+                  // Blakck gradient
+                  ClipPath(
+                    clipper: CircleClipper(
+                      circleRadius: 30,
+                      borderRadius: 24,
                     ),
-                  ),
-                  Text(
-                    model ?? 'HURACAN',
-                    style: context.textTheme.bodyLarge?.copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Colors.black,
+                            Colors.transparent,
+                            Colors.black,
+                          ],
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            SizedBox(
+                              width: context.width - 100,
+                              child: Text(
+                                // TODO: IMPLEMENT
+                                'MELBOURNE, VIC, AUSTRALIA',
+                                textAlign: TextAlign.right,
+                                style: context.textTheme.bodyLarge?.copyWith(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            SizedBox(
+                              width: double.infinity,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    carSpot.car?.make?.name ?? '',
+                                    style: context.textTheme.headlineSmall
+                                        ?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                  Text(
+                                    carSpot.car?.model ?? '',
+                                    style: context.textTheme.bodyLarge
+                                        ?.copyWith(
+                                          fontSize: 14,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],

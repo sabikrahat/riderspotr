@@ -33,7 +33,7 @@ final class CarSpotNotifierProvider
   CarSpotNotifier create() => CarSpotNotifier();
 }
 
-String _$carSpotNotifierHash() => r'c1b04b9512827c71742c47046db94970590cd0a6';
+String _$carSpotNotifierHash() => r'65a703e637476f85a8a6d2d649aa1669f0aeae7d';
 
 abstract class _$CarSpotNotifier extends $AsyncNotifier<List<CarSpotModel>> {
   FutureOr<List<CarSpotModel>> build();

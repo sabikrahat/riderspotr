@@ -10,8 +10,9 @@ CarSpotModel _$CarSpotModelFromJson(Map<String, dynamic> json) => CarSpotModel(
   id: json['id'] as String,
   createdAt: DateTime.parse(json['created_at'] as String),
   user: json['user'] as String,
-  car: json['car'] as String,
-  carExpand: _carExpandFromJson(json['car_expand']),
+  car: json['car'] == null
+      ? null
+      : CarModel.fromJson(json['car'] as Map<String, dynamic>),
   imageUrl: json['image_url'] as String,
   latLng: json['lat_lng'],
   location: json['location'] as Map<String, dynamic>?,
@@ -24,7 +25,6 @@ Map<String, dynamic> _$CarSpotModelToJson(CarSpotModel instance) =>
       'created_at': instance.createdAt.toIso8601String(),
       'user': instance.user,
       'car': instance.car,
-      'car_expand': _carExpandToJson(instance.carExpand),
       'image_url': instance.imageUrl,
       'lat_lng': instance.latLng,
       'location': instance.location,

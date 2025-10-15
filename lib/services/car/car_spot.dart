@@ -16,7 +16,7 @@ class CarSpotService {
     try {
       final res = await _client
           .from('car_spots')
-          .select()
+          .select(CarSpotModel.query)
           .eq('user', _client.auth.currentUser!.id)
           .eq('is_claimed', true);
       return res.map((e) => CarSpotModel.fromJson(e)).toList();
@@ -25,6 +25,7 @@ class CarSpotService {
     } on AuthException catch (e) {
       throw KException(e.message);
     } catch (e) {
+      print(e);
       throw KException(e.toString());
     }
   }

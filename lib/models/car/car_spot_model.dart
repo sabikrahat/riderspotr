@@ -10,9 +10,7 @@ class CarSpotModel {
   final String id;
   DateTime createdAt;
   String user;
-  String car;
-  @JsonKey(fromJson: _carExpandFromJson, toJson: _carExpandToJson)
-  CarModel? carExpand;
+  CarModel? car;
   String imageUrl;
   // dynamic latLng, stored as 'POINT(lon lat)' in Supabase
   dynamic latLng;
@@ -23,25 +21,26 @@ class CarSpotModel {
     required this.id,
     required this.createdAt,
     required this.user,
-    required this.car,
-    this.carExpand,
+    this.car,
     required this.imageUrl,
     this.latLng,
     this.location,
     required this.isClaimed,
   });
 
-  factory CarSpotModel.fromJson(Map<String, dynamic> json) => _$CarSpotModelFromJson(json);
+  factory CarSpotModel.fromJson(Map<String, dynamic> json) =>
+      _$CarSpotModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$CarSpotModelToJson(this);
+
+  static const query = '*, car(*, make(*))';
 
   // Create a copy with method
   CarSpotModel copyWith({
     String? id,
     DateTime? createdAt,
     String? user,
-    String? car,
-    CarModel? carExpand,
+    CarModel? car,
     String? imageUrl,
     dynamic latLng,
     Map<String, dynamic>? location,
@@ -52,7 +51,6 @@ class CarSpotModel {
       createdAt: createdAt ?? this.createdAt,
       user: user ?? this.user,
       car: car ?? this.car,
-      carExpand: carExpand ?? this.carExpand,
       imageUrl: imageUrl ?? this.imageUrl,
       latLng: latLng ?? this.latLng,
       location: location ?? this.location,
@@ -97,17 +95,4 @@ class CarSpotModel {
     ByteData byteData = ByteData.sublistView(Uint8List.fromList(bytes));
     return byteData.getFloat64(0, Endian.little);
   }
-}
-
-// Converter functions for makeExpand
-CarModel? _carExpandFromJson(dynamic json) {
-  if (json == null) return null;
-  if (json is Map<String, dynamic>) {
-    return CarModel.fromJson(json);
-  }
-  return null;
-}
-
-Map<String, dynamic>? _carExpandToJson(CarModel? carExpand) {
-  return carExpand?.toJson();
 }

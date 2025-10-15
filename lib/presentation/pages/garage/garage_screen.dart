@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../providers/car/car_spot_provider.dart';
-import '../../providers/map/lat_lng.dart';
 
 import '../../../core/extensions.dart';
 import '../../widgets/garage/animated_privacy_toggle.dart';
@@ -64,7 +62,8 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
 
                           AnimatedPrivacyToggle(
                             isPublic: isPublic,
-                            onToggle: () => setState(() => isPublic = !isPublic),
+                            onToggle: () =>
+                                setState(() => isPublic = !isPublic),
                           ),
                         ],
                       ),
@@ -83,7 +82,10 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                                 ),
                                 filled: true,
                                 fillColor: Colors.grey[900],
-                                prefixIcon: Icon(Icons.search, color: Colors.white),
+                                prefixIcon: Icon(
+                                  Icons.search,
+                                  color: Colors.white,
+                                ),
                                 contentPadding: const EdgeInsets.symmetric(
                                   vertical: 12,
                                   horizontal: 16,
@@ -149,8 +151,12 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                                   });
                                 },
                                 labelStyle: TextStyle(
-                                  color: isSelected ? Colors.black : Colors.white,
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  color: isSelected
+                                      ? Colors.black
+                                      : Colors.white,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
                                   fontSize: 14,
                                 ),
                                 backgroundColor: Colors.grey[900],
@@ -158,7 +164,9 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
                                   side: BorderSide(
-                                    color: isSelected ? Colors.white : Colors.grey[800]!,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.grey[800]!,
                                     width: 1,
                                   ),
                                 ),
@@ -234,30 +242,18 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                               ? Center(
                                   child: Text(
                                     'No cars in your garage. Pull down to refresh.',
-                                    style: context.textTheme.bodyMedium?.copyWith(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
+                                    style: context.textTheme.bodyMedium
+                                        ?.copyWith(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
                                   ),
                                 )
                               : ListView.separated(
                                   itemCount: data.length,
                                   itemBuilder: (context, index) {
-                                    final datum = data[index];
                                     return CarCard(
-                                      brand: datum.carExpand?.makeExpand?.name,
-                                      imgPath: datum.imageUrl,
-                                      location: datum.latitude == null || datum.longitude == null
-                                          ? 'Unknown Location'
-                                          : ref
-                                                .watch(
-                                                  getLocationBasedOnLatLngPd(
-                                                    LatLng(datum.latitude!, datum.longitude!),
-                                                  ),
-                                                )
-                                                .value
-                                                ?.formattedAddress,
-                                      model: data[index].carExpand?.model,
+                                      carSpot: data[index],
                                     );
                                   },
                                   separatorBuilder: (context, index) => Gap(24),

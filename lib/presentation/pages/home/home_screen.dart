@@ -6,7 +6,6 @@ import '../explore/explore.dart';
 
 import '../../../core/extensions.dart';
 import '../../widgets/capture/scan_detail_container.dart';
-import '../../widgets/shared/car_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -57,7 +56,8 @@ class HomeScreen extends StatelessWidget {
                     ),
                     Gap(4),
                     ElevatedButton(
-                      onPressed: () async => await context.push(ExploreScreen.routeName),
+                      onPressed: () async =>
+                          await context.push(ExploreScreen.routeName),
                       child: Text('View Map'),
                     ),
                   ],
@@ -65,10 +65,11 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CarCard(),
-          ),
+          // TODO: Implement
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: CarCard(),
+          // ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Stack(
@@ -81,7 +82,9 @@ class HomeScreen extends StatelessWidget {
                 Column(
                   children: [
                     Card(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       color: charcol.withValues(alpha: 0.7),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
@@ -93,17 +96,19 @@ class HomeScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   'YOUR XP',
-                                  style: context.textTheme.headlineLarge?.copyWith(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: context.textTheme.headlineLarge
+                                      ?.copyWith(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                 ),
                                 Spacer(),
                                 Text(
                                   '80 XP',
-                                  style: context.textTheme.headlineLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: context.textTheme.headlineLarge
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                 ),
                               ],
                             ),
@@ -122,8 +127,12 @@ class HomeScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(45),
                                 child: LinearProgressIndicator(
                                   value: 0.4,
-                                  backgroundColor: Colors.grey.withValues(alpha: 0.3),
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  backgroundColor: Colors.grey.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
                                   minHeight: 5,
                                   borderRadius: BorderRadius.circular(45),
                                 ),
@@ -138,7 +147,9 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Card(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                             color: charcol.withValues(alpha: 0.7),
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
@@ -148,17 +159,19 @@ class HomeScreen extends StatelessWidget {
                                   Gap(70),
                                   Text(
                                     'Cars Spotted',
-                                    style: context.textTheme.bodyMedium?.copyWith(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: context.textTheme.bodyMedium
+                                        ?.copyWith(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                   Text(
                                     '24',
-                                    style: context.textTheme.bodyMedium?.copyWith(
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: context.textTheme.bodyMedium
+                                        ?.copyWith(
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -168,7 +181,9 @@ class HomeScreen extends StatelessWidget {
                         Gap(8),
                         Expanded(
                           child: Card(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                             color: charcol.withValues(alpha: 0.7),
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
@@ -178,17 +193,19 @@ class HomeScreen extends StatelessWidget {
                                   Gap(70),
                                   Text(
                                     'Legendaries',
-                                    style: context.textTheme.bodyMedium?.copyWith(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: context.textTheme.bodyMedium
+                                        ?.copyWith(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                   Text(
                                     '3',
-                                    style: context.textTheme.bodyMedium?.copyWith(
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: context.textTheme.bodyMedium
+                                        ?.copyWith(
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                   ),
                                 ],
                               ),
