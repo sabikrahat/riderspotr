@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
+
 import 'car_model.dart';
 
 part 'car_spot_model.g.dart';

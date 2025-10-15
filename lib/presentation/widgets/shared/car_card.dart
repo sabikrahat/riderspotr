@@ -5,18 +5,18 @@ import '../../../core/extensions.dart';
 class CarCard extends StatelessWidget {
   const CarCard({
     super.key,
-    this.badgePath = 'assets/images/lamborghini.png',
-    this.imgPath = 'assets/images/lamborghini-hurcan.png',
-    this.location = 'MELBOURNE, VIC, AUSTRALIA',
-    this.brand = 'LAMBORGHINI',
-    this.model = 'HURACAN',
+    this.badgePath,
+    this.imgPath,
+    this.location,
+    this.brand,
+    this.model,
   });
 
-  final String badgePath;
-  final String imgPath;
-  final String location;
-  final String brand;
-  final String model;
+  final String? badgePath;
+  final String? imgPath;
+  final String? location;
+  final String? brand;
+  final String? model;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class CarCard extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: Colors.grey.shade800,
                 radius: 26,
-                child: Image.asset(badgePath),
+                child: Image.asset(badgePath ?? 'assets/images/lamborghini.png'),
               ),
             ),
             SizedBox(
@@ -45,7 +45,10 @@ class CarCard extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage(imgPath),
+                          image: NetworkImage(
+                            imgPath ??
+                                'https://images.unsplash.com/photo-1502877338535-766e1452684a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+                          ),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -68,7 +71,7 @@ class CarCard extends StatelessWidget {
               top: 12,
               right: 12,
               child: Text(
-                location,
+                location ?? 'MELBOURNE, VIC, AUSTRALIA',
                 style: context.textTheme.bodyLarge?.copyWith(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -82,14 +85,14 @@ class CarCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    brand,
+                    brand ?? 'LAMBORGHINI',
                     style: context.textTheme.headlineSmall?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    model,
+                    model ?? 'HURACAN',
                     style: context.textTheme.bodyLarge?.copyWith(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,

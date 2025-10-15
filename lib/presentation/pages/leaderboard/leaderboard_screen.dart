@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import '../../widgets/shared/carbon_background.dart';
 
 import '../../../core/extensions.dart';
 import '../../widgets/leaderboard/comparison_bar.dart';
 import '../../widgets/leaderboard/summary_card.dart';
+import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/page_padding.dart';
 
 class LeaderboardScreen extends StatefulWidget {

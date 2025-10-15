@@ -7,8 +7,7 @@ import '../../../models/google_maps/map_prediction_model.dart';
 import 'custom_text_field.dart';
 
 class AddressTextField extends StatefulWidget {
-  final FutureOr<List<MapPredictionModel>> Function(TextEditingValue)
-  optionsBuilder;
+  final FutureOr<List<MapPredictionModel>> Function(TextEditingValue) optionsBuilder;
   final void Function(MapPredictionModel) onSelected;
   final String Function(MapPredictionModel) displayStringForOption;
   // final String hint;
@@ -92,9 +91,7 @@ class _AddressTextFieldState extends State<AddressTextField> {
             final keyboardHeight = mediaQuery.viewInsets.bottom;
             final screenHeight = mediaQuery.size.height;
             final availableHeight =
-                screenHeight -
-                keyboardHeight -
-                2000; // Reserve space for input field and padding
+                screenHeight - keyboardHeight - 2000; // Reserve space for input field and padding
             final maxHeight = availableHeight.clamp(150.0, 250.0);
 
             return Align(
@@ -138,11 +135,10 @@ class _AddressTextFieldState extends State<AddressTextField> {
                                     children: [
                                       ListTile(
                                         dense: true,
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                              vertical: 8,
-                                            ),
+                                        contentPadding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 8,
+                                        ),
                                         title: Text(
                                           widget.displayStringForOption(option),
                                           style: const TextStyle(
