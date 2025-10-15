@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+
 import '../../../core/extensions.dart';
 import '../../../models/map/map_marker_model.dart';
-import '../../widgets/shared/car_card.dart';
-
 import '../../widgets/shared/back.dart';
+import '../../widgets/shared/car_card.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
