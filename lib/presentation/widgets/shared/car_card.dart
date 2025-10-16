@@ -1,26 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:ridespotr/models/car/car_spot_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../../../models/car/car_spot_model.dart';
 
 import '../../../core/extensions.dart';
+import '../../providers/map/lat_lng.dart';
 
 class CarCard extends StatelessWidget {
   final CarSpotModel carSpot;
-  const CarCard({
-    required this.carSpot,
-    super.key,
-
-    // this.badgePath,
-    // this.imgPath,
-    // this.location,
-    // this.brand,
-    // this.model,
-  });
-
-  // final String? badgePath;
-  // final String? imgPath;
-  // final String? location;
-  // final String? brand;
-  // final String? model;
+  const CarCard({required this.carSpot, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -98,17 +86,35 @@ class CarCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            SizedBox(
-                              width: context.width - 100,
-                              child: Text(
-                                // TODO: IMPLEMENT
-                                'MELBOURNE, VIC, AUSTRALIA',
-                                textAlign: TextAlign.right,
-                                style: context.textTheme.bodyLarge?.copyWith(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w300,
-                                ),
-                              ),
+                            Consumer(
+                              builder: (_, ref, __) {
+                                String address;
+                                if (carSpot.latitude == null || carSpot.longitude == null) {
+                                  address = carSpot.id;
+                                } else {
+                                  address =
+                                      ref
+                                          .watch(
+                                            getLocationBasedOnLatLngPd(
+                                              LatLng(carSpot.latitude!, carSpot.longitude!),
+                                            ),
+                                          )
+                                          .value
+                                          ?.formattedAddress ??
+                                      carSpot.id;
+                                }
+                                return SizedBox(
+                                  width: context.width - 100,
+                                  child: Text(
+                                    address,
+                                    textAlign: TextAlign.right,
+                                    style: context.textTheme.bodyLarge?.copyWith(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                             const Spacer(),
                             SizedBox(
@@ -118,18 +124,16 @@ class CarCard extends StatelessWidget {
                                 children: [
                                   Text(
                                     carSpot.car?.make?.name ?? '',
-                                    style: context.textTheme.headlineSmall
-                                        ?.copyWith(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                    style: context.textTheme.headlineSmall?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   Text(
                                     carSpot.car?.model ?? '',
-                                    style: context.textTheme.bodyLarge
-                                        ?.copyWith(
-                                          fontSize: 14,
-                                        ),
+                                    style: context.textTheme.bodyLarge?.copyWith(
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ],
                               ),

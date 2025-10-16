@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 import 'car_make_model.dart';
 
 part 'car_model.g.dart';

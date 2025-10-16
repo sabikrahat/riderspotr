@@ -1,78 +1,75 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import '../../../models/car/car_spot_model.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/map/map_marker_model.dart';
+import '../../providers/car/car_spot_provider.dart';
 import '../../widgets/shared/back.dart';
+import '../../widgets/shared/car_card.dart';
 
-class ExploreScreen extends StatefulWidget {
+class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
 
   static const String routeName = '/explore';
 
   @override
-  State<ExploreScreen> createState() => _ExploreScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _ExploreScreenState();
 }
 
-class _ExploreScreenState extends State<ExploreScreen> {
-  String? darkMapStyle;
+class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   List<String> availableTimes = ['24 HR', '7 DAYS', 'ALL TIME'];
   String? selectedTime = '24 HR';
   MapboxMap? mapboxMap;
   CircleAnnotationManager? circleAnnotationManager;
-
-  // Sample marker data - replace with your actual data
-  List<MapMarkerModel> markers = [
-    MapMarkerModel(
-      id: '1',
-      latitude: 23.772386,
-      longitude: 90.431026,
-      borderColor: Colors.blue,
-      radius: 40,
-      carName: 'Tesla Model 3',
-    ),
-    MapMarkerModel(
-      id: '2',
-      latitude: 23.774386,
-      longitude: 90.433026,
-      borderColor: Colors.purple,
-      radius: 50,
-      carName: 'BMW M3',
-    ),
-    MapMarkerModel(
-      id: '3',
-      latitude: 23.770386,
-      longitude: 90.429026,
-      borderColor: Colors.red,
-      radius: 35,
-      carName: 'Mercedes AMG',
-    ),
-  ];
+  CarSpotModel? _selectedSpot;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      darkMapStyle = await rootBundle.loadString(
-        'assets/json/map-dark-mode.json',
-      );
-      setState(() {});
-    });
   }
 
-  Future<void> _onMapCreated(MapboxMap mapboxMap) async {
+  Future<void> _onMapCreated(MapboxMap mapboxMap, List<CarSpotModel> spots) async {
     this.mapboxMap = mapboxMap;
-    await _addCircleMarkers();
+    await _addCircleMarkers(spots);
   }
 
-  Future<void> _addCircleMarkers() async {
+  Future<void> _addCircleMarkers(List<CarSpotModel> spots) async {
     if (mapboxMap == null) return;
 
+    final random = Random();
+    final markers = spots.where((s) => s.latitude != null && s.longitude != null).toList().map(
+      (spot) {
+        // Calculate radius based on coordinates
+        // Using a combination of lat/lng to create variation
+        final lat = spot.latitude!.abs();
+        final lng = spot.longitude!.abs();
+        final baseRadius = 20.0;
+        final variation = ((lat + lng) % 60) + 20; // Range: 20-80
+        final calculatedRadius = baseRadius + variation;
+
+        return MapMarkerModel(
+          id: spot.id,
+          latitude: spot.latitude!,
+          longitude: spot.longitude!,
+          borderColor: Color.fromRGBO(
+            random.nextInt(256),
+            random.nextInt(256),
+            random.nextInt(256),
+            1,
+          ),
+          radius: calculatedRadius,
+          carName: spot.car?.model,
+        );
+      },
+    ).toList();
+
     // Create circle annotation manager
-    circleAnnotationManager = await mapboxMap!.annotations
-        .createCircleAnnotationManager();
+    circleAnnotationManager = await mapboxMap!.annotations.createCircleAnnotationManager();
 
     // Listen to tap events
     circleAnnotationManager!.tapEvents(
@@ -80,19 +77,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
         // Find the marker that was tapped
         final tappedMarker = markers.firstWhere(
           (m) =>
-              m.latitude == annotation.geometry.coordinates.lat.toDouble() &&
-              m.longitude == annotation.geometry.coordinates.lng.toDouble(),
+              m.latitude == annotation.geometry.coordinates.lat &&
+              m.longitude == annotation.geometry.coordinates.lng,
           orElse: () => markers.first,
         );
-
-        // Show info about the tapped marker
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(tappedMarker.carName ?? 'Unknown Car'),
-            duration: const Duration(seconds: 2),
-            backgroundColor: tappedMarker.borderColor,
-          ),
-        );
+        setState(() {
+          _selectedSpot = spots.firstWhere((s) => s.id == tappedMarker.id);
+        });
       },
     );
 
@@ -131,134 +122,141 @@ class _ExploreScreenState extends State<ExploreScreen> {
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          MapWidget(
-            key: const ValueKey('mapbox-explore'),
-            styleUri: MapboxStyles.DARK,
-            cameraOptions: CameraOptions(
-              center: Point(
-                coordinates: Position(90.43102689655147, 23.772386586668123),
-              ),
-              zoom: 13.0,
-            ),
-            onMapCreated: _onMapCreated,
-          ),
-          // GoogleMap(
-          //   key: const ValueKey('explore'),
-          //   initialCameraPosition: CameraPosition(
-          //     target: LatLng(23.772347312511954, 90.43097325236988),
-          //     zoom: 12,
-          //   ),
-          //   myLocationEnabled: false,
-          //   myLocationButtonEnabled: false,
-          //   mapType: MapType.normal,
-          //   trafficEnabled: false,
-          //   style: darkMapStyle,
-          //   zoomControlsEnabled: false,
-          // ),
-          Positioned(
-            top: MediaQuery.of(context).padding.top + kToolbarHeight + 16,
-            left: 16,
-            right: 16,
-            child: Column(
-              children: [
-                // Custom Toggle Buttons
-                Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[800],
-                    borderRadius: BorderRadius.circular(25.0),
+      body: ref
+          .watch(carSpotProvider)
+          .when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stack) => Center(child: Text('Error: $error')),
+            data: (data) {
+              final notifier = ref.read(carSpotProvider.notifier);
+              return Stack(
+                children: [
+                  MapWidget(
+                    key: const ValueKey('mapbox-explore'),
+                    styleUri: MapboxStyles.DARK,
+                    cameraOptions: CameraOptions(
+                      center: Point(
+                        coordinates: Position(
+                          notifier.centeredLatLng.longitude,
+                          notifier.centeredLatLng.latitude,
+                        ),
+                      ),
+                      zoom: 13.0,
+                    ),
+                    onMapCreated: (MapboxMap map) => _onMapCreated(map, notifier.carSpots),
                   ),
-                  child: Row(
-                    children: List.generate(
-                      availableTimes.length,
-                      (index) {
-                        final isSelected =
-                            availableTimes[index] == selectedTime;
-                        return Expanded(
-                          child: GestureDetector(
-                            onTap: () => setState(
-                              () => selectedTime = availableTimes[index],
+                  // GoogleMap(
+                  //   key: const ValueKey('explore'),
+                  //   initialCameraPosition: CameraPosition(
+                  //     target: LatLng(23.772347312511954, 90.43097325236988),
+                  //     zoom: 12,
+                  //   ),
+                  //   myLocationEnabled: false,
+                  //   myLocationButtonEnabled: false,
+                  //   mapType: MapType.normal,
+                  //   trafficEnabled: false,
+                  //   style: darkMapStyle,
+                  //   zoomControlsEnabled: false,
+                  // ),
+                  Positioned(
+                    top: MediaQuery.of(context).padding.top + kToolbarHeight + 16,
+                    left: 16,
+                    right: 16,
+                    child: Column(
+                      children: [
+                        // Custom Toggle Buttons
+                        Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[800],
+                            borderRadius: BorderRadius.circular(25.0),
+                          ),
+                          child: Row(
+                            children: List.generate(
+                              availableTimes.length,
+                              (index) {
+                                final isSelected = availableTimes[index] == selectedTime;
+                                return Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => setState(
+                                      () => selectedTime = availableTimes[index],
+                                    ),
+                                    child: Container(
+                                      margin: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: isSelected ? Colors.white : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(25.0),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        availableTimes[index],
+                                        style: context.textTheme.bodyMedium?.copyWith(
+                                          color: isSelected ? Colors.black : Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                            child: Container(
-                              margin: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? Colors.white
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(25.0),
+                          ),
+                        ),
+                        Gap(16),
+                        // Search Bar
+                        TextFormField(
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: 'Search your cars',
+                            hintStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey[800],
+                            prefixIcon: Icon(Icons.search, color: Colors.white),
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 16,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Colors.grey[800]!,
+                                width: 1,
                               ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                availableTimes[index],
-                                style: context.textTheme.bodyMedium?.copyWith(
-                                  color: isSelected
-                                      ? Colors.black
-                                      : Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.5,
-                                ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Colors.grey[800]!,
+                                width: 1,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Colors.grey[800]!,
+                                width: 1,
                               ),
                             ),
                           ),
-                        );
-                      },
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                Gap(16),
-                // Search Bar
-                TextFormField(
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: 'Search your cars',
-                    hintStyle: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
+                  if (_selectedSpot != null)
+                    Positioned(
+                      bottom: 32,
+                      left: 16,
+                      right: 16,
+                      child: CarCard(carSpot: _selectedSpot!),
                     ),
-                    filled: true,
-                    fillColor: Colors.grey[800],
-                    prefixIcon: Icon(Icons.search, color: Colors.white),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 16,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Colors.grey[800]!,
-                        width: 1,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Colors.grey[800]!,
-                        width: 1,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Colors.grey[800]!,
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                ],
+              );
+            },
           ),
-          // TODO: Implement
-          // Positioned(
-          //   bottom: 32,
-          //   left: 16,
-          //   right: 16,
-          //   child: CarCard(),
-          // ),
-        ],
-      ),
     );
   }
 }

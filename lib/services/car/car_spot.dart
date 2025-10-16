@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/exception.dart';
@@ -25,7 +26,7 @@ class CarSpotService {
     } on AuthException catch (e) {
       throw KException(e.message);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       throw KException(e.toString());
     }
   }

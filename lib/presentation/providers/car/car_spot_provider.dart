@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../models/car/car_spot_model.dart';
@@ -22,5 +23,21 @@ class CarSpotNotifier extends _$CarSpotNotifier {
   Future<void> refresh() async {
     _carSpots = await CarSpotService().getCarSpots();
     state = AsyncValue.data(_carSpots);
+  }
+
+  LatLng get centeredLatLng {
+    final filteredList = _carSpots
+        .where((spot) => spot.latitude != null && spot.longitude != null)
+        .toList();
+    if (filteredList.isEmpty) {
+      return const LatLng(0.0, 0.0);
+    }
+    double totalLat = 0.0;
+    double totalLng = 0.0;
+    for (var spot in filteredList) {
+      totalLat += spot.latitude!;
+      totalLng += spot.longitude!;
+    }
+    return LatLng(totalLat / _carSpots.length, totalLng / _carSpots.length);
   }
 }
