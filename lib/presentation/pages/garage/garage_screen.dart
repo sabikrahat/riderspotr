@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import '../../providers/car/car_spot_provider.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/extensions.dart';
+import '../../providers/car/car_spot_provider.dart';
 import '../../widgets/garage/animated_privacy_toggle.dart';
 import '../../widgets/shared/car_card.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/page_padding.dart';
+import '../capture/car_deatil_screen.dart';
 
 class GarageScreen extends ConsumerStatefulWidget {
   const GarageScreen({super.key});
@@ -62,8 +64,7 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
 
                           AnimatedPrivacyToggle(
                             isPublic: isPublic,
-                            onToggle: () =>
-                                setState(() => isPublic = !isPublic),
+                            onToggle: () => setState(() => isPublic = !isPublic),
                           ),
                         ],
                       ),
@@ -151,12 +152,8 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                                   });
                                 },
                                 labelStyle: TextStyle(
-                                  color: isSelected
-                                      ? Colors.black
-                                      : Colors.white,
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
+                                  color: isSelected ? Colors.black : Colors.white,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                   fontSize: 14,
                                 ),
                                 backgroundColor: Colors.grey[900],
@@ -164,9 +161,7 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
                                   side: BorderSide(
-                                    color: isSelected
-                                        ? Colors.white
-                                        : Colors.grey[800]!,
+                                    color: isSelected ? Colors.white : Colors.grey[800]!,
                                     width: 1,
                                   ),
                                 ),
@@ -242,11 +237,10 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                               ? Center(
                                   child: Text(
                                     'No cars in your garage. Pull down to refresh.',
-                                    style: context.textTheme.bodyMedium
-                                        ?.copyWith(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                        ),
+                                    style: context.textTheme.bodyMedium?.copyWith(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
                                   ),
                                 )
                               : ListView.separated(
@@ -254,6 +248,10 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                                   itemBuilder: (context, index) {
                                     return CarCard(
                                       carSpot: data[index],
+                                      onTap: () async => await context.push(
+                                        CarDeatilScreen.routeName,
+                                        extra: data[index],
+                                      ),
                                     );
                                   },
                                   separatorBuilder: (context, index) => Gap(24),

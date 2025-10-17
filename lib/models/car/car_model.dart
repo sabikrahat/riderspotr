@@ -1,6 +1,9 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'car_history_model.dart';
 import 'car_make_model.dart';
+import 'car_production_model.dart';
+import 'car_specs_model.dart';
 
 part 'car_model.g.dart';
 
@@ -13,6 +16,10 @@ class CarModel {
   String rarity;
   int points;
   String? description;
+  //
+  CarProductionModel? production;
+  CarSpecsModel? specs;
+  CarHistoryModel? history;
 
   CarModel({
     required this.id,
@@ -22,10 +29,12 @@ class CarModel {
     required this.rarity,
     required this.points,
     this.description,
+    this.production,
+    this.specs,
+    this.history,
   });
 
-  factory CarModel.fromJson(Map<String, dynamic> json) =>
-      _$CarModelFromJson(json);
+  factory CarModel.fromJson(Map<String, dynamic> json) => _$CarModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$CarModelToJson(this);
 
@@ -38,6 +47,9 @@ class CarModel {
     String? rarity,
     int? points,
     String? description,
+    CarProductionModel? production,
+    CarSpecsModel? specs,
+    CarHistoryModel? history,
   }) {
     return CarModel(
       id: id ?? this.id,
@@ -47,6 +59,9 @@ class CarModel {
       rarity: rarity ?? this.rarity,
       points: points ?? this.points,
       description: description ?? this.description,
+      production: production ?? this.production,
+      specs: specs ?? this.specs,
+      history: history ?? this.history,
     );
   }
 }

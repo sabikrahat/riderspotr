@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../presentation/pages/explore/explore.dart';
+import '../models/car/car_spot_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../presentation/pages/auth/about_you_screen.dart';
@@ -13,6 +13,7 @@ import '../presentation/pages/auth/your_location_screen.dart';
 import '../presentation/pages/capture/camera_screen.dart';
 import '../presentation/pages/capture/car_deatil_screen.dart';
 import '../presentation/pages/capture/scan_deatil_screen.dart';
+import '../presentation/pages/explore/explore.dart';
 import '../presentation/pages/garage/garage_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
 import '../presentation/pages/leaderboard/leaderboard_screen.dart';
@@ -121,7 +122,7 @@ final router = GoRouter(
     GoRoute(
       path: CarDeatilScreen.routeName,
       redirect: authHandler,
-      builder: (_, _) => CarDeatilScreen(),
+      builder: (_, state) => CarDeatilScreen(carSpot: state.extra as CarSpotModel?),
     ),
   ],
 );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../models/car/car_spot_model.dart';
 
 import '../../../core/extensions.dart';
 import '../../widgets/capture/history_part.dart';
@@ -8,7 +9,9 @@ import '../../widgets/shared/back.dart';
 
 class CarDeatilScreen extends StatefulWidget {
   static const String routeName = '/car-detail';
-  const CarDeatilScreen({super.key});
+  const CarDeatilScreen({super.key, required this.carSpot});
+
+  final CarSpotModel? carSpot;
 
   @override
   State<CarDeatilScreen> createState() => _CarDeatilScreenState();
@@ -39,6 +42,19 @@ class _CarDeatilScreenState extends State<CarDeatilScreen> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    if (widget.carSpot == null) {
+      return Scaffold(
+        appBar: AppBar(
+          leading: Back(),
+        ),
+        body: Center(
+          child: Text(
+            'No car data available.',
+            style: context.textTheme.bodyMedium,
+          ),
+        ),
+      );
+    }
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -70,7 +86,7 @@ class _CarDeatilScreenState extends State<CarDeatilScreen> with TickerProviderSt
                       bottomRight: Radius.circular(30),
                     ),
                     image: DecorationImage(
-                      image: AssetImage('assets/images/lamborghini-hurcan.png'),
+                      image: NetworkImage(widget.carSpot!.imageUrl),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -98,7 +114,7 @@ class _CarDeatilScreenState extends State<CarDeatilScreen> with TickerProviderSt
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'LAMBORGHINI AVENTADOR',
+                              widget.carSpot!.car?.make?.name.toUpperCase() ?? 'UNKNOWN MAKE',
                               style: context.textTheme.headlineMedium,
                             ),
                             Container(
@@ -181,10 +197,10 @@ class _CarDeatilScreenState extends State<CarDeatilScreen> with TickerProviderSt
             ),
             // Tab Views
             selectedIndex == 0
-                ? ProductionPart()
+                ? ProductionPart(production: widget.carSpot!.car!.production)
                 : selectedIndex == 1
-                ? SpecsPart()
-                : HistoryPart(),
+                ? SpecsPart(specs: widget.carSpot!.car!.specs)
+                : HistoryPart(history: widget.carSpot!.car!.history),
           ],
         ),
       ),

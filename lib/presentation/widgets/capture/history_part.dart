@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import '../../../models/car/car_history_model.dart';
 
 import '../../../core/extensions.dart';
 
 class HistoryPart extends StatelessWidget {
-  const HistoryPart({super.key});
+  const HistoryPart({super.key, required this.history});
+
+  final CarHistoryModel? history;
 
   @override
   Widget build(BuildContext context) {
+    if (history == null) {
+      return Center(
+        child: Text(
+          'No history data available.',
+          style: context.textTheme.bodyMedium,
+        ),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -30,7 +41,7 @@ class HistoryPart extends StatelessWidget {
                       Text('SIGNIFICANCE', style: context.textTheme.headlineSmall),
                       Gap(8),
                       Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam id efficitur ligula. Vivamus quis ligula urna. Nullam suscipit magna quis eleifend ultrices.',
+                        history!.significance ?? 'No significance data available.',
                         style: context.textTheme.bodyMedium?.copyWith(
                           fontSize: 14,
                           color: Colors.white,
@@ -64,7 +75,7 @@ class HistoryPart extends StatelessWidget {
                       ),
                       Gap(8),
                       Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam id efficitur ligula. Vivamus quis ligula urna. Nullam suscipit magna quis eleifend ultrices.',
+                        history!.heritage ?? 'No motorsport heritage data available.',
                         style: context.textTheme.bodyMedium?.copyWith(
                           fontSize: 14,
                           color: Colors.white,
@@ -84,7 +95,7 @@ class HistoryPart extends StatelessWidget {
           ),
           Gap(8),
           ...List.generate(
-            3,
+            history!.funFacts?.length ?? 0,
             (i) => Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
@@ -102,21 +113,25 @@ class HistoryPart extends StatelessWidget {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
                     children: [
-                      Text(
-                        '💡',
-                        style: context.textTheme.headlineSmall,
-                      ),
-                      Gap(8),
-                      Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam id efficitur ligula.',
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          fontSize: 14,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w400,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '💡',
+                            style: context.textTheme.headlineSmall,
+                          ),
+                          Gap(8),
+                          Text(
+                            history!.funFacts![i],
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              fontSize: 14,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -140,7 +155,7 @@ class HistoryPart extends StatelessWidget {
                 ),
                 Gap(8),
                 Text(
-                  'SAM HUNG',
+                  history!.designerName ?? 'N/A',
                   style: context.textTheme.headlineSmall?.copyWith(
                     fontSize: 22,
                     color: Colors.white,

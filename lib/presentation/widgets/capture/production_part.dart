@@ -1,17 +1,29 @@
 import 'package:arc_progress_bar_new/arc_progress_bar_new.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import '../../../models/car/car_production_model.dart';
 
 import '../../../core/extensions.dart';
 
 class ProductionPart extends StatelessWidget {
-  const ProductionPart({super.key});
+  const ProductionPart({super.key, required this.production});
+
+  final CarProductionModel? production;
 
   @override
   Widget build(BuildContext context) {
+    if (production == null) {
+      return Center(
+        child: Text(
+          'No production data available.',
+          style: context.textTheme.bodyMedium,
+        ),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
             height: 360,
@@ -24,20 +36,21 @@ class ProductionPart extends StatelessWidget {
                     children: [
                       ProductionCard(
                         title: 'YEARS PRODUCED',
-                        subtitle: '2018 - 2020',
+                        subtitle: '${production!.yearStart} - ${production!.yearEnd}',
                       ),
                       ProductionCard(
                         title: 'ORIGINAL MSRP',
-                        subtitle: '\$958,966',
+                        subtitle: '\$${production!.msrp}',
                       ),
                       ProductionCard(
                         title: 'TOTAL MADE',
-                        subtitle: '500',
+                        subtitle: '${production!.totalMade}',
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text('Description', style: context.textTheme.headlineSmall),
-                      ),
+                      if (production!.description != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text('Description', style: context.textTheme.headlineSmall),
+                        ),
                     ],
                   ),
                 ),
@@ -53,14 +66,16 @@ class ProductionPart extends StatelessWidget {
             ),
           ),
           Gap(16),
-          Text(
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam id efficitur ligula. Vivamus quis ligula urna. Nullam suscipit magna quis eleifend ultrices.',
-            style: context.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.normal,
-              fontSize: 14,
+          if (production!.description != null) ...[
+            Text(
+              production!.description!,
+              style: context.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.normal,
+                fontSize: 14,
+              ),
             ),
-          ),
-          Gap(16),
+            Gap(16),
+          ],
           Stack(
             children: [
               ArcProgressBar(
@@ -101,7 +116,7 @@ class ProductionPart extends StatelessWidget {
                     ),
                     Gap(12),
                     Text(
-                      '\$1,200,000 - \$2,000,000',
+                      '\$${production!.minValue} - \$${production!.maxValue}',
                       style: context.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         fontSize: 22,

@@ -1,35 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import '../../../models/car/car_specs_model.dart';
 
 import '../../../core/extensions.dart';
-import 'performance_gauge.dart';
 
 class SpecsPart extends StatelessWidget {
-  const SpecsPart({super.key});
+  const SpecsPart({super.key, required this.specs});
+
+  final CarSpecsModel? specs;
 
   @override
   Widget build(BuildContext context) {
+    if (specs == null) {
+      return Center(
+        child: Text(
+          'No specs data available.',
+          style: context.textTheme.bodyMedium,
+        ),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
           Gap(8),
-          PerformanceGaugeWidget(),
+          // PerformanceGaugeWidget(),
           // TODO: Replace with actual design
-          // SizedBox(
-          //   height: 200,
-          //   child: Center(
-          //     child: Text(
-          //       'Speed Meter Type Design Coming Soon!',
-          //       style: context.textTheme.bodyMedium?.copyWith(
-          //         fontWeight: FontWeight.bold,
-          //         fontSize: 16,
-          //         color: Colors.grey,
-          //         fontStyle: FontStyle.italic,
-          //       ),
-          //     ),
-          //   ),
-          // ),
+          SizedBox(
+            height: 200,
+            child: Center(
+              child: Text(
+                'Speed Meter Type Design Coming Soon!',
+                style: context.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.grey,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+          ),
           // PerformanceGaugeWidget(
           //   accel1: 2.8,
           //   accel2: 2.8,
@@ -69,19 +79,19 @@ class SpecsPart extends StatelessWidget {
                       children: [
                         SpecsCard(
                           title: 'CONFIGURATION',
-                          subtitle: 'v8 Twin Turbo',
+                          subtitle: specs!.configuration ?? 'N/A',
                         ),
                         SpecsCard(
-                          title: 'CONFIGURATION',
-                          subtitle: 'v8 Twin Turbo',
+                          title: 'DISPLACEMENT',
+                          subtitle: '${specs!.displacementl ?? 0.0}L',
                         ),
                         SpecsCard(
-                          title: 'CONFIGURATION',
-                          subtitle: 'v8 Twin Turbo',
+                          title: 'POWER',
+                          subtitle: '${specs!.powerKw} kw/h',
                         ),
                         SpecsCard(
-                          title: 'CONFIGURATION',
-                          subtitle: 'v8 Twin Turbo',
+                          title: 'Torque',
+                          subtitle: '${specs!.torqueNm} Nm',
                         ),
                       ],
                     ),

@@ -8,147 +8,153 @@ import '../../providers/map/lat_lng.dart';
 
 class CarCard extends StatelessWidget {
   final CarSpotModel carSpot;
-  const CarCard({required this.carSpot, super.key});
+  const CarCard({required this.carSpot, super.key, this.onTap});
+
+  final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Stack(
-          children: [
-            Positioned(
-              child: CircleAvatar(
-                backgroundColor: Colors.grey.shade800,
-                radius: 26,
-                child: ClipRRect(
-                  borderRadius: BorderRadiusGeometry.circular(269),
-                  child: Image.network(
-                    carSpot.car?.make?.logoUrl ?? '',
+    return InkWell(
+      borderRadius: BorderRadius.circular(24),
+      onTap: onTap,
+      child: Stack(
+        children: [
+          Stack(
+            children: [
+              Positioned(
+                child: CircleAvatar(
+                  backgroundColor: Colors.grey.shade800,
+                  radius: 26,
+                  child: ClipRRect(
+                    borderRadius: BorderRadiusGeometry.circular(269),
+                    child: Image.network(
+                      carSpot.car?.make?.logoUrl ?? '',
+                    ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(
-              height: context.height * 0.25,
-              width: context.width,
-              child: Stack(
-                children: [
-                  // Clipped background
-                  ClipPath(
-                    clipper: CircleClipper(
-                      circleRadius: 30,
-                      borderRadius: 24,
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(
-                            carSpot.imageUrl,
+              SizedBox(
+                height: context.height * 0.25,
+                width: context.width,
+                child: Stack(
+                  children: [
+                    // Clipped background
+                    ClipPath(
+                      clipper: CircleClipper(
+                        circleRadius: 30,
+                        borderRadius: 24,
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(
+                              carSpot.imageUrl,
+                            ),
+                            fit: BoxFit.cover,
                           ),
-                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
-                  ),
 
-                  // Border drawn on top
-                  CustomPaint(
-                    painter: CircleBorderPainter(
-                      circleRadius: 30,
-                      borderRadius: 24,
-                      borderColor: Colors.grey.shade800,
-                      borderWidth: 1,
-                    ),
-                    child: Container(),
-                  ),
-
-                  // Blakck gradient
-                  ClipPath(
-                    clipper: CircleClipper(
-                      circleRadius: 30,
-                      borderRadius: 24,
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            Colors.black,
-                            Colors.transparent,
-                            Colors.black,
-                          ],
-                        ),
+                    // Border drawn on top
+                    CustomPaint(
+                      painter: CircleBorderPainter(
+                        circleRadius: 30,
+                        borderRadius: 24,
+                        borderColor: Colors.grey.shade800,
+                        borderWidth: 1,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Consumer(
-                              builder: (_, ref, __) {
-                                String address;
-                                if (carSpot.latitude == null || carSpot.longitude == null) {
-                                  address = carSpot.id;
-                                } else {
-                                  address =
-                                      ref
-                                          .watch(
-                                            getLocationBasedOnLatLngPd(
-                                              LatLng(carSpot.latitude!, carSpot.longitude!),
-                                            ),
-                                          )
-                                          .value
-                                          ?.formattedAddress ??
-                                      carSpot.id;
-                                }
-                                return SizedBox(
-                                  width: context.width - 100,
-                                  child: Text(
-                                    address,
-                                    textAlign: TextAlign.right,
-                                    style: context.textTheme.bodyLarge?.copyWith(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w300,
+                      child: Container(),
+                    ),
+
+                    // Blakck gradient
+                    ClipPath(
+                      clipper: CircleClipper(
+                        circleRadius: 30,
+                        borderRadius: 24,
+                      ),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [
+                              Colors.black,
+                              Colors.transparent,
+                              Colors.black,
+                            ],
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Consumer(
+                                builder: (_, ref, __) {
+                                  String address;
+                                  if (carSpot.latitude == null || carSpot.longitude == null) {
+                                    address = carSpot.id;
+                                  } else {
+                                    address =
+                                        ref
+                                            .watch(
+                                              getLocationBasedOnLatLngPd(
+                                                LatLng(carSpot.latitude!, carSpot.longitude!),
+                                              ),
+                                            )
+                                            .value
+                                            ?.formattedAddress ??
+                                        carSpot.id;
+                                  }
+                                  return SizedBox(
+                                    width: context.width - 100,
+                                    child: Text(
+                                      address,
+                                      textAlign: TextAlign.right,
+                                      style: context.textTheme.bodyLarge?.copyWith(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w300,
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
-                            const Spacer(),
-                            SizedBox(
-                              width: double.infinity,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    carSpot.car?.make?.name ?? '',
-                                    style: context.textTheme.headlineSmall?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    carSpot.car?.model ?? '',
-                                    style: context.textTheme.bodyLarge?.copyWith(
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
+                                  );
+                                },
                               ),
-                            ),
-                          ],
+                              const Spacer(),
+                              SizedBox(
+                                width: double.infinity,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      carSpot.car?.make?.name ?? '',
+                                      style: context.textTheme.headlineSmall?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      carSpot.car?.model ?? '',
+                                      style: context.textTheme.bodyLarge?.copyWith(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

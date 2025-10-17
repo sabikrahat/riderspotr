@@ -28,12 +28,11 @@ class CarSpotModel {
     required this.isClaimed,
   });
 
-  factory CarSpotModel.fromJson(Map<String, dynamic> json) =>
-      _$CarSpotModelFromJson(json);
+  factory CarSpotModel.fromJson(Map<String, dynamic> json) => _$CarSpotModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$CarSpotModelToJson(this);
 
-  static const query = '*, car(*, make(*))';
+  static const query = '*, car(*, make(*), production: car_production(*), specs: car_specs(*), history: car_history(*))';
 
   // Create a copy with method
   CarSpotModel copyWith({
