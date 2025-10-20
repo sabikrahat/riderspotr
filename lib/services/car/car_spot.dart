@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -21,7 +22,10 @@ class CarSpotService {
           .eq('user', _client.auth.currentUser!.id)
           .eq('is_claimed', true);
       debugPrint('Car Spots fetched: ${res.toString()}');
-      return res.map((e) => CarSpotModel.fromJson(e)).toList();
+      final list = res.map((e) => CarSpotModel.fromJson(e)).toList();
+      // copy the data json in clipboard
+      await Clipboard.setData(ClipboardData(text: res[0].toString()));
+      return list;
     } on SocketException catch (e) {
       throw KException('No internet connection. ${e.message}');
     } on AuthException catch (e) {

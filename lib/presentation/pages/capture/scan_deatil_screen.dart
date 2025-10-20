@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/extensions.dart';
+import '../../../models/car/car_spot_model.dart';
 import '../../widgets/capture/scan_detail_container.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/page_padding.dart';
@@ -11,7 +12,9 @@ import 'car_deatil_screen.dart';
 
 class ScanDeatilScreen extends StatelessWidget {
   static const String routeName = '/scan-detail';
-  const ScanDeatilScreen({super.key});
+  const ScanDeatilScreen({super.key, required this.carSpot});
+
+  final CarSpotModel? carSpot;
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +113,7 @@ class ScanDeatilScreen extends StatelessWidget {
                   title: 'LEVEL UP',
                   buttonText: 'DETAILS',
                   onButtonPressed: () async =>
-                      await context.push(CarDeatilScreen.routeName, extra: null),
+                      await context.push(CarDeatilScreen.routeName, extra: carSpot),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

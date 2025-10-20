@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -32,6 +33,7 @@ class Ridespotr extends StatelessWidget {
         showSemanticsDebugger: false,
         theme: theme(context),
         routerConfig: router,
+        builder: EasyLoading.init(),
       ),
     );
   }

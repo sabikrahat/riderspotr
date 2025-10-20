@@ -1,8 +1,13 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../core/toastification.dart';
+import '../../../models/car/car_spot_model.dart';
 
 import '../../../core/extensions.dart';
+import '../../../services/capture/capture.dart';
 import '../../widgets/capture/scanner.dart';
 import '../../widgets/shared/back.dart';
 import 'scan_deatil_screen.dart';
@@ -134,7 +139,39 @@ class _CameraScreenState extends State<CameraScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     GestureDetector(
-                      onTap: () async => await context.push(ScanDeatilScreen.routeName),
+                      onTap: () async {
+                        // capture image
+                        try {
+                          EasyLoading.show();
+                          // final XFile? file = await _controller?.takePicture();
+                          // TODO: Replace the dummy data
+                          final XFile? file = await ImagePicker().pickImage(
+                            source: ImageSource.gallery,
+                          );
+                          if (file == null) {
+                            showAlertMessage('Failed to capture image. Please try again.');
+                            return;
+                          }
+                          final url = await CaptureService().uploadFileToStorage(file);
+                          if (url == null) {
+                            showAlertMessage('Failed to upload image. Please try again.');
+                            return;
+                          }
+                          debugPrint('Image uploaded to: $url');
+
+                          final res = await CaptureService().uploadToEdgeFunction(url);
+                          debugPrint('Edge function upload result: $res');
+                          final carSpotModel = CarSpotModel.fromJson(res['data']);
+                          EasyLoading.dismiss();
+                          if (!context.mounted) return;
+                          await context.push(ScanDeatilScreen.routeName, extra: carSpotModel);
+                        } catch (e) {
+                          debugPrint('Error capturing image: $e');
+                          showAlertMessage('Error capturing image: $e');
+                        } finally {
+                          EasyLoading.dismiss();
+                        }
+                      },
                       child: Container(
                         width: 80,
                         height: 80,

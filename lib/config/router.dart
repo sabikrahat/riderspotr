@@ -117,7 +117,7 @@ final router = GoRouter(
     GoRoute(
       path: ScanDeatilScreen.routeName,
       redirect: authHandler,
-      builder: (_, _) => ScanDeatilScreen(),
+      builder: (_, state) => ScanDeatilScreen(carSpot: state.extra as CarSpotModel?),
     ),
     GoRoute(
       path: CarDeatilScreen.routeName,
