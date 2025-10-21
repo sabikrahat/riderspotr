@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:uuid/uuid.dart';
 import '../../config/constants.dart';
 import '../google_maps/google_maps_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,7 +19,7 @@ class CaptureService {
 
   Future<String?> uploadFileToStorage(XFile file) async {
     try {
-      final path = '${DateTime.now().millisecondsSinceEpoch}_${file.name}';
+      final path = '${const Uuid().v4()}.jpg';
       // upload to supabase storage bucket 'car-spots'
       final res = await _client.storage
           .from('car-spots')
@@ -39,13 +41,16 @@ class CaptureService {
       // will return latitude and longitude and address string
       final data = await _getLocation();
       // edge function call
+      // TODO: Replace the dummy url to actual
       final requestBody = {
-        'imageUrl': url,
+        // 'imageUrl': url,
+        'imageUrl': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfjl-oShMovlXEXFkzBCKMGgk8EaeEU-1HlA&s',
         ...data,
       };
       debugPrint('Uploading to edge function with data: $requestBody');
       final response = await _client.functions.invoke('scan-car', body: requestBody);
       debugPrint('Edge function <scan-car> response: ${response.data}');
+      await Clipboard.setData(ClipboardData(text: response.data.toString()));
       return response.data as Map<String, dynamic>;
     } catch (e) {
       throw Exception('Error uploading to edge function: $e');

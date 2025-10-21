@@ -144,7 +144,7 @@ class _CameraScreenState extends State<CameraScreen> {
                         try {
                           EasyLoading.show();
                           // final XFile? file = await _controller?.takePicture();
-                          // TODO: Replace the dummy data
+                          // TODO: Replace the dummy imagepciker with the actual capture data.
                           final XFile? file = await ImagePicker().pickImage(
                             source: ImageSource.gallery,
                           );

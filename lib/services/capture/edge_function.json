@@ -1,0 +1,67 @@
+{
+    "success": true,
+    "message": "Car matched successfully (exact match)",
+    "data": {
+        "id": "27186410-555c-4561-86af-4fdb173c4749",
+        "created_at": "2025-10-21T05:03:08.816011+00:00",
+        "user": "13fbdcdd-1ad6-4899-bcc8-004ab30fdebd",
+        "car": {
+            "id": "e2a3de6a-18a3-4892-a707-934548c42d18",
+            "created_at": "2025-10-20T00:02:18.915828+00:00",
+            "make": {
+                "id": "60a7d2e1-4633-4e8c-a1c3-00b1a8a1c5d9",
+                "name": "Lamborghini",
+                "logo_url": "https://example.com/logos/lamborghini.png",
+                "created_at": "2025-10-08T00:46:03.114501+00:00"
+            },
+            "model": "Aventador S Roadster",
+            "rarity": "common",
+            "points": 10,
+            "description": "The Lamborghini Aventador S Roadster is a high-performance supercar featuring a V12 engine and a striking design. It offers open-top driving with advanced aerodynamics and cutting-edge technology, making it a standout in the luxury sports car segment.",
+            "specs": {
+                "car": "e2a3de6a-18a3-4892-a707-934548c42d18",
+                "power_kw": 544,
+                "torque_nm": 690,
+                "weight_kg": 1625,
+                "configuration": "V12 Naturally Aspirated",
+                "top_speed_kmh": 350,
+                "displacement_l": 6.5,
+                "quarter_mile_s": 10.6,
+                "acceleration_0_100": 3
+            },
+            "history": {
+                "car": "e2a3de6a-18a3-4892-a707-934548c42d18",
+                "heritage": "The Aventador line continues Lamborghini's tradition of V12-powered supercars, following in the footsteps of models like the Murciélago and Diablo.",
+                "fun_facts": [
+                    "The Aventador S Roadster features a removable roof panel for open-air driving.",
+                    "It includes Lamborghini's Dynamic Steering system for enhanced handling.",
+                    "The car's design is inspired by aerospace technology.",
+                    "It offers customizable driving modes for different driving experiences.",
+                    "The Aventador S Roadster was unveiled at the 2017 Frankfurt Motor Show.",
+                    "It features a TFT digital dashboard with customizable displays."
+                ],
+                "significance": "The Aventador S Roadster represents Lamborghini's commitment to combining extreme performance with luxury and style. It is known for its powerful V12 engine and advanced aerodynamics.",
+                "designer_name": "Filippo Perini"
+            },
+            "production": {
+                "car": "e2a3de6a-18a3-4892-a707-934548c42d18",
+                "msrp": 460000,
+                "year_end": 2021,
+                "max_value": 450000,
+                "min_value": 300000,
+                "total_made": null,
+                "year_start": 2017,
+                "description": "The Aventador S Roadster was produced as a convertible variant of the Aventador S, offering a blend of performance and luxury.",
+                "circulation_count": null
+            },
+            "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfjl-oShMovlXEXFkzBCKMGgk8EaeEU-1HlA&s",
+            "lat_lng": "0101000020E6100000E010AAD4EC216240AD174339D1EA42C0",
+            "location": {
+                "latitude": -37.83451,
+                "longitude": 145.06016
+            },
+            "is_claimed": false,
+            "address": "38 John Street, Melbourne, Australia"
+        }
+    }
+}

@@ -35,4 +35,20 @@ class CarSpotService {
       throw KException(e.toString());
     }
   }
+
+  Future<void> markClaimed(String id) async {
+    try {
+      await _client.from('car_spots').update({'is_claimed': true}).eq('id', id);
+    } catch (e) {
+      throw Exception('Error marking claimed: $e');
+    }
+  }
+
+  Future<void> delete(String id) async {
+    try {
+      await _client.from('car_spots').delete().eq('id', id);
+    } catch (e) {
+      throw Exception('Error deleting car spot: $e');
+    }
+  }
 }

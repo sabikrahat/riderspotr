@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/toastification.dart';
+import '../../../services/car/car_spot.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
@@ -31,7 +33,7 @@ class ScanDeatilScreen extends StatelessWidget {
           SizedBox(
             width: context.width,
             height: context.height,
-            child: Image.asset('assets/images/demo.png', fit: BoxFit.cover),
+            child: Image.network(carSpot!.imageUrl, fit: BoxFit.cover),
           ),
           // Title and rarity
           Positioned(
@@ -57,7 +59,7 @@ class ScanDeatilScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'LAMBORGHINI AVENTADOR',
+                        carSpot!.car?.make?.name.toUpperCase() ?? 'UNKNOWN MAKE',
                         style: context.textTheme.headlineMedium,
                       ),
                       Container(
@@ -186,7 +188,15 @@ class ScanDeatilScreen extends StatelessWidget {
                         spacing: 8,
                         children: [
                           FilledButton.icon(
-                            onPressed: () {},
+                            onPressed: () async {
+                              try {
+                                await CarSpotService().delete(carSpot!.id);
+                                if (!context.mounted) return;
+                                context.pop();
+                              } catch (e) {
+                                showErrorMessage('Error deleting car spot: $e');
+                              }
+                            },
                             icon: Icon(Icons.refresh),
                             label: Text('Retake'),
                           ),
@@ -207,7 +217,14 @@ class ScanDeatilScreen extends StatelessWidget {
                                   fixedSize: WidgetStatePropertyAll(Size(double.infinity, 40)),
                                   foregroundColor: WidgetStatePropertyAll(Colors.white),
                                 ),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  try {
+                                    await CarSpotService().markClaimed(carSpot!.id);
+                                    showSuccessMessage('Car spot claimed successfully!');
+                                  } catch (e) {
+                                    showErrorMessage('Error claiming car spot: $e');
+                                  }
+                                },
                                 icon: Icon(Icons.check),
                                 label: Text(
                                   'CLAIM',
