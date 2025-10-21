@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../models/car/car_spot_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../models/car/car_spot_model.dart';
 import '../presentation/pages/auth/about_you_screen.dart';
 import '../presentation/pages/auth/login_screen.dart';
 import '../presentation/pages/auth/otp_screen.dart';

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import '../../../models/car/car_specs_model.dart';
 
 import '../../../core/extensions.dart';
+import '../../../models/car/car_specs_model.dart';
 
 class SpecsPart extends StatelessWidget {
   const SpecsPart({super.key, required this.specs});

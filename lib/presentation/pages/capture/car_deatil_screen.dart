@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../models/car/car_spot_model.dart';
 
 import '../../../core/extensions.dart';
+import '../../../models/car/car_spot_model.dart';
 import '../../widgets/capture/history_part.dart';
 import '../../widgets/capture/production_part.dart';
 import '../../widgets/capture/specs_part.dart';

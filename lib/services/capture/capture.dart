@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+
 import '../../config/constants.dart';
 import '../google_maps/google_maps_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CaptureService {
   late SupabaseClient _client;

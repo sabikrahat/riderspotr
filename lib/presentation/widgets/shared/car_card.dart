@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../../models/car/car_spot_model.dart';
 
 import '../../../core/extensions.dart';
+import '../../../models/car/car_spot_model.dart';
 import '../../providers/map/lat_lng.dart';
 
 class CarCard extends StatelessWidget {

@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
-import '../../../models/car/car_spot_model.dart';
 
 import '../../../core/extensions.dart';
+import '../../../models/car/car_spot_model.dart';
 import '../../../models/map/map_marker_model.dart';
 import '../../providers/car/car_spot_provider.dart';
 import '../../widgets/shared/back.dart';

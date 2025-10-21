@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../core/toastification.dart';
-import '../../../models/car/car_spot_model.dart';
 
 import '../../../core/extensions.dart';
+import '../../../core/toastification.dart';
+import '../../../models/car/car_spot_model.dart';
 import '../../../services/capture/capture.dart';
 import '../../widgets/capture/scanner.dart';
 import '../../widgets/shared/back.dart';

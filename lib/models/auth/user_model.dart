@@ -81,4 +81,6 @@ class UserModel {
     address: address ?? this.address,
     createdAt: createdAt,
   );
+
+  String get fullName => "$firstName$lastName";
 }
