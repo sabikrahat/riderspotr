@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'friend_profile.dart';
-
 import '../../../core/extensions.dart';
 import '../../providers/user_stats/user_stats_provider.dart';
 import '../../widgets/leaderboard/comparison_bar.dart';
@@ -199,8 +197,9 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                         children: [
                                           InkWell(
                                             borderRadius: BorderRadius.circular(30),
-                                            onTap: () async =>
-                                                await context.push(FriendProfileScreen.routeName),
+                                            onTap: () async {
+                                              // TODO:
+                                            },
                                             child: CircleAvatar(
                                               radius: 25,
                                               backgroundImage: const NetworkImage(

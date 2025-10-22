@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
-import '../../../core/extensions.dart';
-import 'friend_profile.dart';
-import '../../widgets/shared/page_padding.dart';
 
+import '../../../core/extensions.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/carbon_background.dart';
+import '../../widgets/shared/page_padding.dart';
 
 class SearchFriendScreen extends StatelessWidget {
   const SearchFriendScreen({super.key});
@@ -110,7 +108,9 @@ class SearchFriendScreen extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 16.0),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(12),
-                      onTap: () async => await context.push(FriendProfileScreen.routeName),
+                      onTap: () {
+                        //TODO:
+                      },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Stack(
