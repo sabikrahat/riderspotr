@@ -13,7 +13,7 @@ import '../presentation/pages/auth/your_location_screen.dart';
 import '../presentation/pages/capture/camera_screen.dart';
 import '../presentation/pages/capture/car_deatil_screen.dart';
 import '../presentation/pages/capture/scan_deatil_screen.dart';
-import '../presentation/pages/explore/explore.dart';
+import '../presentation/pages/explore/explore_screen.dart';
 import '../presentation/pages/garage/garage_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
 import '../presentation/pages/leaderboard/leaderboard_screen.dart';
@@ -117,12 +117,14 @@ final router = GoRouter(
     GoRoute(
       path: ScanDeatilScreen.routeName,
       redirect: authHandler,
-      builder: (_, state) => ScanDeatilScreen(carSpot: state.extra as CarSpotModel?),
+      builder: (_, state) =>
+          ScanDeatilScreen(carSpot: state.extra as CarSpotModel?),
     ),
     GoRoute(
       path: CarDeatilScreen.routeName,
       redirect: authHandler,
-      builder: (_, state) => CarDeatilScreen(carSpot: state.extra as CarSpotModel?),
+      builder: (_, state) =>
+          CarDeatilScreen(carSpot: state.extra as CarSpotModel?),
     ),
   ],
 );

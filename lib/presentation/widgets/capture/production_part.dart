@@ -36,7 +36,8 @@ class ProductionPart extends StatelessWidget {
                     children: [
                       ProductionCard(
                         title: 'YEARS PRODUCED',
-                        subtitle: '${production!.yearStart} - ${production!.yearEnd}',
+                        subtitle:
+                            '${production!.yearStart} - ${production!.yearEnd ?? DateTime.now().year}',
                       ),
                       ProductionCard(
                         title: 'ORIGINAL MSRP',
@@ -49,7 +50,10 @@ class ProductionPart extends StatelessWidget {
                       if (production!.description != null)
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
-                          child: Text('Description', style: context.textTheme.headlineSmall),
+                          child: Text(
+                            'Description',
+                            style: context.textTheme.headlineSmall,
+                          ),
                         ),
                     ],
                   ),

@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/extensions.dart';
 import '../../widgets/capture/scan_detail_container.dart';
-import '../explore/explore.dart';
+import '../explore/explore_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

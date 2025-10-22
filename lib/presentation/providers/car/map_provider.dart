@@ -4,24 +4,24 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../models/car/car_spot_model.dart';
-import '../../../services/car/car_spot.dart';
+import '../../../services/car/car_service.dart';
 
-part 'car_spot_provider.g.dart';
+part 'map_provider.g.dart';
 
 @Riverpod(keepAlive: true)
-class CarSpotNotifier extends _$CarSpotNotifier {
+class MapNotifier extends _$MapNotifier {
   List<CarSpotModel> _carSpots = [];
 
   @override
   FutureOr<List<CarSpotModel>> build() async {
-    _carSpots = await CarSpotService().getCarSpots();
+    _carSpots = await CarService().getAllCarSpots();
     return _carSpots;
   }
 
   List<CarSpotModel> get carSpots => _carSpots;
 
   Future<void> refresh() async {
-    _carSpots = await CarSpotService().getCarSpots();
+    _carSpots = await CarService().getAllCarSpots();
     state = AsyncValue.data(_carSpots);
   }
 

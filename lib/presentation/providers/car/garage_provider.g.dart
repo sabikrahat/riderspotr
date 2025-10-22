@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'car_spot_provider.dart';
+part of 'garage_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,33 +9,33 @@ part of 'car_spot_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(CarSpotNotifier)
-const carSpotProvider = CarSpotNotifierProvider._();
+@ProviderFor(GarageNotifier)
+const garageProvider = GarageNotifierProvider._();
 
-final class CarSpotNotifierProvider
-    extends $AsyncNotifierProvider<CarSpotNotifier, List<CarSpotModel>> {
-  const CarSpotNotifierProvider._()
+final class GarageNotifierProvider
+    extends $AsyncNotifierProvider<GarageNotifier, List<CarSpotModel>> {
+  const GarageNotifierProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'carSpotProvider',
+        name: r'garageProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$carSpotNotifierHash();
+  String debugGetCreateSourceHash() => _$garageNotifierHash();
 
   @$internal
   @override
-  CarSpotNotifier create() => CarSpotNotifier();
+  GarageNotifier create() => GarageNotifier();
 }
 
-String _$carSpotNotifierHash() => r'073042b058d8f00b9f9235dd020a0213dbe2a771';
+String _$garageNotifierHash() => r'3cd36fc97b0c2286b6e2d853821208e0375b1410';
 
-abstract class _$CarSpotNotifier extends $AsyncNotifier<List<CarSpotModel>> {
+abstract class _$GarageNotifier extends $AsyncNotifier<List<CarSpotModel>> {
   FutureOr<List<CarSpotModel>> build();
   @$mustCallSuper
   @override

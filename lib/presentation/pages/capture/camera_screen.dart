@@ -1,27 +1,27 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
-import '../../../models/car/car_spot_model.dart';
-import '../../../services/capture/capture.dart';
+import '../../providers/car/garage_provider.dart';
 import '../../widgets/capture/scanner.dart';
 import '../../widgets/shared/back.dart';
 import 'scan_deatil_screen.dart';
 
-class CameraScreen extends StatefulWidget {
+class CameraScreen extends ConsumerStatefulWidget {
   const CameraScreen({super.key});
 
   static const String routeName = '/camera';
 
   @override
-  State<CameraScreen> createState() => _CameraScreenState();
+  ConsumerState<CameraScreen> createState() => _CameraScreenState();
 }
 
-class _CameraScreenState extends State<CameraScreen> {
+class _CameraScreenState extends ConsumerState<CameraScreen> {
   CameraController? _controller;
   Future<void>? _initializeControllerFuture;
   bool _isLoading = true;
@@ -143,28 +143,32 @@ class _CameraScreenState extends State<CameraScreen> {
                         // capture image
                         try {
                           EasyLoading.show();
-                          // final XFile? file = await _controller?.takePicture();
+                          final XFile? file = await _controller?.takePicture();
                           // TODO: Replace the dummy imagepciker with the actual capture data.
-                          final XFile? file = await ImagePicker().pickImage(
-                            source: ImageSource.gallery,
-                          );
+                          // final XFile? file = await ImagePicker().pickImage(
+                          //   source: ImageSource.gallery,
+                          // );
                           if (file == null) {
-                            showAlertMessage('Failed to capture image. Please try again.');
+                            showAlertMessage(
+                              'Failed to capture image. Please try again.',
+                            );
                             return;
                           }
-                          final url = await CaptureService().uploadFileToStorage(file);
-                          if (url == null) {
-                            showAlertMessage('Failed to upload image. Please try again.');
-                            return;
-                          }
-                          debugPrint('Image uploaded to: $url');
 
-                          final res = await CaptureService().uploadToEdgeFunction(url);
-                          debugPrint('Edge function upload result: $res');
-                          final carSpotModel = CarSpotModel.fromJson(res['data']);
+                          // Use garage provider to scan the car
+                          final garageNotifier = ref.read(
+                            garageProvider.notifier,
+                          );
+                          final carSpotModel = await garageNotifier.scanCar(
+                            file,
+                          );
+
                           EasyLoading.dismiss();
                           if (!context.mounted) return;
-                          await context.push(ScanDeatilScreen.routeName, extra: carSpotModel);
+                          await context.push(
+                            ScanDeatilScreen.routeName,
+                            extra: carSpotModel,
+                          );
                         } catch (e) {
                           debugPrint('Error capturing image: $e');
                           showAlertMessage('Error capturing image: $e');
@@ -195,7 +199,9 @@ class _CameraScreenState extends State<CameraScreen> {
                     const SizedBox(height: 12),
                     Text(
                       'Tap to capture',
-                      style: context.textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: Colors.white70,
+                      ),
                     ),
                   ],
                 ),
