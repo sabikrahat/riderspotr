@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import '../leaderboard/search_friend.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
@@ -205,40 +207,45 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                         ),
                         Gap(16),
                         // Search Bar
-                        TextFormField(
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            hintText: 'Search your cars',
-                            hintStyle: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey[800],
-                            prefixIcon: Icon(Icons.search, color: Colors.white),
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal: 16,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Colors.grey[800]!,
-                                width: 1,
+                        InkWell(
+                          onTap: () async => await context.push(SearchFriendScreen.routeName),
+                          borderRadius: BorderRadius.circular(12),
+                          child: TextFormField(
+                            enabled: false,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              hintText: 'Search your cars',
+                              hintStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
                               ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Colors.grey[800]!,
-                                width: 1,
+                              filled: true,
+                              fillColor: Colors.grey[800],
+                              prefixIcon: Icon(Icons.search, color: Colors.white),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 16,
                               ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Colors.grey[800]!,
-                                width: 1,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[800]!,
+                                  width: 1,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[800]!,
+                                  width: 1,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[800]!,
+                                  width: 1,
+                                ),
                               ),
                             ),
                           ),

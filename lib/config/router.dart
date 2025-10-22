@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../presentation/pages/leaderboard/search_friend.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/car/car_spot_model.dart';
@@ -16,6 +17,7 @@ import '../presentation/pages/capture/scan_deatil_screen.dart';
 import '../presentation/pages/explore/explore.dart';
 import '../presentation/pages/garage/garage_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
+import '../presentation/pages/leaderboard/friend_profile.dart';
 import '../presentation/pages/leaderboard/leaderboard_screen.dart';
 import '../presentation/pages/nav_screen.dart';
 import '../presentation/pages/profile/profile_screen.dart';
@@ -83,6 +85,16 @@ final router = GoRouter(
       path: ExploreScreen.routeName,
       // redirect: authHandler,
       builder: (_, _) => ExploreScreen(),
+    ),
+    GoRoute(
+      path: SearchFriendScreen.routeName,
+      // redirect: authHandler,
+      builder: (_, _) => SearchFriendScreen(),
+    ),
+    GoRoute(
+      path: FriendProfileScreen.routeName,
+      // redirect: authHandler,
+      builder: (_, _) => FriendProfileScreen(),
     ),
     ShellRoute(
       redirect: authHandler,

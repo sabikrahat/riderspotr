@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import 'friend_profile.dart';
 
 import '../../../core/extensions.dart';
 import '../../providers/user_stats/user_stats_provider.dart';
@@ -8,6 +10,7 @@ import '../../widgets/leaderboard/comparison_bar.dart';
 import '../../widgets/leaderboard/summary_card.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/page_padding.dart';
+import 'search_friend.dart';
 
 class LeaderboardScreen extends ConsumerStatefulWidget {
   const LeaderboardScreen({super.key});
@@ -45,7 +48,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                           Text('LEADERBOARD', style: context.textTheme.headlineMedium),
                           InkWell(
                             borderRadius: BorderRadius.circular(45),
-                            onTap: () {},
+                            onTap: () async => await context.push(SearchFriendScreen.routeName),
                             child: Icon(
                               Icons.person_add_alt_1_rounded,
                               color: Colors.white,
@@ -194,10 +197,15 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                       ),
                                       child: Row(
                                         children: [
-                                          CircleAvatar(
-                                            radius: 25,
-                                            backgroundImage: const NetworkImage(
-                                              'https://picsum.photos/200',
+                                          InkWell(
+                                            borderRadius: BorderRadius.circular(30),
+                                            onTap: () async =>
+                                                await context.push(FriendProfileScreen.routeName),
+                                            child: CircleAvatar(
+                                              radius: 25,
+                                              backgroundImage: const NetworkImage(
+                                                'https://picsum.photos/200',
+                                              ),
                                             ),
                                           ),
                                           Gap(12),
