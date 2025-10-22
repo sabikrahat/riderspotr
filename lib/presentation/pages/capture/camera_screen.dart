@@ -1,22 +1,27 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridespotr/presentation/pages/capture/scan_deatil_screen.dart';
-import 'package:ridespotr/presentation/widgets/capture/scanner.dart';
+import 'package:image_picker/image_picker.dart';
+
 import '../../../core/extensions.dart';
-
+import '../../../core/toastification.dart';
+import '../../providers/car/garage_provider.dart';
+import '../../widgets/capture/scanner.dart';
 import '../../widgets/shared/back.dart';
+import 'scan_deatil_screen.dart';
 
-class CameraScreen extends StatefulWidget {
+class CameraScreen extends ConsumerStatefulWidget {
   const CameraScreen({super.key});
 
   static const String routeName = '/camera';
 
   @override
-  State<CameraScreen> createState() => _CameraScreenState();
+  ConsumerState<CameraScreen> createState() => _CameraScreenState();
 }
 
-class _CameraScreenState extends State<CameraScreen> {
+class _CameraScreenState extends ConsumerState<CameraScreen> {
   CameraController? _controller;
   Future<void>? _initializeControllerFuture;
   bool _isLoading = true;
@@ -134,8 +139,42 @@ class _CameraScreenState extends State<CameraScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        context.push(ScanDeatilScreen.routeName);
+                      onTap: () async {
+                        // capture image
+                        try {
+                          EasyLoading.show();
+                          final XFile? file = await _controller?.takePicture();
+                          // TODO: Replace the dummy imagepciker with the actual capture data.
+                          // final XFile? file = await ImagePicker().pickImage(
+                          //   source: ImageSource.gallery,
+                          // );
+                          if (file == null) {
+                            showAlertMessage(
+                              'Failed to capture image. Please try again.',
+                            );
+                            return;
+                          }
+
+                          // Use garage provider to scan the car
+                          final garageNotifier = ref.read(
+                            garageProvider.notifier,
+                          );
+                          final carSpotModel = await garageNotifier.scanCar(
+                            file,
+                          );
+
+                          EasyLoading.dismiss();
+                          if (!context.mounted) return;
+                          await context.push(
+                            ScanDeatilScreen.routeName,
+                            extra: carSpotModel,
+                          );
+                        } catch (e) {
+                          debugPrint('Error capturing image: $e');
+                          showAlertMessage('Error capturing image: $e');
+                        } finally {
+                          EasyLoading.dismiss();
+                        }
                       },
                       child: Container(
                         width: 80,

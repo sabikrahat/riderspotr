@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridespotr/core/exception.dart';
-import 'package:ridespotr/core/toastification.dart';
-import 'package:ridespotr/presentation/pages/auth/otp_screen.dart';
-import 'package:ridespotr/presentation/widgets/shared/loading_overlay.dart';
 
+import '../../../core/exception.dart';
 import '../../../core/extensions.dart';
+import '../../../core/toastification.dart';
 import '../../providers/auth/user_provider.dart';
 import '../../widgets/shared/back.dart';
+import '../../widgets/shared/custom_text_field.dart';
+import '../../widgets/shared/loading_overlay.dart';
 import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
-import '../../widgets/shared/custom_text_field.dart';
+import 'otp_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -50,10 +50,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         body: Stack(
           children: [
             Image.asset(
-              'assets/onboarding/login.png',
+              'assets/carbon/47.jpg',
               fit: BoxFit.cover,
               width: double.infinity,
-              height: context.height * 0.36,
+              height: context.height * 0.5,
             ),
             PagePadding(
               child: Column(
@@ -93,6 +93,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         context: context,
                                         email: _emailController.text,
                                       );
+                                      if (!context.mounted) return;
                                       context.push(
                                         OtpScreen.routeName,
                                         extra: OtpScreenParams(

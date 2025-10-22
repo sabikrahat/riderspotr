@@ -5,3 +5,6 @@ const supabaseKey =
 const usersTbl = 'users';
 
 const googleMapKey = 'AIzaSyBVLKzXc8b-kYbfpIYjHOV4cNbJmTP89_c';
+
+const mapBoxAccessToken =
+    'pk.eyJ1Ijoic2FtaHVuZzQxMSIsImEiOiJjbWZwMW8wbWcwYjYxMmxweDBsYWxpcng0In0.VKdPmqyZ3ONKWC6ex_kkLw';

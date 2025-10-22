@@ -17,10 +17,10 @@ class NavScreen extends StatelessWidget {
     switch (path.toLowerCase()) {
       case 'home':
         return KNavItem.home;
-      case 'map':
-        return KNavItem.map;
-      case 'graph':
-        return KNavItem.graph;
+      case 'garage':
+        return KNavItem.garage;
+      case 'leaderboard':
+        return KNavItem.leaderboard;
       case 'profile':
         return KNavItem.profile;
       default:
@@ -30,24 +30,18 @@ class NavScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: body,
-        bottomNavigationBar: KBottomNavbar(
-          selectedNavItem: _getSelectedNavItem(path),
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.grey.shade900,
-          shape: const CircleBorder(),
-          child: const Icon(
-            Icons.camera,
-            size: 40,
-            color: Colors.white,
-          ),
-          onPressed: () => context.push(CameraScreen.routeName),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      body: body,
+      bottomNavigationBar: KBottomNavbar(selectedNavItem: _getSelectedNavItem(path)),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.grey.shade900,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.camera, size: 40, color: Colors.white),
+        onPressed: () => context.push(CameraScreen.routeName),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
@@ -75,7 +69,7 @@ class KBottomNavbar extends StatelessWidget {
         safeAreaValues: const SafeAreaValues(bottom: false),
         onTap: (i) async {
           if (idx == i) return;
-          context.goNamed(KNavItem.values[i].route);
+          context.go(KNavItem.values[i].route);
         },
       ),
     );

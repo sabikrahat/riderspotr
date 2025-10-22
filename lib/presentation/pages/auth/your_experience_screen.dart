@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridespotr/core/exception.dart';
-import 'package:ridespotr/presentation/pages/auth/your_location_screen.dart';
-import 'package:ridespotr/presentation/widgets/shared/loading_overlay.dart';
 
+import '../../../core/exception.dart';
 import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
 import '../../providers/auth/user_provider.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/dropdown_textfield.dart';
+import '../../widgets/shared/loading_overlay.dart';
 import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
+import 'your_location_screen.dart';
 
 class YourExperienceScreen extends ConsumerStatefulWidget {
   static const String routeName = '/your-experience';

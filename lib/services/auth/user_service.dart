@@ -1,4 +1,6 @@
 import 'dart:io';
+
+import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../config/constants.dart';
@@ -96,7 +98,7 @@ class UserService {
 
   Future<void> update({required UserModel user}) async {
     try {
-      print("Updating user: ${user.toJson()}");
+      debugPrint("Updating user: ${user.toJson()}");
       // Check if username is used
       final username = await _client
           .from('usernames')

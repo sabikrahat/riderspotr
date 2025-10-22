@@ -1,0 +1,51 @@
+[
+    {
+        "id": "13fbdcdd-1ad6-4899-bcc8-004ab30fdebd",
+        "total_points": 4602,
+        "car_spots": 65,
+        "user": [
+            {
+                "id": "27d946c3-e415-43dc-9d2f-107900ef5b30",
+                "car": "65e2cf85-0a55-4b08-8e76-5c3aefecf5f1",
+                "user": "13fbdcdd-1ad6-4899-bcc8-004ab30fdebd",
+                "address": "38 John Street, Melbourne, Australia",
+                "lat_lng": "0101000020E61000006B6DD04D912062406E371CF1BFF142C0",
+                "location": {
+                    "latitude": -37.8725632,
+                    "longitude": 145.0653996
+                },
+                "image_url": "https://i.ytimg.com/vi/JfZgATJjP9U/maxresdefault.jpg",
+                "created_at": "2025-08-25T18:03:21.366177+00:00",
+                "is_claimed": false
+            },
+            {
+                "id": "3a2fb57a-4237-4a4a-aeb4-28fd6cfd6e8f",
+                "car": "65e2cf85-0a55-4b08-8e76-5c3aefecf5f1",
+                "user": "13fbdcdd-1ad6-4899-bcc8-004ab30fdebd",
+                "address": "38 John Street, Melbourne, Australia",
+                "lat_lng": "0101000020E6100000B15A4F63F1216240287BF07FECED42C0",
+                "location": {
+                    "latitude": -37.7789671,
+                    "longitude": 145.0337451
+                },
+                "image_url": "https://i.ytimg.com/vi/JfZgATJjP9U/maxresdefault.jpg",
+                "created_at": "2025-10-06T05:52:42.938951+00:00",
+                "is_claimed": false
+            },
+            {
+                "id": "d88493f5-a9b2-49e5-9c97-633fb2f5b054",
+                "car": "65e2cf85-0a55-4b08-8e76-5c3aefecf5f1",
+                "user": "13fbdcdd-1ad6-4899-bcc8-004ab30fdebd",
+                "address": "38 John Street, Melbourne, Australia",
+                "lat_lng": "0101000020E6100000B15A4F63F1216240287BF07FECED42C0",
+                "location": {
+                    "latitude": -37.7789671,
+                    "longitude": 145.0337451
+                },
+                "image_url": "https://i.ytimg.com/vi/JfZgATJjP9U/maxresdefault.jpg",
+                "created_at": "2025-10-06T05:52:42.938951+00:00",
+                "is_claimed": false
+            }
+        ]
+    }
+]

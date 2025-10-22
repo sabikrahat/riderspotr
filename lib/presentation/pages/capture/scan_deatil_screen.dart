@@ -1,17 +1,26 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:ridespotr/core/extensions.dart';
-import 'package:ridespotr/presentation/widgets/capture/scan_detail_container.dart';
-import 'package:ridespotr/presentation/widgets/shared/back.dart';
-import 'package:ridespotr/presentation/widgets/shared/page_padding.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 
-class ScanDeatilScreen extends StatelessWidget {
+import '../../../core/extensions.dart';
+import '../../../core/toastification.dart';
+import '../../../models/car/car_spot_model.dart';
+import '../../providers/car/garage_provider.dart';
+import '../../widgets/capture/scan_detail_container.dart';
+import '../../widgets/shared/back.dart';
+import '../../widgets/shared/page_padding.dart';
+import 'car_deatil_screen.dart';
+
+class ScanDeatilScreen extends ConsumerWidget {
   static const String routeName = '/scan-detail';
-  const ScanDeatilScreen({super.key});
+  const ScanDeatilScreen({super.key, required this.carSpot});
+
+  final CarSpotModel? carSpot;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -25,7 +34,7 @@ class ScanDeatilScreen extends StatelessWidget {
           SizedBox(
             width: context.width,
             height: context.height,
-            child: Image.asset('assets/demo.png', fit: BoxFit.cover),
+            child: Image.network(carSpot!.imageUrl, fit: BoxFit.cover),
           ),
           // Title and rarity
           Positioned(
@@ -51,7 +60,8 @@ class ScanDeatilScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'LAMBORGHINI AVENTADOR',
+                        carSpot!.car?.make?.name.toUpperCase() ??
+                            'UNKNOWN MAKE',
                         style: context.textTheme.headlineMedium,
                       ),
                       Container(
@@ -59,7 +69,9 @@ class ScanDeatilScreen extends StatelessWidget {
                           border: Border.all(color: Colors.purpleAccent),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.purpleAccent.withOpacity(0.25),
+                              color: Colors.purpleAccent.withValues(
+                                alpha: 0.25,
+                              ),
                               blurRadius: 10,
                               spreadRadius: 2,
                             ),
@@ -105,45 +117,156 @@ class ScanDeatilScreen extends StatelessWidget {
               child: PagePadding(
                 child: ScanDetailContainer(
                   title: 'LEVEL UP',
-                  buttonText: 'STATS',
-                  onButtonPressed: () {},
+                  buttonText: 'DETAILS',
+                  onButtonPressed: () async => await context.push(
+                    CarDeatilScreen.routeName,
+                    extra: carSpot,
+                  ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('200 XP'),
-                          Text('250 XP'),
+                          Text(
+                            '200 XP',
+                            style: context.textTheme.headlineSmall?.copyWith(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SvgPicture.asset('assets/images/long-arrow.svg'),
+                          Container(
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.purpleAccent.withValues(
+                                    alpha: 0.25,
+                                  ),
+                                  blurRadius: 30,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.electric_bolt_rounded,
+                                  color: Colors.purpleAccent,
+                                  size: 18,
+                                ),
+                                Gap(2),
+                                Text(
+                                  '250 XP',
+                                  style: context.textTheme.headlineSmall
+                                      ?.copyWith(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.purpleAccent,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
-                      // TODO: Implement the progress bar
+                      Spacer(),
+                      Container(
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.purpleAccent.withValues(
+                                alpha: 0.25,
+                              ),
+                              blurRadius: 30,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(45),
+                          child: LinearProgressIndicator(
+                            value: 0.4,
+                            backgroundColor: Colors.grey.withValues(alpha: 0.3),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.purpleAccent,
+                            ),
+                            minHeight: 5,
+                            borderRadius: BorderRadius.circular(45),
+                          ),
+                        ),
+                      ),
                       Spacer(),
                       Row(
                         spacing: 8,
                         children: [
                           FilledButton.icon(
-                            onPressed: () {},
+                            onPressed: () async {
+                              try {
+                                final garageNotifier = ref.read(
+                                  garageProvider.notifier,
+                                );
+                                await garageNotifier.deleteCar(carSpot!.id);
+                                if (!context.mounted) return;
+                                context.pop();
+                              } catch (e) {
+                                showErrorMessage('Error deleting car spot: $e');
+                              }
+                            },
                             icon: Icon(Icons.refresh),
                             label: Text('Retake'),
                           ),
                           Expanded(
-                            child: FilledButton.icon(
-                              style: ButtonStyle(
-                                fixedSize: WidgetStatePropertyAll(
-                                  Size(double.infinity, 40),
-                                ),
-                              ),
-                              onPressed: () {},
-                              icon: Icon(Icons.check),
-                              label: Text(
-                                'CLAIM',
-                                style: context.textTheme.headlineSmall
-                                    ?.copyWith(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.purpleAccent.withValues(
+                                      alpha: 0.25,
                                     ),
+                                    blurRadius: 30,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: FilledButton.icon(
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStatePropertyAll(
+                                    Colors.purpleAccent,
+                                  ),
+                                  fixedSize: WidgetStatePropertyAll(
+                                    Size(double.infinity, 40),
+                                  ),
+                                  foregroundColor: WidgetStatePropertyAll(
+                                    Colors.white,
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  try {
+                                    final garageNotifier = ref.read(
+                                      garageProvider.notifier,
+                                    );
+                                    await garageNotifier.claimCar(carSpot!.id);
+                                    showSuccessMessage(
+                                      'Car spot claimed successfully!',
+                                    );
+                                    if (!context.mounted) return;
+                                    context.pop();
+                                  } catch (e) {
+                                    showErrorMessage(
+                                      'Error claiming car spot: $e',
+                                    );
+                                  }
+                                },
+                                icon: Icon(Icons.check),
+                                label: Text(
+                                  'CLAIM',
+                                  style: context.textTheme.headlineSmall
+                                      ?.copyWith(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                ),
                               ),
                             ),
                           ),

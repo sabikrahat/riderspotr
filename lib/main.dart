@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toastification/toastification.dart';
 
@@ -14,6 +16,8 @@ Future<void> main() async {
   await Hive.initFlutter();
 
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+
+  MapboxOptions.setAccessToken(mapBoxAccessToken);
 
   runApp(ProviderScope(child: const Ridespotr()));
 }
@@ -29,6 +33,7 @@ class Ridespotr extends StatelessWidget {
         showSemanticsDebugger: false,
         theme: theme(context),
         routerConfig: router,
+        builder: EasyLoading.init(),
       ),
     );
   }

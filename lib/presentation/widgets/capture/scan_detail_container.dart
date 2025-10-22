@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ridespotr/core/extensions.dart';
+
+import '../../../core/extensions.dart';
 
 final charcol = Color(0xFF2D2D2D).withValues(alpha: 0.8);
 final borderGrey = Color(0xFF3A3A3A);

@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridespotr/presentation/pages/auth/about_you_screen.dart';
-import 'package:ridespotr/presentation/pages/auth/your_experience_screen.dart';
-import 'package:ridespotr/presentation/pages/auth/your_location_screen.dart';
-import 'package:ridespotr/presentation/pages/capture/scan_deatil_screen.dart';
-import 'package:ridespotr/presentation/pages/nav_screen.dart';
-import 'package:ridespotr/services/auth/user_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../models/car/car_spot_model.dart';
+import '../presentation/pages/auth/about_you_screen.dart';
 import '../presentation/pages/auth/login_screen.dart';
 import '../presentation/pages/auth/otp_screen.dart';
 import '../presentation/pages/auth/register_screen.dart';
 import '../presentation/pages/auth/welcome_screen.dart';
+import '../presentation/pages/auth/your_experience_screen.dart';
+import '../presentation/pages/auth/your_location_screen.dart';
 import '../presentation/pages/capture/camera_screen.dart';
-import '../presentation/pages/graph/graph_screen.dart';
+import '../presentation/pages/capture/car_deatil_screen.dart';
+import '../presentation/pages/capture/scan_deatil_screen.dart';
+import '../presentation/pages/explore/explore_screen.dart';
+import '../presentation/pages/garage/garage_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
-import '../presentation/pages/map/map_screen.dart';
+import '../presentation/pages/leaderboard/leaderboard_screen.dart';
+import '../presentation/pages/nav_screen.dart';
 import '../presentation/pages/profile/profile_screen.dart';
+import '../services/auth/user_service.dart';
 
 Future<String?> authHandler(BuildContext context, GoRouterState state) async {
   // final currentPath = state.matchedLocation;
@@ -76,7 +79,11 @@ final router = GoRouter(
       // redirect: authHandler,
       builder: (_, _) => YourLocationScreen(),
     ),
-
+    GoRoute(
+      path: ExploreScreen.routeName,
+      // redirect: authHandler,
+      builder: (_, _) => ExploreScreen(),
+    ),
     ShellRoute(
       redirect: authHandler,
       builder: (context, state, child) {
@@ -89,12 +96,12 @@ final router = GoRouter(
           builder: (_, _) => HomeScreen(),
         ),
         GoRoute(
-          path: MapScreen.routeName,
-          builder: (_, _) => MapScreen(),
+          path: GarageScreen.routeName,
+          builder: (_, _) => GarageScreen(),
         ),
         GoRoute(
-          path: GraphScreen.routeName,
-          builder: (_, _) => GraphScreen(),
+          path: LeaderboardScreen.routeName,
+          builder: (_, _) => LeaderboardScreen(),
         ),
         GoRoute(
           path: ProfileScreen.routeName,
@@ -110,7 +117,14 @@ final router = GoRouter(
     GoRoute(
       path: ScanDeatilScreen.routeName,
       redirect: authHandler,
-      builder: (_, _) => ScanDeatilScreen(),
+      builder: (_, state) =>
+          ScanDeatilScreen(carSpot: state.extra as CarSpotModel?),
+    ),
+    GoRoute(
+      path: CarDeatilScreen.routeName,
+      redirect: authHandler,
+      builder: (_, state) =>
+          CarDeatilScreen(carSpot: state.extra as CarSpotModel?),
     ),
   ],
 );

@@ -144,14 +144,14 @@ ThemeData theme(BuildContext context) {
         fontWeight: FontWeight.w400,
       ),
       rangeSelectionOverlayColor: WidgetStateProperty.all(
-        Colors.white.withOpacity(0.1),
+        Colors.white.withValues(alpha: 0.1),
       ),
-      rangeSelectionBackgroundColor: Colors.white.withOpacity(0.1),
+      rangeSelectionBackgroundColor: Colors.white.withValues(alpha: 0.1),
       todayForegroundColor: WidgetStateProperty.all(
         Colors.white,
       ),
       todayBackgroundColor: WidgetStateProperty.all(
-        Colors.white.withOpacity(0.1),
+        Colors.white.withValues(alpha: 0.1),
       ),
       cancelButtonStyle: TextButton.styleFrom(
         foregroundColor: Colors.white,

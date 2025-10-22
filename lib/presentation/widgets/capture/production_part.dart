@@ -1,0 +1,279 @@
+import 'package:arc_progress_bar_new/arc_progress_bar_new.dart';
+import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import '../../../models/car/car_production_model.dart';
+
+import '../../../core/extensions.dart';
+
+class ProductionPart extends StatelessWidget {
+  const ProductionPart({super.key, required this.production});
+
+  final CarProductionModel? production;
+
+  @override
+  Widget build(BuildContext context) {
+    if (production == null) {
+      return Center(
+        child: Text(
+          'No production data available.',
+          style: context.textTheme.bodyMedium,
+        ),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: 360,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ProductionCard(
+                        title: 'YEARS PRODUCED',
+                        subtitle:
+                            '${production!.yearStart} - ${production!.yearEnd ?? DateTime.now().year}',
+                      ),
+                      ProductionCard(
+                        title: 'ORIGINAL MSRP',
+                        subtitle: '\$${production!.msrp}',
+                      ),
+                      ProductionCard(
+                        title: 'TOTAL MADE',
+                        subtitle: '${production!.totalMade}',
+                      ),
+                      if (production!.description != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            'Description',
+                            style: context.textTheme.headlineSmall,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Gap(16),
+                Expanded(
+                  child: Image.asset(
+                    'assets/images/production.png',
+                    height: 360,
+                    fit: BoxFit.fitWidth,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Gap(16),
+          if (production!.description != null) ...[
+            Text(
+              production!.description!,
+              style: context.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.normal,
+                fontSize: 14,
+              ),
+            ),
+            Gap(16),
+          ],
+          Stack(
+            children: [
+              ArcProgressBar(
+                percentage: 85,
+                backgroundColor: Colors.grey.shade800,
+                foregroundColor: Colors.white,
+                arcThickness: 2,
+                handleSize: 70,
+                handleWidget: Padding(
+                  padding: const EdgeInsets.only(left: 15.0),
+                  child: RotatedBox(
+                    quarterTurns: 1,
+                    child: Icon(
+                      Icons.arrow_drop_down,
+                      size: 40,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                centerWidget: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '\$',
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 35,
+                      ),
+                    ),
+                    Gap(12),
+                    Text(
+                      'EST. VALUE',
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        color: Colors.white.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    Gap(12),
+                    Text(
+                      '\$${production!.minValue} - \$${production!.maxValue}',
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ArcProgressBar(
+                percentage: 70,
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.blue,
+                arcThickness: 2,
+                handleSize: 70,
+                handleWidget: Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: RotatedBox(
+                    quarterTurns: 1,
+                    child: Icon(
+                      Icons.arrow_drop_down,
+                      size: 45,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // TweenAnimationBuilder<double>(
+          //   tween: Tween(begin: 0.0, end: 1.0),
+          //   duration: const Duration(milliseconds: 1500),
+          //   curve: Curves.easeOutCubic,
+          //   builder: (_, value, __) => ArcProgressBar(
+          //     progress: value, // Animated progress (0.0 to 1.0)
+          //     msrp: 0.65, // MSRP marker at ~65%
+          //     current: 0.85, // Current marker at ~85%
+          //     size: const Size(380, 200),
+          //     stroke: 5.0,
+          //   ),
+          // ),
+          Gap(16),
+          Row(
+            children: [
+              Expanded(
+                child: ProductionCard(
+                  title: 'TOTAL PRODUCED',
+                  subtitle: '500',
+                ),
+              ),
+              Gap(16),
+              Expanded(
+                child: ProductionCard(
+                  title: 'EST. IN CIRCULATION',
+                  subtitle: '300',
+                ),
+              ),
+            ],
+          ),
+          Gap(24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                height: 60,
+                width: 3,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+              ),
+              Gap(16),
+              Expanded(
+                child: Text(
+                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam id efficitur ligula. Vivamus quis ligula urna. Nullam suscipit magna quis eleifend ultrices.',
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Gap(24),
+          Container(
+            width: double.infinity,
+            alignment: Alignment.center,
+            padding: EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.purpleAccent),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.purpleAccent.withValues(alpha: 0.25),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Text(
+              'EPIC',
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: Colors.purpleAccent,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Gap(100),
+        ],
+      ),
+    );
+  }
+}
+
+class ProductionCard extends StatelessWidget {
+  const ProductionCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+  });
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.grey.shade900, width: 0.8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Align(
+            alignment: Alignment.topRight,
+            child: Icon(Icons.calendar_today, size: 18, color: Colors.white),
+          ),
+          Text(
+            title,
+            style: context.textTheme.bodyMedium?.copyWith(
+              fontSize: 12,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+          Gap(8),
+          Text(
+            subtitle,
+            style: context.textTheme.bodyMedium?.copyWith(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
