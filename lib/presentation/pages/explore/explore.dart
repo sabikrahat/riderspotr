@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
-import '../leaderboard/search_friend.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
@@ -13,6 +12,7 @@ import '../../../models/map/map_marker_model.dart';
 import '../../providers/car/car_spot_provider.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/car_card.dart';
+import '../leaderboard/search_friend.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});

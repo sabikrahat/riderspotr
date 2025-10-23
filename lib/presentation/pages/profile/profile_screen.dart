@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import '../../../core/extensions.dart';
 
+import '../../../core/extensions.dart';
 import '../../providers/auth/profile_provider.dart';
 import '../../widgets/shared/car_card.dart';
 
@@ -174,7 +174,7 @@ class ProfileScreen extends ConsumerWidget {
                                 ),
                               ),
                               SizedBox(
-                                height: context.height * 0.25,
+                                height: context.height * 0.2,
                                 width: context.width,
                                 child: Stack(
                                   children: [
