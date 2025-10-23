@@ -242,14 +242,13 @@ class LeaderboardComparisonBar extends StatelessWidget {
     );
   }
 
-  ImageProvider _getImageProvider(String image) {
-    if (image.startsWith('http://') || image.startsWith('https://')) {
-      return NetworkImage(image);
-    } else if (image.startsWith('assets/')) {
-      return AssetImage(image);
-    } else {
-      return AssetImage(image);
+  ImageProvider _getImageProvider(String imagePath) {
+    // Check if the path is a network URL
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return NetworkImage(imagePath);
     }
+    // Otherwise, treat it as an asset image
+    return AssetImage(imagePath);
   }
 }
 
