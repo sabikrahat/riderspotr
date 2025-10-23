@@ -37,13 +37,10 @@ class UserService {
   //   }
   // }
 
-  Future<UserModel?> getUser() async {
+  Future<UserModel?> getUser([String? uid]) async {
     try {
-      final res = await _client
-          .from(usersTbl)
-          .select()
-          .eq('id', _client.auth.currentUser!.id)
-          .maybeSingle();
+      final id = uid ?? _client.auth.currentUser!.id;
+      final res = await _client.from(usersTbl).select().eq('id', id).maybeSingle();
       if (res == null) return null;
       return UserModel.fromJson(res);
     } on SocketException catch (e) {

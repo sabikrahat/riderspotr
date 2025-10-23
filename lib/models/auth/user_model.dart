@@ -30,6 +30,8 @@ class UserModel {
   String? experience;
   String? address;
   Location? location;
+  String? profilePictureUrl;
+  String? bannerUrl;
   DateTime createdAt;
 
   UserModel({
@@ -44,6 +46,8 @@ class UserModel {
     this.experience,
     this.address,
     this.location,
+    this.profilePictureUrl,
+    this.bannerUrl,
     required this.createdAt,
   });
 
@@ -67,6 +71,8 @@ class UserModel {
     String? experience,
     String? address,
     Location? location,
+    String? profilePictureUrl,
+    String? bannerUrl,
   }) => UserModel(
     id: id,
     email: email,
@@ -79,6 +85,8 @@ class UserModel {
     experience: experience ?? this.experience,
     location: location ?? this.location,
     address: address ?? this.address,
+    profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
+    bannerUrl: bannerUrl ?? this.bannerUrl,
     createdAt: createdAt,
   );
 

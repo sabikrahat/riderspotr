@@ -33,7 +33,7 @@ final class UserStatsNotifierProvider
   UserStatsNotifier create() => UserStatsNotifier();
 }
 
-String _$userStatsNotifierHash() => r'f874cf1b37c221067d5b9315c59e6d1467e36c7d';
+String _$userStatsNotifierHash() => r'8adb30ddc19d7b980c74f9380cd38becd17574eb';
 
 abstract class _$UserStatsNotifier
     extends $AsyncNotifier<List<UserStatsModel>> {

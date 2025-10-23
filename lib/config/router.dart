@@ -111,7 +111,7 @@ final router = GoRouter(
         ),
         GoRoute(
           path: ProfileScreen.routeName,
-          builder: (_, _) => ProfileScreen(),
+          builder: (_, state) => ProfileScreen(id: state.extra as String?),
         ),
       ],
     ),

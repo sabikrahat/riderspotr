@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../core/extensions.dart';
 import '../../providers/user_stats/user_stats_provider.dart';
 import '../../widgets/leaderboard/comparison_bar.dart';
 import '../../widgets/leaderboard/summary_card.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/page_padding.dart';
+import '../profile/profile_screen.dart';
 import 'search_friend.dart';
 
 class LeaderboardScreen extends ConsumerStatefulWidget {
@@ -99,10 +101,13 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
 
                       // Learderboard Bar
                       LeaderboardComparisonBar(
+                        firstUid: notifier.userStats[0].user?.id ?? '',
                         firstPlaceImage: 'https://picsum.photos/200',
                         firstPlaceName: notifier.userStats[0].user?.username ?? 'firstuser',
+                        secondUid: notifier.userStats[1].user?.id ?? '',
                         secondPlaceImage: 'https://picsum.photos/200',
                         secondPlaceName: notifier.userStats[1].user?.username ?? 'seconduser',
+                        thirdUid: notifier.userStats[2].user?.id ?? '',
                         thirdPlaceImage: 'https://picsum.photos/200',
                         thirdPlaceName: notifier.userStats[2].user?.username ?? 'thirduser',
                       ),
@@ -198,7 +203,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                           InkWell(
                                             borderRadius: BorderRadius.circular(30),
                                             onTap: () async {
-                                              // TODO:
+                                              await context.push(
+                                                ProfileScreen.routeName,
+                                                extra: userStat.user?.id ?? '',
+                                              );
                                             },
                                             child: CircleAvatar(
                                               radius: 25,
