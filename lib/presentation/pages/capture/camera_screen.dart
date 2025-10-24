@@ -1,6 +1,5 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -25,6 +24,8 @@ class _CameraScreenState extends State<CameraScreen> {
   CameraController? _controller;
   Future<void>? _initializeControllerFuture;
   bool _isLoading = true;
+
+  bool _isUploading = false;
 
   @override
   void initState() {
@@ -139,39 +140,47 @@ class _CameraScreenState extends State<CameraScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     GestureDetector(
-                      onTap: () async {
-                        // capture image
-                        try {
-                          EasyLoading.show();
-                          // final XFile? file = await _controller?.takePicture();
-                          // TODO: Replace the dummy imagepciker with the actual capture data.
-                          final XFile? file = await ImagePicker().pickImage(
-                            source: ImageSource.gallery,
-                          );
-                          if (file == null) {
-                            showAlertMessage('Failed to capture image. Please try again.');
-                            return;
-                          }
-                          final url = await CaptureService().uploadFileToStorage(file);
-                          if (url == null) {
-                            showAlertMessage('Failed to upload image. Please try again.');
-                            return;
-                          }
-                          debugPrint('Image uploaded to: $url');
+                      onTap: _isUploading
+                          ? null
+                          : () async {
+                              // capture image
+                              try {
+                                setState(() {
+                                  _isUploading = true;
+                                });
+                                // final XFile? file = await _controller?.takePicture();
+                                // TODO: Replace the dummy imagepciker with the actual capture data.
+                                final XFile? file = await ImagePicker().pickImage(
+                                  source: ImageSource.gallery,
+                                );
+                                if (file == null) {
+                                  showAlertMessage('Failed to capture image. Please try again.');
+                                  return;
+                                }
+                                final url = await CaptureService().uploadFileToStorage(file);
+                                if (url == null) {
+                                  showAlertMessage('Failed to upload image. Please try again.');
+                                  return;
+                                }
+                                debugPrint('Image uploaded to: $url');
 
-                          final res = await CaptureService().uploadToEdgeFunction(url);
-                          debugPrint('Edge function upload result: $res');
-                          final carSpotModel = CarSpotModel.fromJson(res['data']);
-                          EasyLoading.dismiss();
-                          if (!context.mounted) return;
-                          await context.push(ScanDeatilScreen.routeName, extra: carSpotModel);
-                        } catch (e) {
-                          debugPrint('Error capturing image: $e');
-                          showAlertMessage('Error capturing image: $e');
-                        } finally {
-                          EasyLoading.dismiss();
-                        }
-                      },
+                                final res = await CaptureService().uploadToEdgeFunction(url);
+                                debugPrint('Edge function upload result: $res');
+                                final carSpotModel = CarSpotModel.fromJson(res['data']);
+                                setState(() {
+                                  _isUploading = false;
+                                });
+                                if (!context.mounted) return;
+                                await context.push(ScanDeatilScreen.routeName, extra: carSpotModel);
+                              } catch (e) {
+                                debugPrint('Error capturing image: $e');
+                                showAlertMessage('Error capturing image: $e');
+                              } finally {
+                                setState(() {
+                                  _isUploading = false;
+                                });
+                              }
+                            },
                       child: Container(
                         width: 80,
                         height: 80,
@@ -186,10 +195,18 @@ class _CameraScreenState extends State<CameraScreen> {
                             ),
                           ],
                         ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          color: Colors.black,
-                        ),
+                        child: _isUploading
+                            ? Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: CircularProgressIndicator(
+                                  color: Colors.black.withValues(alpha: 0.7),
+                                  strokeCap: StrokeCap.round,
+                                ),
+                              )
+                            : const Icon(
+                                Icons.camera_alt,
+                                color: Colors.black,
+                              ),
                       ),
                     ),
                     const SizedBox(height: 12),
