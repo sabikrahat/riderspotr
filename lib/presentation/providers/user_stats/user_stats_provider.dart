@@ -1,7 +1,8 @@
 import 'dart:async';
 
+import 'package:ridespotr/services/auth/user_service.dart';
+
 import '../../../models/user_stats/user_stats_model.dart';
-import '../../../services/user_stats/user_stats.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'user_stats_provider.g.dart';
@@ -12,19 +13,20 @@ class UserStatsNotifier extends _$UserStatsNotifier {
 
   @override
   FutureOr<List<UserStatsModel>> build() async {
-    _userStats = await UserStatsService().getUserStats();
+    _userStats = await UserService().getUserStats();
     return _userStats;
   }
 
   List<UserStatsModel> get userStats => _userStats;
 
   Future<void> refresh() async {
-    _userStats = await UserStatsService().getUserStats();
+    _userStats = await UserService().getUserStats();
     state = AsyncValue.data(_userStats);
   }
 
   List<UserStatsModel> get topThree =>
       _userStats.length >= 3 ? _userStats.sublist(0, 3) : _userStats;
 
-  List<UserStatsModel> get otherStats => _userStats.length > 3 ? _userStats.sublist(3) : [];
+  List<UserStatsModel> get otherStats =>
+      _userStats.length > 3 ? _userStats.sublist(3) : [];
 }

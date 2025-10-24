@@ -94,14 +94,18 @@ class CarCard extends StatelessWidget {
                               Consumer(
                                 builder: (_, ref, __) {
                                   String address;
-                                  if (carSpot.latitude == null || carSpot.longitude == null) {
+                                  if (carSpot.latitude == null ||
+                                      carSpot.longitude == null) {
                                     address = carSpot.id;
                                   } else {
                                     address =
                                         ref
                                             .watch(
                                               getLocationBasedOnLatLngPd(
-                                                LatLng(carSpot.latitude!, carSpot.longitude!),
+                                                LatLng(
+                                                  carSpot.latitude!,
+                                                  carSpot.longitude!,
+                                                ),
                                               ),
                                             )
                                             .value
@@ -113,10 +117,11 @@ class CarCard extends StatelessWidget {
                                     child: Text(
                                       address,
                                       textAlign: TextAlign.right,
-                                      style: context.textTheme.bodyLarge?.copyWith(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w300,
-                                      ),
+                                      style: context.textTheme.bodyLarge
+                                          ?.copyWith(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w300,
+                                          ),
                                     ),
                                   );
                                 },
@@ -129,16 +134,18 @@ class CarCard extends StatelessWidget {
                                   children: [
                                     Text(
                                       carSpot.car?.make?.name ?? '',
-                                      style: context.textTheme.headlineSmall?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: context.textTheme.headlineSmall
+                                          ?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
                                     Text(
                                       carSpot.car?.model ?? '',
-                                      style: context.textTheme.bodyLarge?.copyWith(
-                                        fontSize: 14,
-                                      ),
+                                      style: context.textTheme.bodyLarge
+                                          ?.copyWith(
+                                            fontSize: 14,
+                                          ),
                                     ),
                                   ],
                                 ),
