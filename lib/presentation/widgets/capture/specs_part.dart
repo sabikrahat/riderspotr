@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:ridespotr/presentation/widgets/capture/speedometer_widget.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/car/car_specs_model.dart';
@@ -23,23 +24,29 @@ class SpecsPart extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          Gap(8),
+          Gap(20),
           // PerformanceGaugeWidget(),
           // TODO: Replace with actual design
-          SizedBox(
-            height: 200,
-            child: Center(
-              child: Text(
-                'Speed Meter Type Design Coming Soon!',
-                style: context.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Colors.grey,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ),
+          SpeedometerWidget(
+            value: 200, // your dynamic value
+            duration: Duration(seconds: 3), // animation speed
           ),
+          SizedBox(height: 40),
+          // TODO: Remove following commented code
+          // SizedBox(
+          //   height: 200,
+          //   child: Center(
+          //     child: Text(
+          //       'Speed Meter Type Design Coming Soon!',
+          //       style: context.textTheme.bodyMedium?.copyWith(
+          //         fontWeight: FontWeight.bold,
+          //         fontSize: 16,
+          //         color: Colors.grey,
+          //         fontStyle: FontStyle.italic,
+          //       ),
+          //     ),
+          //   ),
+          // ),
           // PerformanceGaugeWidget(
           //   accel1: 2.8,
           //   accel2: 2.8,
