@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import '../settings/settings_screen.dart';
 
 import '../../../core/extensions.dart';
 import '../../providers/auth/profile_provider.dart';
@@ -48,39 +50,41 @@ class ProfileScreen extends ConsumerWidget {
                                     fit: BoxFit.cover,
                                   ),
                           ),
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.fromLTRB(16.0, 48.0, 16.0, 0.0),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.black.withValues(alpha: 0.6),
-                                    Colors.black.withValues(alpha: 0.53),
-                                    Colors.transparent,
+                          if (id == null)
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.fromLTRB(16.0, 48.0, 16.0, 0.0),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.black.withValues(alpha: 0.6),
+                                      Colors.black.withValues(alpha: 0.53),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox.shrink(),
+                                    IconButton(
+                                      onPressed: () async =>
+                                          await context.push(SettingsScreen.routeName),
+                                      icon: Icon(
+                                        Icons.settings,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  SizedBox.shrink(),
-                                  IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      Icons.settings,
-                                      color: Colors.white,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ],
-                              ),
                             ),
-                          ),
                           Positioned(
                             bottom: 0,
                             left: 0,

@@ -1,9 +1,9 @@
 import 'package:arc_progress_bar_new/arc_progress_bar_new.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import '../../../models/car/car_production_model.dart';
 
 import '../../../core/extensions.dart';
+import '../../../models/car/car_production_model.dart';
 
 class ProductionPart extends StatelessWidget {
   const ProductionPart({super.key, required this.production});

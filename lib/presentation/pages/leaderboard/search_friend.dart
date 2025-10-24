@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import '../../providers/leaderboard/search_friend_provider.dart';
 
 import '../../../core/extensions.dart';
+import '../../providers/leaderboard/search_friend_provider.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/page_padding.dart';

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../presentation/pages/leaderboard/search_friend.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/car/car_spot_model.dart';
@@ -18,8 +17,10 @@ import '../presentation/pages/explore/explore.dart';
 import '../presentation/pages/garage/garage_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
 import '../presentation/pages/leaderboard/leaderboard_screen.dart';
+import '../presentation/pages/leaderboard/search_friend.dart';
 import '../presentation/pages/nav_screen.dart';
 import '../presentation/pages/profile/profile_screen.dart';
+import '../presentation/pages/settings/settings_screen.dart';
 import '../services/auth/user_service.dart';
 
 Future<String?> authHandler(BuildContext context, GoRouterState state) async {
@@ -114,6 +115,11 @@ final router = GoRouter(
           builder: (_, state) => ProfileScreen(id: state.extra as String?),
         ),
       ],
+    ),
+    GoRoute(
+      path: SettingsScreen.routeName,
+      redirect: authHandler,
+      builder: (_, _) => SettingsScreen(),
     ),
     GoRoute(
       path: CameraScreen.routeName,
