@@ -69,17 +69,17 @@ final router = GoRouter(
     GoRoute(
       path: AboutYouScreen.routeName,
       // redirect: authHandler,
-      builder: (_, _) => AboutYouScreen(),
+      builder: (_, state) => AboutYouScreen(fromUpdateProfile: state.extra as bool? ?? false),
     ),
     GoRoute(
       path: YourExperienceScreen.routeName,
       // redirect: authHandler,
-      builder: (_, _) => YourExperienceScreen(),
+      builder: (_, state) => YourExperienceScreen(fromUpdateProfile: state.extra as bool? ?? false),
     ),
     GoRoute(
       path: YourLocationScreen.routeName,
       // redirect: authHandler,
-      builder: (_, _) => YourLocationScreen(),
+      builder: (_, state) => YourLocationScreen(fromUpdateProfile: state.extra as bool? ?? false),
     ),
     GoRoute(
       path: ExploreScreen.routeName,

@@ -55,3 +55,16 @@ extension MeasurementUnitExtension on Measurement {
     Measurement.imperial => 'Imperial',
   };
 }
+
+extension MeasurementStringExtension on String {
+  Measurement? get toMeasurement {
+    switch (this) {
+      case 'metric':
+        return Measurement.metric;
+      case 'imperial':
+        return Measurement.imperial;
+      default:
+        return null;
+    }
+  }
+}

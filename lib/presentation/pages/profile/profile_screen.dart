@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import '../settings/settings_screen.dart';
 
 import '../../../core/extensions.dart';
 import '../../providers/auth/profile_provider.dart';
 import '../../widgets/shared/car_card.dart';
+import '../settings/settings_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key, this.id});

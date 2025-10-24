@@ -17,14 +17,16 @@ import '../../widgets/shared/loading_overlay.dart';
 import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
 import '../home/home_screen.dart';
+import 'login_screen.dart';
 
 class YourLocationScreen extends ConsumerStatefulWidget {
   static const String routeName = '/your-location';
-  const YourLocationScreen({super.key});
+  const YourLocationScreen({super.key, this.fromUpdateProfile = false});
+
+  final bool fromUpdateProfile;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _YourLocationScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _YourLocationScreenState();
 }
 
 class _YourLocationScreenState extends ConsumerState<YourLocationScreen> {
@@ -35,6 +37,22 @@ class _YourLocationScreenState extends ConsumerState<YourLocationScreen> {
   bool isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.watch(userProvider.future);
+      final notifier = ref.read(userProvider.notifier);
+      _locationController.text = notifier.user?.address ?? '';
+      if (notifier.user?.location != null) {
+        _selectedLatLng = LatLng(
+          notifier.user!.location!.latitude,
+          notifier.user!.location!.longitude,
+        );
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _locationController.dispose();
     super.dispose();
@@ -42,6 +60,7 @@ class _YourLocationScreenState extends ConsumerState<YourLocationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(userProvider);
     final notifier = ref.read(userProvider.notifier);
     return LoadingOverlay(
       isLoading: isLoading,
@@ -49,7 +68,18 @@ class _YourLocationScreenState extends ConsumerState<YourLocationScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          leading: Back(),
+          leading: Back(
+            onPressed: () async {
+              if (widget.fromUpdateProfile) {
+                if (context.mounted) context.pop();
+                return;
+              }
+              await notifier.signOut(context: context);
+              if (context.mounted) {
+                context.pushReplacement(LoginScreen.routeName);
+              }
+            },
+          ),
         ),
         extendBodyBehindAppBar: true,
         body: Stack(
@@ -95,10 +125,9 @@ class _YourLocationScreenState extends ConsumerState<YourLocationScreen> {
                           },
                           displayStringForOption: (v) => v.description!,
                           onSelected: (MapPredictionModel v) async {
-                            final data = await GoogleMapsService()
-                                .getLocationBasedOnPlaceId(
-                                  v.placeId!,
-                                );
+                            final data = await GoogleMapsService().getLocationBasedOnPlaceId(
+                              v.placeId!,
+                            );
 
                             if (data == null) return;
                             if (data.geometry == null) return;
@@ -130,6 +159,10 @@ class _YourLocationScreenState extends ConsumerState<YourLocationScreen> {
                                     ),
                                   ),
                                 );
+                                if (widget.fromUpdateProfile) {
+                                  if (context.mounted) context.pop();
+                                  return;
+                                }
                                 if (context.mounted) {
                                   context.pushReplacement(HomeScreen.routeName);
                                 }

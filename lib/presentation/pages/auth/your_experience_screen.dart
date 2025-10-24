@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'login_screen.dart' show LoginScreen;
 
 import '../../../core/exception.dart';
 import '../../../core/extensions.dart';
@@ -16,11 +17,12 @@ import 'your_location_screen.dart';
 
 class YourExperienceScreen extends ConsumerStatefulWidget {
   static const String routeName = '/your-experience';
-  const YourExperienceScreen({super.key});
+  const YourExperienceScreen({super.key, this.fromUpdateProfile = false});
+
+  final bool fromUpdateProfile;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _YourExperienceScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _YourExperienceScreenState();
 }
 
 class _YourExperienceScreenState extends ConsumerState<YourExperienceScreen> {
@@ -30,7 +32,21 @@ class _YourExperienceScreenState extends ConsumerState<YourExperienceScreen> {
   bool isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.watch(userProvider.future);
+      final notifier = ref.read(userProvider.notifier);
+      setState(() {
+        _carKnowledge = notifier.user?.knowledgeLevel;
+        _spottingExperience = notifier.user?.experience;
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    ref.watch(userProvider);
     final notifier = ref.read(userProvider.notifier);
     return LoadingOverlay(
       isLoading: isLoading,
@@ -38,7 +54,18 @@ class _YourExperienceScreenState extends ConsumerState<YourExperienceScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          leading: Back(),
+          leading: Back(
+            onPressed: () async {
+              if (widget.fromUpdateProfile) {
+                if (context.mounted) context.pop();
+                return;
+              }
+              await notifier.signOut(context: context);
+              if (context.mounted) {
+                context.pushReplacement(LoginScreen.routeName);
+              }
+            },
+          ),
         ),
         extendBodyBehindAppBar: true,
         body: Stack(
@@ -63,6 +90,7 @@ class _YourExperienceScreenState extends ConsumerState<YourExperienceScreen> {
                       Text('How experienced are you with car spotting?'),
                       Gap(24),
                       DropdownTextfield(
+                        initialValue: _carKnowledge,
                         labelText: 'Car Knowledge',
                         items: [
                           'Newbie',
@@ -75,6 +103,7 @@ class _YourExperienceScreenState extends ConsumerState<YourExperienceScreen> {
                       ),
                       Gap(8),
                       DropdownTextfield(
+                        initialValue: _spottingExperience,
                         labelText: 'Spotting Experience',
                         items: [
                           'First Timer',
@@ -83,8 +112,7 @@ class _YourExperienceScreenState extends ConsumerState<YourExperienceScreen> {
                           'Street Scout',
                           'Pro Spotter',
                         ],
-                        onChanged: (val) =>
-                            setState(() => _spottingExperience = val),
+                        onChanged: (val) => setState(() => _spottingExperience = val),
                       ),
                       Gap(24),
                       LongButton(
@@ -112,6 +140,10 @@ class _YourExperienceScreenState extends ConsumerState<YourExperienceScreen> {
                                 experience: _spottingExperience!,
                               ),
                             );
+                            if (widget.fromUpdateProfile) {
+                              if (context.mounted) context.pop();
+                              return;
+                            }
                             if (context.mounted) {
                               context.push(YourLocationScreen.routeName);
                             }

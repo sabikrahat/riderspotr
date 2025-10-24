@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../pages/profile/profile_screen.dart';
 
 class LeaderboardComparisonBar extends StatelessWidget {
