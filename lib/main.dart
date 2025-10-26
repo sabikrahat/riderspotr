@@ -1,3 +1,4 @@
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,16 +16,22 @@ Future<void> main() async {
 
   await Hive.initFlutter();
 
+  // Initialize fast_cached_network_image
+  await FastCachedImageConfig.init(clearCacheAfter: const Duration(days: 30));
+
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
 
   MapboxOptions.setAccessToken(mapBoxAccessToken);
 
-  runApp(ProviderScope(
-    retry: (retryCount, error) {
+  runApp(
+    ProviderScope(
+      retry: (retryCount, error) {
         if (retryCount > 1) return null;
         return Duration(seconds: retryCount * 2);
       },
-    child: const Ridespotr()));
+      child: const Ridespotr(),
+    ),
+  );
 }
 
 class Ridespotr extends StatelessWidget {

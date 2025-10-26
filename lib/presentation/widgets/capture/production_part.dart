@@ -1,17 +1,22 @@
+import 'dart:math';
+
 import 'package:arc_progress_bar_new/arc_progress_bar_new.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:intl/intl.dart';
+import 'package:ridespotr/core/enums.dart';
+import 'package:ridespotr/models/car/car_model.dart';
 
 import '../../../core/extensions.dart';
-import '../../../models/car/car_production_model.dart';
 
 class ProductionPart extends StatelessWidget {
-  const ProductionPart({super.key, required this.production});
+  const ProductionPart({super.key, required this.car});
 
-  final CarProductionModel? production;
+  final CarModel car;
 
   @override
   Widget build(BuildContext context) {
+    final production = car.production;
     if (production == null) {
       return Center(
         child: Text(
@@ -26,32 +31,42 @@ class ProductionPart extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            height: 360,
+            // height: 360,
             child: Row(
               children: [
                 Expanded(
+                  flex: 3,
                   child: Column(
+                    spacing: 16,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ProductionCard(
+                        icon: Icons.calendar_month,
                         title: 'YEARS PRODUCED',
                         subtitle:
-                            '${production!.yearStart} - ${production!.yearEnd ?? DateTime.now().year}',
+                            '${production.yearStart} - ${production.yearEnd ?? DateTime.now().year}',
                       ),
                       ProductionCard(
+                        icon: Icons.attach_money_rounded,
                         title: 'ORIGINAL MSRP',
-                        subtitle: '\$${production!.msrp}',
+                        subtitle: NumberFormat.currency(
+                          symbol: '\$',
+                          decimalDigits: 0,
+                        ).format(production.msrp),
                       ),
                       ProductionCard(
+                        icon: Icons.numbers_rounded,
                         title: 'TOTAL MADE',
-                        subtitle: '${production!.totalMade}',
+                        subtitle: NumberFormat.decimalPattern().format(
+                          production.totalMade,
+                        ),
                       ),
-                      if (production!.description != null)
+                      if (car.description != null)
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
-                            'Description',
+                            'DESCRIPTION',
                             style: context.textTheme.headlineSmall,
                           ),
                         ),
@@ -60,6 +75,7 @@ class ProductionPart extends StatelessWidget {
                 ),
                 Gap(16),
                 Expanded(
+                  flex: 2,
                   child: Image.asset(
                     'assets/images/production.png',
                     height: 360,
@@ -69,13 +85,12 @@ class ProductionPart extends StatelessWidget {
               ],
             ),
           ),
-          Gap(16),
-          if (production!.description != null) ...[
+          Gap(8),
+          if (car.description != null) ...[
             Text(
-              production!.description!,
+              car.description!,
               style: context.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.normal,
-                fontSize: 14,
+                fontWeight: FontWeight.w200,
               ),
             ),
             Gap(16),
@@ -83,22 +98,11 @@ class ProductionPart extends StatelessWidget {
           Stack(
             children: [
               ArcProgressBar(
-                percentage: 85,
+                percentage: min(production.minValue! / 1000000 * 100, 100),
                 backgroundColor: Colors.grey.shade800,
                 foregroundColor: Colors.white,
                 arcThickness: 2,
-                handleSize: 70,
-                handleWidget: Padding(
-                  padding: const EdgeInsets.only(left: 15.0),
-                  child: RotatedBox(
-                    quarterTurns: 1,
-                    child: Icon(
-                      Icons.arrow_drop_down,
-                      size: 40,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+                handleSize: 12,
                 centerWidget: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -120,61 +124,62 @@ class ProductionPart extends StatelessWidget {
                     ),
                     Gap(12),
                     Text(
-                      '\$${production!.minValue} - \$${production!.maxValue}',
+                      '${NumberFormat.currency(symbol: '\$', decimalDigits: 0).format(production.minValue)} - ${NumberFormat.currency(symbol: '\$', decimalDigits: 0).format(production.maxValue)}',
                       style: context.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        fontSize: 22,
+                        fontSize: 18,
                       ),
                     ),
                   ],
                 ),
               ),
               ArcProgressBar(
-                percentage: 70,
+                percentage: min((production.msrp ?? 0) / 1000000 * 100, 100),
                 backgroundColor: Colors.transparent,
                 foregroundColor: Colors.blue,
                 arcThickness: 2,
-                handleSize: 70,
-                handleWidget: Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: RotatedBox(
-                    quarterTurns: 1,
-                    child: Icon(
-                      Icons.arrow_drop_down,
-                      size: 45,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
+                handleSize: 12,
               ),
             ],
           ),
-          // TweenAnimationBuilder<double>(
-          //   tween: Tween(begin: 0.0, end: 1.0),
-          //   duration: const Duration(milliseconds: 1500),
-          //   curve: Curves.easeOutCubic,
-          //   builder: (_, value, __) => ArcProgressBar(
-          //     progress: value, // Animated progress (0.0 to 1.0)
-          //     msrp: 0.65, // MSRP marker at ~65%
-          //     current: 0.85, // Current marker at ~85%
-          //     size: const Size(380, 200),
-          //     stroke: 5.0,
-          //   ),
-          // ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 8,
+                backgroundColor: Colors.blue,
+              ),
+              const Gap(8),
+              Text('MSRP'),
+              const Gap(24),
+              CircleAvatar(
+                radius: 8,
+                backgroundColor: Colors.white,
+              ),
+              const Gap(8),
+              Text('Current'),
+            ],
+          ),
           Gap(16),
           Row(
             children: [
               Expanded(
                 child: ProductionCard(
                   title: 'TOTAL PRODUCED',
-                  subtitle: '500',
+                  subtitle: NumberFormat.decimalPattern().format(
+                    production.totalMade ?? 0,
+                  ),
+                  icon: Icons.create,
                 ),
               ),
               Gap(16),
               Expanded(
                 child: ProductionCard(
                   title: 'EST. IN CIRCULATION',
-                  subtitle: '300',
+                  subtitle: NumberFormat.decimalPattern().format(
+                    production.circulationCount ?? 0,
+                  ),
+                  icon: Icons.recycling,
                 ),
               ),
             ],
@@ -185,7 +190,7 @@ class ProductionPart extends StatelessWidget {
             children: [
               Container(
                 height: 60,
-                width: 3,
+                width: 1,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(25),
@@ -194,10 +199,9 @@ class ProductionPart extends StatelessWidget {
               Gap(16),
               Expanded(
                 child: Text(
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam id efficitur ligula. Vivamus quis ligula urna. Nullam suscipit magna quis eleifend ultrices.',
+                  production.description!,
                   style: context.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.normal,
-                    fontSize: 14,
+                    fontWeight: FontWeight.w200,
                   ),
                 ),
               ),
@@ -209,20 +213,20 @@ class ProductionPart extends StatelessWidget {
             alignment: Alignment.center,
             padding: EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.purpleAccent),
+              border: Border.all(color: car.rarity.color),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.purpleAccent.withValues(alpha: 0.25),
+                  color: car.rarity.color.withValues(alpha: 0.25),
                   blurRadius: 10,
                   spreadRadius: 2,
                 ),
               ],
             ),
             child: Text(
-              'EPIC',
+              car.rarity.name.toUpperCase(),
               style: context.textTheme.bodyMedium?.copyWith(
-                color: Colors.purpleAccent,
-                fontWeight: FontWeight.bold,
+                color: car.rarity.color,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
@@ -236,9 +240,11 @@ class ProductionPart extends StatelessWidget {
 class ProductionCard extends StatelessWidget {
   const ProductionCard({
     super.key,
+    required this.icon,
     required this.title,
     required this.subtitle,
   });
+  final IconData icon;
   final String title;
   final String subtitle;
 
@@ -255,20 +261,21 @@ class ProductionCard extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.topRight,
-            child: Icon(Icons.calendar_today, size: 18, color: Colors.white),
+            child: Icon(icon, size: 18, color: Colors.white),
           ),
+          Gap(4),
           Text(
             title,
             style: context.textTheme.bodyMedium?.copyWith(
-              fontSize: 12,
-              fontWeight: FontWeight.normal,
+              fontSize: 10,
+              fontWeight: FontWeight.w300,
             ),
           ),
-          Gap(8),
+          Gap(4),
           Text(
             subtitle,
             style: context.textTheme.bodyMedium?.copyWith(
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -276,4 +283,30 @@ class ProductionCard extends StatelessWidget {
       ),
     );
   }
+}
+
+// Custom triangle painter for arc indicators
+class TrianglePainter extends CustomPainter {
+  final Color color;
+
+  TrianglePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    // Triangle pointing down
+    path.moveTo(size.width / 2, size.height); // Bottom center (point)
+    path.lineTo(0, 0); // Top left
+    path.lineTo(size.width, 0); // Top right
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -8,7 +9,7 @@ import '../../../core/toastification.dart';
 import '../../providers/car/garage_provider.dart';
 import '../../widgets/capture/scanner.dart';
 import '../../widgets/shared/back.dart';
-import 'scan_deatil_screen.dart';
+import 'scan_detail_screen.dart';
 
 class CameraScreen extends ConsumerStatefulWidget {
   const CameraScreen({super.key});
@@ -147,30 +148,28 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                                 setState(() {
                                   _isUploading = true;
                                 });
-                                // final XFile? file = await _controller?.takePicture();
-                                // TODO: Replace the dummy imagepciker with the actual capture data.
-                                final XFile? file = await ImagePicker().pickImage(
-                                  source: ImageSource.gallery,
-                                );
+                                final XFile? file = await _controller
+                                    ?.takePicture();
                                 if (file == null) {
-                                  showAlertMessage('Failed to capture image. Please try again.');
+                                  showAlertMessage(
+                                    'Failed to capture image. Please try again.',
+                                  );
                                   return;
                                 }
-                                final url = await CaptureService().uploadFileToStorage(file);
-                                if (url == null) {
-                                  showAlertMessage('Failed to upload image. Please try again.');
-                                  return;
-                                }
-                                debugPrint('Image uploaded to: $url');
 
-                                final res = await CaptureService().uploadToEdgeFunction(url);
-                                debugPrint('Edge function upload result: $res');
-                                final carSpotModel = CarSpotModel.fromJson(res['data']);
+                                // Use garage provider's scanCar method
+                                final carSpotModel = await ref
+                                    .read(garageProvider.notifier)
+                                    .scanCar(file);
+
                                 setState(() {
                                   _isUploading = false;
                                 });
                                 if (!context.mounted) return;
-                                await context.push(ScanDeatilScreen.routeName, extra: carSpotModel);
+                                await context.push(
+                                  ScanDeatilScreen.routeName,
+                                  extra: carSpotModel,
+                                );
                               } catch (e) {
                                 debugPrint('Error capturing image: $e');
                                 showAlertMessage('Error capturing image: $e');

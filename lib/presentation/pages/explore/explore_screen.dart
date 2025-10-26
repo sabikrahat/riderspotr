@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocator/geolocator.dart' as geo;
-import 'package:go_router/go_router.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:ridespotr/presentation/widgets/explore/explore_tab_bar.dart';
+import 'package:ridespotr/presentation/widgets/shared/search_text_field.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
@@ -13,7 +14,6 @@ import '../../../models/map/map_marker_model.dart';
 import '../../providers/car/map_provider.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/car_card.dart';
-import '../capture/car_deatil_screen.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
@@ -267,26 +267,32 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     onMapCreated: (MapboxMap map) =>
                         _onMapCreated(map, _sortedCarSpots),
                   ),
-                  // Black gradient overlay at the top
                   Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      height: 200,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.black.withValues(alpha: 0.8),
-                            Colors.transparent,
-                          ],
-                          stops: const [0.0, 0.7],
+                    child: IgnorePointer(
+                      child: Container(
+                        height: context.height * 0.5,
+                        padding: EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          top:
+                              MediaQuery.of(context).padding.top +
+                              kToolbarHeight +
+                              16,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black,
+                              Colors.transparent,
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
+                  // Interactive elements positioned separately
                   Positioned(
                     top:
                         MediaQuery.of(context).padding.top +
@@ -296,93 +302,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     right: 16,
                     child: Column(
                       children: [
-                        // Custom Toggle Buttons
-                        Container(
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[800],
-                            borderRadius: BorderRadius.circular(25.0),
-                          ),
-                          child: Row(
-                            children: List.generate(
-                              availableTimes.length,
-                              (index) {
-                                final isSelected =
-                                    availableTimes[index] == selectedTime;
-                                return Expanded(
-                                  child: GestureDetector(
-                                    onTap: () => setState(
-                                      () =>
-                                          selectedTime = availableTimes[index],
-                                    ),
-                                    child: Container(
-                                      margin: const EdgeInsets.all(4),
-                                      decoration: BoxDecoration(
-                                        color: isSelected
-                                            ? Colors.white
-                                            : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(
-                                          25.0,
-                                        ),
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        availableTimes[index],
-                                        style: context.textTheme.bodyMedium
-                                            ?.copyWith(
-                                              color: isSelected
-                                                  ? Colors.black
-                                                  : Colors.white,
-                                              fontWeight: FontWeight.w600,
-                                              letterSpacing: 0.5,
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
+                        ExploreTabBar(),
                         Gap(16),
-                        // Search Bar
-                        TextFormField(
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            hintText: 'Search cars',
-                            hintStyle: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey[800],
-                            prefixIcon: Icon(Icons.search, color: Colors.white),
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal: 16,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Colors.grey[800]!,
-                                width: 1,
-                              ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Colors.grey[800]!,
-                                width: 1,
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Colors.grey[800]!,
-                                width: 1,
-                              ),
-                            ),
-                          ),
+                        SearchTextField(
+                          hintText: 'Search for a car',
                         ),
                       ],
                     ),
@@ -402,10 +325,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: CarCard(
                               carSpot: _sortedCarSpots[index],
-                              onTap: () async => await context.push(
-                                CarDeatilScreen.routeName,
-                                extra: _sortedCarSpots[index],
-                              ),
                             ),
                           );
                         },

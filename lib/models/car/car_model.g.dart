@@ -13,7 +13,7 @@ CarModel _$CarModelFromJson(Map<String, dynamic> json) => CarModel(
       ? null
       : CarMakeModel.fromJson(json['make'] as Map<String, dynamic>),
   model: json['model'] as String?,
-  rarity: json['rarity'] as String,
+  rarity: $enumDecode(_$RarityEnumMap, json['rarity']),
   points: (json['points'] as num).toInt(),
   description: json['description'] as String?,
   production: json['production'] == null
@@ -32,10 +32,19 @@ Map<String, dynamic> _$CarModelToJson(CarModel instance) => <String, dynamic>{
   'created_at': instance.createdAt.toIso8601String(),
   'make': instance.make,
   'model': instance.model,
-  'rarity': instance.rarity,
+  'rarity': _$RarityEnumMap[instance.rarity]!,
   'points': instance.points,
   'description': instance.description,
   'production': instance.production,
   'specs': instance.specs,
   'history': instance.history,
+};
+
+const _$RarityEnumMap = {
+  Rarity.common: 'common',
+  Rarity.uncommon: 'uncommon',
+  Rarity.rare: 'rare',
+  Rarity.epic: 'epic',
+  Rarity.legendary: 'legendary',
+  Rarity.mythic: 'mythic',
 };

@@ -68,3 +68,63 @@ extension MeasurementStringExtension on String {
     }
   }
 }
+
+enum Rarity { common, uncommon, rare, epic, legendary, mythic }
+
+extension RarityStringExtension on Rarity {
+  String get name {
+    switch (this) {
+      case Rarity.common:
+        return 'Common';
+      case Rarity.uncommon:
+        return 'Uncommon';
+      case Rarity.rare:
+        return 'Rare';
+      case Rarity.epic:
+        return 'Epic';
+      case Rarity.legendary:
+        return 'Legendary';
+      case Rarity.mythic:
+        return 'Mythic';
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case Rarity.common:
+        return Colors.grey;
+      case Rarity.uncommon:
+        return Colors.lightBlue;
+      case Rarity.rare:
+        return Colors.orange;
+      case Rarity.epic:
+        return Colors.purpleAccent;
+      case Rarity.legendary:
+        return Colors.amber;
+      case Rarity.mythic:
+        return Colors.red;
+    }
+  }
+}
+
+enum SortOptions {
+  recent,
+  oldest,
+  alphabetical,
+  alphabeticalReverse,
+}
+
+extension SortOptionsExtension on SortOptions {
+  String get name {
+    switch (this) {
+      case SortOptions.recent:
+        return 'Most Recent';
+      case SortOptions.oldest:
+        return 'Oldest';
+      case SortOptions.alphabetical:
+        return 'A-Z';
+      case SortOptions.alphabeticalReverse:
+        return 'Z-A';
+    }
+  }
+}

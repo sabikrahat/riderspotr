@@ -11,8 +11,8 @@ import '../presentation/pages/auth/welcome_screen.dart';
 import '../presentation/pages/auth/your_experience_screen.dart';
 import '../presentation/pages/auth/your_location_screen.dart';
 import '../presentation/pages/capture/camera_screen.dart';
-import '../presentation/pages/capture/car_deatil_screen.dart';
-import '../presentation/pages/capture/scan_deatil_screen.dart';
+import '../presentation/pages/capture/car_detail_screen.dart';
+import '../presentation/pages/capture/scan_detail_screen.dart';
 import '../presentation/pages/explore/explore_screen.dart';
 import '../presentation/pages/garage/garage_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
@@ -69,17 +69,21 @@ final router = GoRouter(
     GoRoute(
       path: AboutYouScreen.routeName,
       // redirect: authHandler,
-      builder: (_, state) => AboutYouScreen(fromUpdateProfile: state.extra as bool? ?? false),
+      builder: (_, state) =>
+          AboutYouScreen(fromUpdateProfile: state.extra as bool? ?? false),
     ),
     GoRoute(
       path: YourExperienceScreen.routeName,
       // redirect: authHandler,
-      builder: (_, state) => YourExperienceScreen(fromUpdateProfile: state.extra as bool? ?? false),
+      builder: (_, state) => YourExperienceScreen(
+        fromUpdateProfile: state.extra as bool? ?? false,
+      ),
     ),
     GoRoute(
       path: YourLocationScreen.routeName,
       // redirect: authHandler,
-      builder: (_, state) => YourLocationScreen(fromUpdateProfile: state.extra as bool? ?? false),
+      builder: (_, state) =>
+          YourLocationScreen(fromUpdateProfile: state.extra as bool? ?? false),
     ),
     GoRoute(
       path: ExploreScreen.routeName,
@@ -135,10 +139,10 @@ final router = GoRouter(
           ScanDeatilScreen(carSpot: state.extra as CarSpotModel?),
     ),
     GoRoute(
-      path: CarDeatilScreen.routeName,
+      path: CarDetailScreen.routeName,
       redirect: authHandler,
       builder: (_, state) =>
-          CarDeatilScreen(carSpot: state.extra as CarSpotModel?),
+          CarDetailScreen(carSpot: state.extra as CarSpotModel?),
     ),
   ],
 );

@@ -8,11 +8,10 @@ import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../providers/car/garage_provider.dart';
-import '../../../services/car/car_spot.dart';
 import '../../widgets/capture/scan_detail_container.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/page_padding.dart';
-import 'car_deatil_screen.dart';
+import 'car_detail_screen.dart';
 
 class ScanDeatilScreen extends ConsumerWidget {
   static const String routeName = '/scan-detail';
@@ -120,7 +119,7 @@ class ScanDeatilScreen extends ConsumerWidget {
                   title: 'LEVEL UP',
                   buttonText: 'DETAILS',
                   onButtonPressed: () async => await context.push(
-                    CarDeatilScreen.routeName,
+                    CarDetailScreen.routeName,
                     extra: carSpot,
                   ),
                   child: Column(

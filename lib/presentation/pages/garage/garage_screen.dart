@@ -1,30 +1,79 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
+import 'package:ridespotr/presentation/widgets/shared/search_text_field.dart';
 
+import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
+import '../../../models/car/car_spot_model.dart';
 import '../../providers/car/garage_provider.dart';
-import '../../providers/car/garage_state_provider.dart';
 import '../../widgets/garage/animated_privacy_toggle.dart';
 import '../../widgets/shared/car_card.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/page_padding.dart';
-import '../capture/car_deatil_screen.dart';
 
-class GarageScreen extends ConsumerWidget {
+class GarageScreen extends ConsumerStatefulWidget {
   const GarageScreen({super.key});
 
   static const String routeName = '/garage';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final searchController = ref.watch(_searchControllerProvider);
-    final garageState = ref.watch(garageStateProvider);
-    final filters = ref.watch(filtersProvider);
-    final sortOptions = ref.watch(sortOptionsProvider);
-    final searchResultsCount = ref.watch(searchResultsCountProvider);
+  ConsumerState<GarageScreen> createState() => _GarageScreenState();
+}
 
+class _GarageScreenState extends ConsumerState<GarageScreen> {
+  // Local state
+  late TextEditingController _searchController;
+  String _searchQuery = '';
+  Rarity? _selectedRarity;
+  SortOptions _selectedSort = SortOptions.recent;
+  bool _isPublic = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+    });
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    setState(() {
+      _searchQuery = '';
+    });
+  }
+
+  void _onFilterChanged(Rarity? rarity) {
+    setState(() {
+      _selectedRarity = rarity;
+    });
+  }
+
+  void _onSortChanged(SortOptions sort) {
+    setState(() {
+      _selectedSort = sort;
+    });
+  }
+
+  void _togglePrivacy() {
+    setState(() {
+      _isPublic = !_isPublic;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: CarbonBackground(
         imgPath: 'assets/carbon/garage-bg.jpg',
@@ -36,7 +85,11 @@ class GarageScreen extends ConsumerWidget {
                 error: (error, stack) => Center(child: Text('Error: $error')),
                 data: (data) {
                   final notifier = ref.read(garageProvider.notifier);
-                  final sortedCars = ref.watch(filteredCarsProvider);
+                  final sortedCars = notifier.getFilteredCars(
+                    searchQuery: _searchQuery,
+                    rarity: _selectedRarity,
+                    sortBy: _selectedSort,
+                  );
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,102 +98,62 @@ class GarageScreen extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'YOUR GARAGE',
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            'GARAGE',
+                            style: context.textTheme.headlineMedium,
                           ),
                           AnimatedPrivacyToggle(
-                            isPublic: garageState.isPublic,
-                            onToggle: () => ref
-                                .read(garageStateProvider.notifier)
-                                .togglePrivacy(),
+                            isPublic: _isPublic,
+                            onToggle: _togglePrivacy,
                           ),
                         ],
                       ),
-                      const Gap(24),
+                      const Gap(16),
                       // Search Bar
-                      _SearchBar(controller: searchController),
-                      if (garageState.searchQuery.isNotEmpty) ...[
+                      SearchTextField(
+                        hintText: 'Search by car name, make or model...',
+                        controller: _searchController,
+                        onChanged: _onSearchChanged,
+                        showClearButton: _searchQuery.isNotEmpty,
+                        onClear: _clearSearch,
+                      ),
+                      if (_searchQuery.isNotEmpty) ...[
+                        const Gap(8),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: Text(
-                            'Found $searchResultsCount car${searchResultsCount != 1 ? 's' : ''} for "${garageState.searchQuery}"',
+                            'Found ${sortedCars.length} car${sortedCars.length != 1 ? 's' : ''} for "$_searchQuery"',
                             style: context.textTheme.bodyMedium?.copyWith(
                               color: Colors.white.withOpacity(0.8),
                               fontSize: 14,
                             ),
                           ),
                         ),
-                        const Gap(8),
                       ],
                       const Gap(16),
                       // Choice Chips
-                      _FilterChips(filters: filters),
+                      _FilterChips(
+                        allCars: data,
+                        selectedRarity: _selectedRarity,
+                        onFilterChanged: _onFilterChanged,
+                      ),
                       const Gap(16),
                       // Sort Options
-                      _SortDropdown(sortOptions: sortOptions),
+                      _SortDropdown(
+                        selectedSort: _selectedSort,
+                        onSortChanged: _onSortChanged,
+                      ),
                       const Gap(16),
                       // Car Cards List
                       Expanded(
                         child: RefreshIndicator(
                           onRefresh: () async => await notifier.refresh(),
                           child: sortedCars.isEmpty
-                              ? Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.search_off,
-                                        size: 64,
-                                        color: Colors.white.withOpacity(0.5),
-                                      ),
-                                      const Gap(16),
-                                      Text(
-                                        garageState.searchQuery.isNotEmpty
-                                            ? 'No cars found for "${garageState.searchQuery}"'
-                                            : 'No cars in your garage. Pull down to refresh.',
-                                        style: context.textTheme.bodyMedium
-                                            ?.copyWith(
-                                              color: Colors.white,
-                                              fontSize: 16,
-                                            ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      if (garageState
-                                          .searchQuery
-                                          .isNotEmpty) ...[
-                                        const Gap(8),
-                                        TextButton(
-                                          onPressed: () => ref
-                                              .read(
-                                                garageStateProvider.notifier,
-                                              )
-                                              .clearSearch(),
-                                          child: Text(
-                                            'Clear search',
-                                            style: context.textTheme.bodyMedium
-                                                ?.copyWith(
-                                                  color: Colors.blue,
-                                                  fontSize: 14,
-                                                ),
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                )
+                              ? _buildEmptyState(data)
                               : ListView.separated(
                                   itemCount: sortedCars.length,
                                   itemBuilder: (context, index) {
                                     return CarCard(
                                       carSpot: sortedCars[index],
-                                      onTap: () async => await context.push(
-                                        CarDeatilScreen.routeName,
-                                        extra: sortedCars[index],
-                                      ),
                                     );
                                   },
                                   separatorBuilder: (context, index) =>
@@ -156,125 +169,188 @@ class GarageScreen extends ConsumerWidget {
       ),
     );
   }
-}
 
-// Search Bar Widget
-class _SearchBar extends ConsumerWidget {
-  const _SearchBar({required this.controller});
-
-  final TextEditingController controller;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final garageState = ref.watch(garageStateProvider);
-    final stateNotifier = ref.read(garageStateProvider.notifier);
-
-    return Row(
-      children: [
-        Expanded(
-          child: TextFormField(
-            controller: controller,
-            onChanged: stateNotifier.setSearchQuery,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: 'Search by car name, make or model...',
-              suffixIcon: garageState.searchQuery.isNotEmpty
-                  ? IconButton(
-                      icon: Icon(
-                        Icons.clear,
-                        color: Colors.white.withOpacity(0.7),
-                      ),
-                      onPressed: () {
-                        stateNotifier.clearSearch();
-                        controller.clear();
-                      },
-                    )
-                  : null,
-              hintStyle: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-              ),
-              filled: true,
-              fillColor: Colors.grey[900],
-              prefixIcon: const Icon(
-                Icons.search,
-                color: Colors.white,
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                vertical: 12,
-                horizontal: 16,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Colors.grey[800]!,
-                  width: 1,
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Colors.grey[800]!,
-                  width: 1,
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Colors.grey[800]!,
-                  width: 1,
+  Widget _buildEmptyState(List<CarSpotModel> allCars) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.search_off,
+            size: 64,
+            color: Colors.white.withOpacity(0.5),
+          ),
+          const Gap(16),
+          Text(
+            _searchQuery.isNotEmpty || _selectedRarity != null
+                ? 'No cars found'
+                : allCars.isEmpty
+                ? 'No cars in your garage. Pull down to refresh.'
+                : 'No cars match your filters',
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: Colors.white,
+              fontSize: 16,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          if (_searchQuery.isNotEmpty || _selectedRarity != null) ...[
+            const Gap(8),
+            TextButton(
+              onPressed: () {
+                _clearSearch();
+                setState(() {
+                  _selectedRarity = null;
+                });
+              },
+              child: Text(
+                'Clear filters',
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: Colors.blue,
+                  fontSize: 14,
                 ),
               ),
             ),
-          ),
-        ),
-        const Gap(8),
-        Container(
-          padding: const EdgeInsets.all(11),
-          decoration: BoxDecoration(
-            color: Colors.grey[900],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.grey[800]!,
-              width: 1,
-            ),
-          ),
-          child: const Icon(
-            Icons.tune_rounded,
-            color: Colors.white,
-          ),
-        ),
-      ],
+          ],
+        ],
+      ),
     );
   }
 }
 
-// Filter Chips Widget
-class _FilterChips extends ConsumerWidget {
-  const _FilterChips({required this.filters});
+// Search Bar Widget
+// class _SearchBar extends ConsumerWidget {
+//   const _SearchBar({required this.controller});
 
-  final List<String> filters;
+//   final TextEditingController controller;
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final garageState = ref.watch(garageStateProvider);
+//     final stateNotifier = ref.read(garageStateProvider.notifier);
+
+//     return Row(
+//       children: [
+//         Expanded(
+//           child: TextFormField(
+//             controller: controller,
+//             onChanged: stateNotifier.setSearchQuery,
+//             style: const TextStyle(color: Colors.white),
+//             decoration: InputDecoration(
+//               hintText: 'Search by car name, make or model...',
+//               suffixIcon: garageState.searchQuery.isNotEmpty
+//                   ? IconButton(
+//                       icon: Icon(
+//                         Icons.clear,
+//                         color: Colors.white.withOpacity(0.7),
+//                       ),
+//                       onPressed: () {
+//                         stateNotifier.clearSearch();
+//                         controller.clear();
+//                       },
+//                     )
+//                   : null,
+//               hintStyle: const TextStyle(
+//                 color: Colors.white,
+//                 fontSize: 14,
+//               ),
+//               filled: true,
+//               fillColor: Colors.grey[900],
+//               prefixIcon: const Icon(
+//                 Icons.search,
+//                 color: Colors.white,
+//               ),
+//               contentPadding: const EdgeInsets.symmetric(
+//                 vertical: 12,
+//                 horizontal: 16,
+//               ),
+//               border: OutlineInputBorder(
+//                 borderRadius: BorderRadius.circular(12),
+//                 borderSide: BorderSide(
+//                   color: Colors.grey[800]!,
+//                   width: 1,
+//                 ),
+//               ),
+//               enabledBorder: OutlineInputBorder(
+//                 borderRadius: BorderRadius.circular(12),
+//                 borderSide: BorderSide(
+//                   color: Colors.grey[800]!,
+//                   width: 1,
+//                 ),
+//               ),
+//               focusedBorder: OutlineInputBorder(
+//                 borderRadius: BorderRadius.circular(12),
+//                 borderSide: BorderSide(
+//                   color: Colors.grey[800]!,
+//                   width: 1,
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ),
+//         const Gap(8),
+//         Container(
+//           padding: const EdgeInsets.all(11),
+//           decoration: BoxDecoration(
+//             color: Colors.grey[900],
+//             borderRadius: BorderRadius.circular(12),
+//             border: Border.all(
+//               color: Colors.grey[800]!,
+//               width: 1,
+//             ),
+//           ),
+//           child: const Icon(
+//             Icons.tune_rounded,
+//             color: Colors.white,
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
+
+// Filter Chips Widget
+class _FilterChips extends StatelessWidget {
+  const _FilterChips({
+    required this.allCars,
+    required this.selectedRarity,
+    required this.onFilterChanged,
+  });
+
+  final List<CarSpotModel> allCars;
+  final Rarity? selectedRarity;
+  final void Function(Rarity?) onFilterChanged;
+
+  int _getCountForRarity(Rarity? rarity) {
+    if (rarity == null) {
+      return allCars.length;
+    }
+    return allCars.where((car) => car.car?.rarity == rarity).length;
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selectedFilter = ref.watch(
-      garageStateProvider.select((state) => state.selectedFilter),
-    );
-    final stateNotifier = ref.read(garageStateProvider.notifier);
+  Widget build(BuildContext context) {
+    // Create filter options: null (All) + all rarity values
+    final filters = <({String label, Rarity? value})>[
+      (label: 'All', value: null),
+      ...Rarity.values.map((r) => (label: r.name, value: r)),
+    ];
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: filters.map((filter) {
-          final isSelected = selectedFilter == filter;
+          final isSelected = selectedRarity == filter.value;
+          final count = _getCountForRarity(filter.value);
+          final displayLabel = '${filter.label} ($count)';
+
           return Padding(
             padding: const EdgeInsets.only(right: 8),
             child: ChoiceChip(
-              label: Text(filter),
+              label: Text(displayLabel),
               selected: isSelected,
               onSelected: (selected) {
                 if (selected) {
-                  stateNotifier.setFilter(filter);
+                  onFilterChanged(filter.value);
                 }
               },
               labelStyle: TextStyle(
@@ -287,7 +363,7 @@ class _FilterChips extends ConsumerWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
                 side: BorderSide(
-                  color: isSelected ? Colors.white : Colors.grey[800]!,
+                  color: isSelected ? Colors.white : Colors.grey[850]!,
                   width: 1,
                 ),
               ),
@@ -304,18 +380,17 @@ class _FilterChips extends ConsumerWidget {
 }
 
 // Sort Dropdown Widget
-class _SortDropdown extends ConsumerWidget {
-  const _SortDropdown({required this.sortOptions});
+class _SortDropdown extends StatelessWidget {
+  const _SortDropdown({
+    required this.selectedSort,
+    required this.onSortChanged,
+  });
 
-  final List<String> sortOptions;
+  final SortOptions selectedSort;
+  final void Function(SortOptions) onSortChanged;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selectedSort = ref.watch(
-      garageStateProvider.select((state) => state.selectedSort),
-    );
-    final stateNotifier = ref.read(garageStateProvider.notifier);
-
+  Widget build(BuildContext context) {
     return Row(
       children: [
         const Icon(
@@ -329,12 +404,12 @@ class _SortDropdown extends ConsumerWidget {
           style: context.textTheme.bodyMedium,
         ),
         const Gap(16),
-        DropdownButton<String>(
+        DropdownButton<SortOptions>(
           isDense: true,
           value: selectedSort,
           onChanged: (value) {
             if (value != null) {
-              stateNotifier.setSort(value);
+              onSortChanged(value);
             }
           },
           underline: const SizedBox.shrink(),
@@ -349,11 +424,11 @@ class _SortDropdown extends ConsumerWidget {
             fontSize: 15,
             fontWeight: FontWeight.w500,
           ),
-          items: sortOptions.map((option) {
-            return DropdownMenuItem<String>(
+          items: SortOptions.values.map((option) {
+            return DropdownMenuItem<SortOptions>(
               value: option,
               child: Text(
-                option,
+                option.name,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 14,
@@ -367,12 +442,12 @@ class _SortDropdown extends ConsumerWidget {
   }
 }
 
-// Provider for search controller (disposed automatically)
-final _searchControllerProvider = Provider<TextEditingController>((ref) {
-  final controller = TextEditingController();
+// // Provider for search controller (disposed automatically)
+// final _searchControllerProvider = Provider<TextEditingController>((ref) {
+//   final controller = TextEditingController();
 
-  ref.onDispose(() {
-    controller.dispose();
-  });
-  return controller;
-});
+//   ref.onDispose(() {
+//     controller.dispose();
+//   });
+//   return controller;
+// });

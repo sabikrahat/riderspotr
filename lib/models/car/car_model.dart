@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:ridespotr/core/enums.dart';
 
 import 'car_history_model.dart';
 import 'car_make_model.dart';
@@ -13,7 +14,7 @@ class CarModel {
   DateTime createdAt;
   CarMakeModel? make;
   String? model;
-  String rarity;
+  Rarity rarity;
   int points;
   String? description;
   //
@@ -34,7 +35,8 @@ class CarModel {
     this.history,
   });
 
-  factory CarModel.fromJson(Map<String, dynamic> json) => _$CarModelFromJson(json);
+  factory CarModel.fromJson(Map<String, dynamic> json) =>
+      _$CarModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$CarModelToJson(this);
 
@@ -44,7 +46,7 @@ class CarModel {
     DateTime? createdAt,
     CarMakeModel? make,
     String? model,
-    String? rarity,
+    Rarity? rarity,
     int? points,
     String? description,
     CarProductionModel? production,

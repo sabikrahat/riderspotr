@@ -33,7 +33,7 @@ final class GarageNotifierProvider
   GarageNotifier create() => GarageNotifier();
 }
 
-String _$garageNotifierHash() => r'3cd36fc97b0c2286b6e2d853821208e0375b1410';
+String _$garageNotifierHash() => r'e6a9e82aaf16c6def85019f648f05641ba167f15';
 
 abstract class _$GarageNotifier extends $AsyncNotifier<List<CarSpotModel>> {
   FutureOr<List<CarSpotModel>> build();

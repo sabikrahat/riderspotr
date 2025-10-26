@@ -14,6 +14,7 @@ class CarSpotModel {
   String imageUrl;
   // dynamic latLng, stored as 'POINT(lon lat)' in Supabase
   dynamic latLng;
+  final String address;
   Map<String, dynamic>? location;
   bool isClaimed;
 
@@ -25,14 +26,17 @@ class CarSpotModel {
     required this.imageUrl,
     this.latLng,
     this.location,
+    required this.address,
     required this.isClaimed,
   });
 
-  factory CarSpotModel.fromJson(Map<String, dynamic> json) => _$CarSpotModelFromJson(json);
+  factory CarSpotModel.fromJson(Map<String, dynamic> json) =>
+      _$CarSpotModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$CarSpotModelToJson(this);
 
-  static const query = '*, car(*, make(*), production: car_production(*), specs: car_specs(*), history: car_history(*))';
+  static const query =
+      '*, car(*, make(*), production: car_production(*), specs: car_specs(*), history: car_history(*))';
 
   // Create a copy with method
   CarSpotModel copyWith({
@@ -44,6 +48,7 @@ class CarSpotModel {
     dynamic latLng,
     Map<String, dynamic>? location,
     bool? isClaimed,
+    String? address,
   }) {
     return CarSpotModel(
       id: id ?? this.id,
@@ -54,6 +59,7 @@ class CarSpotModel {
       latLng: latLng ?? this.latLng,
       location: location ?? this.location,
       isClaimed: isClaimed ?? this.isClaimed,
+      address: address ?? this.address,
     );
   }
 

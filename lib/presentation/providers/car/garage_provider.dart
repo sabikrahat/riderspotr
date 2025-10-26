@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/enums.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../../services/car/car_service.dart';
 
@@ -62,5 +63,80 @@ class GarageNotifier extends _$GarageNotifier {
     } catch (e) {
       throw Exception('Error deleting car: $e');
     }
+  }
+
+  /// Search cars by query (searches model, make name, and full car name)
+  List<CarSpotModel> searchCars(List<CarSpotModel> cars, String query) {
+    if (query.isEmpty) return cars;
+
+    final lowercaseQuery = query.toLowerCase();
+    return cars.where((car) {
+      final modelMatch =
+          car.car?.model?.toLowerCase().contains(lowercaseQuery) ?? false;
+      final makeName = car.car?.make?.name;
+      final makeMatch =
+          makeName?.toLowerCase().contains(lowercaseQuery) ?? false;
+      final carName = '${makeName ?? ''} ${car.car?.model ?? ''}'
+          .toLowerCase()
+          .trim();
+      final nameMatch = carName.contains(lowercaseQuery);
+
+      return modelMatch || makeMatch || nameMatch;
+    }).toList();
+  }
+
+  /// Filter cars by rarity
+  List<CarSpotModel> filterCars(List<CarSpotModel> cars, Rarity? rarity) {
+    if (rarity == null) return cars;
+
+    return cars.where((car) => car.car?.rarity == rarity).toList();
+  }
+
+  /// Sort cars by the selected sort option
+  List<CarSpotModel> sortCars(List<CarSpotModel> cars, SortOptions sortBy) {
+    final sortedCars = List<CarSpotModel>.from(cars);
+
+    switch (sortBy) {
+      case SortOptions.recent:
+        sortedCars.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        break;
+      case SortOptions.oldest:
+        sortedCars.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+        break;
+      case SortOptions.alphabetical:
+        sortedCars.sort((a, b) {
+          final carNameA = a.car?.model ?? '';
+          final carNameB = b.car?.model ?? '';
+          return carNameA.compareTo(carNameB);
+        });
+        break;
+      case SortOptions.alphabeticalReverse:
+        sortedCars.sort((a, b) {
+          final carNameA = a.car?.model ?? '';
+          final carNameB = b.car?.model ?? '';
+          return carNameB.compareTo(carNameA);
+        });
+        break;
+    }
+
+    return sortedCars;
+  }
+
+  /// Getter to apply search, filter, and sort to car list
+  List<CarSpotModel> getFilteredCars({
+    required String searchQuery,
+    required Rarity? rarity,
+    required SortOptions sortBy,
+  }) {
+    // Apply search
+    final searchedCars = searchCars(_carSpots, searchQuery);
+
+    // Apply filter
+    final filteredCars = filterCars(searchedCars, rarity);
+
+    // Apply sort
+    final sortedCars = sortCars(filteredCars, sortBy);
+
+    return sortedCars;
   }
 }

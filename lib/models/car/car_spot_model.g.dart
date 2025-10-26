@@ -16,6 +16,7 @@ CarSpotModel _$CarSpotModelFromJson(Map<String, dynamic> json) => CarSpotModel(
   imageUrl: json['image_url'] as String,
   latLng: json['lat_lng'],
   location: json['location'] as Map<String, dynamic>?,
+  address: json['address'] as String,
   isClaimed: json['is_claimed'] as bool,
 );
 
@@ -27,6 +28,7 @@ Map<String, dynamic> _$CarSpotModelToJson(CarSpotModel instance) =>
       'car': instance.car,
       'image_url': instance.imageUrl,
       'lat_lng': instance.latLng,
+      'address': instance.address,
       'location': instance.location,
       'is_claimed': instance.isClaimed,
     };

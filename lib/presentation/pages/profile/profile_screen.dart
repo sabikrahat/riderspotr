@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/extensions.dart';
 import '../../providers/auth/profile_provider.dart';
-import '../../widgets/shared/car_card.dart';
+// import '../../widgets/shared/car_card.dart';
 import '../settings/settings_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -56,7 +56,12 @@ class ProfileScreen extends ConsumerWidget {
                               left: 0,
                               right: 0,
                               child: Container(
-                                padding: const EdgeInsets.fromLTRB(16.0, 48.0, 16.0, 0.0),
+                                padding: const EdgeInsets.fromLTRB(
+                                  16.0,
+                                  48.0,
+                                  16.0,
+                                  0.0,
+                                ),
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     begin: Alignment.topCenter,
@@ -69,12 +74,14 @@ class ProfileScreen extends ConsumerWidget {
                                   ),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     SizedBox.shrink(),
                                     IconButton(
-                                      onPressed: () async =>
-                                          await context.push(SettingsScreen.routeName),
+                                      onPressed: () async => await context.push(
+                                        SettingsScreen.routeName,
+                                      ),
                                       icon: Icon(
                                         Icons.settings,
                                         color: Colors.white,
@@ -106,7 +113,8 @@ class ProfileScreen extends ConsumerWidget {
                                 children: [
                                   CircleAvatar(
                                     radius: 35,
-                                    backgroundImage: user?.profilePictureUrl == null
+                                    backgroundImage:
+                                        user?.profilePictureUrl == null
                                         ? AssetImage(
                                             'assets/images/user-placeholder.png',
                                           )
@@ -117,26 +125,30 @@ class ProfileScreen extends ConsumerWidget {
                                   Gap(12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           user?.fullName ?? 'Full Name',
-                                          style: context.textTheme.bodyMedium?.copyWith(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          style: context.textTheme.bodyMedium
+                                              ?.copyWith(
+                                                color: Colors.white,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                         ),
                                         Text(
                                           '@${user?.username ?? 'username'}',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: context.textTheme.bodyMedium?.copyWith(
-                                            color: Colors.white70,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                          style: context.textTheme.bodyMedium
+                                              ?.copyWith(
+                                                color: Colors.white70,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                         ),
                                       ],
                                     ),
@@ -168,7 +180,9 @@ class ProfileScreen extends ConsumerWidget {
                                   backgroundColor: Colors.grey.shade800,
                                   radius: 26,
                                   child: ClipRRect(
-                                    borderRadius: BorderRadiusGeometry.circular(269),
+                                    borderRadius: BorderRadiusGeometry.circular(
+                                      269,
+                                    ),
                                     child: Icon(
                                       Icons.electric_bolt,
                                       size: 30,
@@ -177,100 +191,100 @@ class ProfileScreen extends ConsumerWidget {
                                   ),
                                 ),
                               ),
-                              SizedBox(
-                                height: context.height * 0.2,
-                                width: context.width,
-                                child: Stack(
-                                  children: [
-                                    // Clipped background
-                                    ClipPath(
-                                      clipper: CircleClipper(
-                                        circleRadius: 30,
-                                        borderRadius: 24,
-                                      ),
-                                      child: Container(),
-                                    ),
+                              // SizedBox(
+                              //   height: context.height * 0.2,
+                              //   width: context.width,
+                              //   child: Stack(
+                              //     children: [
+                              //       // Clipped background
+                              //       ClipPath(
+                              //         clipper: CircleClipper(
+                              //           circleRadius: 30,
+                              //           borderRadius: 24,
+                              //         ),
+                              //         child: Container(),
+                              //       ),
 
-                                    // Border drawn on top
-                                    CustomPaint(
-                                      painter: CircleBorderPainter(
-                                        circleRadius: 30,
-                                        borderRadius: 24,
-                                        borderColor: Colors.grey.shade800,
-                                        borderWidth: 1,
-                                      ),
-                                      child: Container(),
-                                    ),
+                              //       // Border drawn on top
+                              //       CustomPaint(
+                              //         painter: CircleBorderPainter(
+                              //           circleRadius: 30,
+                              //           borderRadius: 24,
+                              //           borderColor: Colors.grey.shade800,
+                              //           borderWidth: 1,
+                              //         ),
+                              //         child: Container(),
+                              //       ),
 
-                                    // Blakck gradient
-                                    ClipPath(
-                                      clipper: CircleClipper(
-                                        circleRadius: 30,
-                                        borderRadius: 24,
-                                      ),
-                                      child: Container(
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(color: Colors.grey.shade900),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.end,
-                                            children: [
-                                              Row(
-                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                children: [
-                                                  Text(
-                                                    'YOUR XP',
-                                                    style: context.textTheme.headlineLarge
-                                                        ?.copyWith(
-                                                          fontSize: 14,
-                                                          fontWeight: FontWeight.bold,
-                                                        ),
-                                                  ),
-                                                  Spacer(),
-                                                  Text(
-                                                    '80 XP',
-                                                    style: context.textTheme.headlineLarge
-                                                        ?.copyWith(
-                                                          fontWeight: FontWeight.bold,
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Gap(12),
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.white.withValues(alpha: 0.9),
-                                                      blurRadius: 30,
-                                                      spreadRadius: 2,
-                                                    ),
-                                                  ],
-                                                ),
-                                                child: ClipRRect(
-                                                  borderRadius: BorderRadius.circular(45),
-                                                  child: LinearProgressIndicator(
-                                                    value: 0.4,
-                                                    backgroundColor: Colors.grey.withValues(
-                                                      alpha: 0.3,
-                                                    ),
-                                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                                      Colors.white,
-                                                    ),
-                                                    minHeight: 5,
-                                                    borderRadius: BorderRadius.circular(45),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                              //       // Blakck gradient
+                              //       ClipPath(
+                              //         clipper: CircleClipper(
+                              //           circleRadius: 30,
+                              //           borderRadius: 24,
+                              //         ),
+                              //         child: Container(
+                              //           width: double.infinity,
+                              //           decoration: BoxDecoration(color: Colors.grey.shade900),
+                              //           child: Padding(
+                              //             padding: const EdgeInsets.all(16),
+                              //             child: Column(
+                              //               mainAxisAlignment: MainAxisAlignment.end,
+                              //               children: [
+                              //                 Row(
+                              //                   crossAxisAlignment: CrossAxisAlignment.end,
+                              //                   children: [
+                              //                     Text(
+                              //                       'YOUR XP',
+                              //                       style: context.textTheme.headlineLarge
+                              //                           ?.copyWith(
+                              //                             fontSize: 14,
+                              //                             fontWeight: FontWeight.bold,
+                              //                           ),
+                              //                     ),
+                              //                     Spacer(),
+                              //                     Text(
+                              //                       '80 XP',
+                              //                       style: context.textTheme.headlineLarge
+                              //                           ?.copyWith(
+                              //                             fontWeight: FontWeight.bold,
+                              //                           ),
+                              //                     ),
+                              //                   ],
+                              //                 ),
+                              //                 Gap(12),
+                              //                 Container(
+                              //                   decoration: BoxDecoration(
+                              //                     boxShadow: [
+                              //                       BoxShadow(
+                              //                         color: Colors.white.withValues(alpha: 0.9),
+                              //                         blurRadius: 30,
+                              //                         spreadRadius: 2,
+                              //                       ),
+                              //                     ],
+                              //                   ),
+                              //                   child: ClipRRect(
+                              //                     borderRadius: BorderRadius.circular(45),
+                              //                     child: LinearProgressIndicator(
+                              //                       value: 0.4,
+                              //                       backgroundColor: Colors.grey.withValues(
+                              //                         alpha: 0.3,
+                              //                       ),
+                              //                       valueColor: AlwaysStoppedAnimation<Color>(
+                              //                         Colors.white,
+                              //                       ),
+                              //                       minHeight: 5,
+                              //                       borderRadius: BorderRadius.circular(45),
+                              //                     ),
+                              //                   ),
+                              //                 ),
+                              //               ],
+                              //             ),
+                              //           ),
+                              //         ),
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
                             ],
                           ),
                           //
