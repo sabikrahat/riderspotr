@@ -19,7 +19,9 @@ import 'your_experience_screen.dart';
 
 class AboutYouScreen extends ConsumerStatefulWidget {
   static const String routeName = '/about-you';
-  const AboutYouScreen({super.key});
+  const AboutYouScreen({super.key, this.fromUpdateProfile = false});
+
+  final bool fromUpdateProfile;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _AboutYouScreenState();
@@ -37,6 +39,23 @@ class _AboutYouScreenState extends ConsumerState<AboutYouScreen> {
   bool isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.watch(userProvider.future);
+      final notifier = ref.read(userProvider.notifier);
+      _firstNameController.text = notifier.user?.firstName ?? '';
+      _lastNameController.text = notifier.user?.lastName ?? '';
+      _usernameController.text = notifier.user?.username ?? '';
+      _dateOfBirth = notifier.user?.dob;
+      _dobController.text = _dateOfBirth == null
+          ? ''
+          : '${_dateOfBirth?.year}-${_dateOfBirth?.month.toString().padLeft(2, '0')}-${_dateOfBirth?.day.toString().padLeft(2, '0')}';
+      _measurement = notifier.user?.measurement?.toMeasurement?.name ?? Measurement.metric.name;
+    });
+  }
+
+  @override
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
@@ -47,6 +66,7 @@ class _AboutYouScreenState extends ConsumerState<AboutYouScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(userProvider);
     final notifier = ref.read(userProvider.notifier);
     return LoadingOverlay(
       isLoading: isLoading,
@@ -56,6 +76,10 @@ class _AboutYouScreenState extends ConsumerState<AboutYouScreen> {
           elevation: 0,
           leading: Back(
             onPressed: () async {
+              if (widget.fromUpdateProfile) {
+                if (context.mounted) context.pop();
+                return;
+              }
               await notifier.signOut(context: context);
               if (context.mounted) {
                 context.pushReplacement(LoginScreen.routeName);
@@ -151,6 +175,13 @@ class _AboutYouScreenState extends ConsumerState<AboutYouScreen> {
                         DropdownTextfield(
                           labelText: 'Measurement',
                           items: Measurement.values.map((e) => e.title).toList(),
+                          initialValue: _measurement != null
+                              ? Measurement.values
+                                    .firstWhere(
+                                      (element) => element.name == _measurement,
+                                    )
+                                    .title
+                              : null,
                           onChanged: (val) => setState(() {
                             final idx = Measurement.values.indexWhere(
                               (element) => element.title == val,
@@ -176,6 +207,10 @@ class _AboutYouScreenState extends ConsumerState<AboutYouScreen> {
                                     measurement: _measurement!,
                                   ),
                                 );
+                                if (widget.fromUpdateProfile) {
+                                  if (context.mounted) context.pop();
+                                  return;
+                                }
                                 if (context.mounted) {
                                   context.push(YourExperienceScreen.routeName);
                                 }

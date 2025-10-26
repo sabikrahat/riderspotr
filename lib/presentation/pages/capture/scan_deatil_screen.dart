@@ -8,6 +8,7 @@ import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../providers/car/garage_provider.dart';
+import '../../../services/car/car_spot.dart';
 import '../../widgets/capture/scan_detail_container.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/page_padding.dart';

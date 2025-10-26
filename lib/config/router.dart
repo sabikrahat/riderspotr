@@ -17,8 +17,10 @@ import '../presentation/pages/explore/explore_screen.dart';
 import '../presentation/pages/garage/garage_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
 import '../presentation/pages/leaderboard/leaderboard_screen.dart';
+import '../presentation/pages/leaderboard/search_friend.dart';
 import '../presentation/pages/nav_screen.dart';
 import '../presentation/pages/profile/profile_screen.dart';
+import '../presentation/pages/settings/settings_screen.dart';
 import '../services/auth/user_service.dart';
 
 Future<String?> authHandler(BuildContext context, GoRouterState state) async {
@@ -67,48 +69,28 @@ final router = GoRouter(
     GoRoute(
       path: AboutYouScreen.routeName,
       // redirect: authHandler,
-      builder: (_, _) => AboutYouScreen(),
+      builder: (_, state) => AboutYouScreen(fromUpdateProfile: state.extra as bool? ?? false),
     ),
     GoRoute(
       path: YourExperienceScreen.routeName,
       // redirect: authHandler,
-      builder: (_, _) => YourExperienceScreen(),
+      builder: (_, state) => YourExperienceScreen(fromUpdateProfile: state.extra as bool? ?? false),
     ),
     GoRoute(
       path: YourLocationScreen.routeName,
       // redirect: authHandler,
-      builder: (_, _) => YourLocationScreen(),
+      builder: (_, state) => YourLocationScreen(fromUpdateProfile: state.extra as bool? ?? false),
     ),
     GoRoute(
       path: ExploreScreen.routeName,
       // redirect: authHandler,
       builder: (_, _) => ExploreScreen(),
     ),
-    // ShellRoute(
-    //   redirect: authHandler,
-    //   builder: (context, state, child) {
-    //     final path = state.fullPath?.split('/').last.toLowerCase();
-    //     return NavScreen(path: path, body: child);
-    //   },
-    //   routes: [
-    //     GoRoute(
-    //       path: HomeScreen.routeName,
-    //       builder: (_, _) => HomeScreen(),
-    //     ),
-    //     GoRoute(
-    //       path: GarageScreen.routeName,
-    //       builder: (_, _) => GarageScreen(),
-    //     ),
-    //     GoRoute(
-    //       path: LeaderboardScreen.routeName,
-    //       builder: (_, _) => LeaderboardScreen(),
-    //     ),
-    //     GoRoute(
-    //       path: ProfileScreen.routeName,
-    //       builder: (_, _) => ProfileScreen(),
-    //     ),
-    //   ],
-    // ),
+    GoRoute(
+      path: SearchFriendScreen.routeName,
+      // redirect: authHandler,
+      builder: (_, _) => SearchFriendScreen(),
+    ),
     ShellRoute(
       redirect: authHandler,
       builder: (context, state, child) {
@@ -128,13 +110,19 @@ final router = GoRouter(
           path: LeaderboardScreen.routeName,
           pageBuilder: (_, __) => NoTransitionPage(child: LeaderboardScreen()),
         ),
+        // TODO: Wrap in NoTransitionPage
         GoRoute(
           path: ProfileScreen.routeName,
-          pageBuilder: (_, __) => NoTransitionPage(child: ProfileScreen()),
+          builder: (_, state) => ProfileScreen(id: state.extra as String?),
         ),
       ],
     ),
 
+    GoRoute(
+      path: SettingsScreen.routeName,
+      redirect: authHandler,
+      builder: (_, _) => SettingsScreen(),
+    ),
     GoRoute(
       path: CameraScreen.routeName,
       redirect: authHandler,

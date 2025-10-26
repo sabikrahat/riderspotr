@@ -19,7 +19,12 @@ Future<void> main() async {
 
   MapboxOptions.setAccessToken(mapBoxAccessToken);
 
-  runApp(ProviderScope(child: const Ridespotr()));
+  runApp(ProviderScope(
+    retry: (retryCount, error) {
+        if (retryCount > 1) return null;
+        return Duration(seconds: retryCount * 2);
+      },
+    child: const Ridespotr()));
 }
 
 class Ridespotr extends StatelessWidget {

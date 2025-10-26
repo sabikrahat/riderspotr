@@ -13,6 +13,7 @@ import '../../widgets/shared/back.dart';
 import '../../widgets/shared/loading_overlay.dart';
 import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
+import '../home/home_screen.dart';
 import 'about_you_screen.dart';
 
 class OtpScreenParams {
@@ -102,11 +103,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                   defaultPinTheme: PinTheme(
                                     width: 100,
                                     height: 60,
-                                    textStyle: context.textTheme.headlineMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          color: context.theme.primaryColor,
-                                        ),
+                                    textStyle: context.textTheme.headlineMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: context.theme.primaryColor,
+                                    ),
                                     decoration: BoxDecoration(
                                       border: Border(
                                         bottom: BorderSide(
@@ -119,11 +119,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                   focusedPinTheme: PinTheme(
                                     width: 100,
                                     height: 60,
-                                    textStyle: context.textTheme.headlineMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          color: context.theme.primaryColor,
-                                        ),
+                                    textStyle: context.textTheme.headlineMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: context.theme.primaryColor,
+                                    ),
                                     decoration: BoxDecoration(
                                       border: Border(
                                         bottom: BorderSide(
@@ -152,15 +151,14 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                           context: context,
                                           email: widget.params.email,
                                           token: pinController.text,
-                                          shouldCreateUser:
-                                              widget.params.shouldCreateUser,
+                                          shouldCreateUser: widget.params.shouldCreateUser,
                                         );
 
                                     if (context.mounted) {
                                       if (widget.params.shouldCreateUser) {
                                         context.push(AboutYouScreen.routeName);
                                       } else {
-                                        context.push('/');
+                                        context.pushReplacement(HomeScreen.routeName);
                                       }
                                     }
                                   } on KException catch (e) {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import '../../../models/car/car_history_model.dart';
 
 import '../../../core/extensions.dart';
+import '../../../models/car/car_history_model.dart';
 
 class HistoryPart extends StatelessWidget {
   const HistoryPart({super.key, required this.history});

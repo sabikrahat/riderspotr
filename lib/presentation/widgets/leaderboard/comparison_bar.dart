@@ -1,19 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../pages/profile/profile_screen.dart';
 
 class LeaderboardComparisonBar extends StatelessWidget {
+  final String firstUid;
   final String firstPlaceImage;
   final String firstPlaceName;
+  final String secondUid;
   final String secondPlaceImage;
   final String secondPlaceName;
+  final String thirdUid;
   final String thirdPlaceImage;
   final String thirdPlaceName;
 
   const LeaderboardComparisonBar({
     super.key,
+    required this.firstUid,
     required this.firstPlaceImage,
     required this.firstPlaceName,
+    required this.secondUid,
     required this.secondPlaceImage,
     required this.secondPlaceName,
+    required this.thirdUid,
     required this.thirdPlaceImage,
     required this.thirdPlaceName,
   });
@@ -73,6 +82,8 @@ class LeaderboardComparisonBar extends StatelessWidget {
                 // 2nd Place Profile
                 Expanded(
                   child: _buildProfileSection(
+                    context: context,
+                    uid: secondUid,
                     image: secondPlaceImage,
                     name: secondPlaceName,
                     topPadding: 90,
@@ -82,6 +93,8 @@ class LeaderboardComparisonBar extends StatelessWidget {
                 // 1st Place Profile
                 Expanded(
                   child: _buildProfileSection(
+                    context: context,
+                    uid: firstUid,
                     image: firstPlaceImage,
                     name: firstPlaceName,
                     topPadding: 30,
@@ -91,6 +104,8 @@ class LeaderboardComparisonBar extends StatelessWidget {
                 // 3rd Place Profile
                 Expanded(
                   child: _buildProfileSection(
+                    context: context,
+                    uid: thirdUid,
                     image: thirdPlaceImage,
                     name: thirdPlaceName,
                     topPadding: 130,
@@ -184,53 +199,57 @@ class LeaderboardComparisonBar extends StatelessWidget {
   }
 
   Widget _buildProfileSection({
+    required BuildContext context,
+    required String uid,
     required String image,
     required String name,
     required double topPadding,
   }) {
     return Padding(
       padding: EdgeInsets.only(top: topPadding),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Profile Image
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: _getImageProvider(image),
-                fit: BoxFit.cover,
+      child: InkWell(
+        onTap: () async => await context.push(ProfileScreen.routeName, extra: uid),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Profile Image
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: _getImageProvider(image),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 8),
-          // Username
-          Text(
-            '@$name',
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
+            const SizedBox(height: 8),
+            // Username
+            Text(
+              '@$name',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  ImageProvider _getImageProvider(String image) {
-    if (image.startsWith('http://') || image.startsWith('https://')) {
-      return NetworkImage(image);
-    } else if (image.startsWith('assets/')) {
-      return AssetImage(image);
-    } else {
-      return AssetImage(image);
+  ImageProvider _getImageProvider(String imagePath) {
+    // Check if the path is a network URL
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return NetworkImage(imagePath);
     }
+    // Otherwise, treat it as an asset image
+    return AssetImage(imagePath);
   }
 }
 

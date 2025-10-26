@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/extensions.dart';
 import '../../providers/user_stats/user_stats_provider.dart';
@@ -8,6 +9,8 @@ import '../../widgets/leaderboard/comparison_bar.dart';
 import '../../widgets/leaderboard/summary_card.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/page_padding.dart';
+import '../profile/profile_screen.dart';
+import 'search_friend.dart';
 
 class LeaderboardScreen extends ConsumerStatefulWidget {
   const LeaderboardScreen({super.key});
@@ -45,7 +48,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                           Text('LEADERBOARD', style: context.textTheme.headlineMedium),
                           InkWell(
                             borderRadius: BorderRadius.circular(45),
-                            onTap: () {},
+                            onTap: () async => await context.push(SearchFriendScreen.routeName),
                             child: Icon(
                               Icons.person_add_alt_1_rounded,
                               color: Colors.white,
@@ -98,11 +101,20 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
 
                       // Learderboard Bar
                       LeaderboardComparisonBar(
-                        firstPlaceImage: 'https://picsum.photos/200',
+                        firstUid: notifier.userStats[0].user?.id ?? '',
+                        firstPlaceImage: notifier.userStats[0].user?.profilePictureUrl == null
+                            ? 'assets/images/user-placeholder.png'
+                            : notifier.userStats[0].user!.profilePictureUrl!,
                         firstPlaceName: notifier.userStats[0].user?.username ?? 'firstuser',
-                        secondPlaceImage: 'https://picsum.photos/200',
+                        secondUid: notifier.userStats[1].user?.id ?? '',
+                        secondPlaceImage: notifier.userStats[1].user?.profilePictureUrl == null
+                            ? 'assets/images/user-placeholder.png'
+                            : notifier.userStats[1].user!.profilePictureUrl!,
                         secondPlaceName: notifier.userStats[1].user?.username ?? 'seconduser',
-                        thirdPlaceImage: 'https://picsum.photos/200',
+                        thirdUid: notifier.userStats[2].user?.id ?? '',
+                        thirdPlaceImage: notifier.userStats[2].user?.profilePictureUrl == null
+                            ? 'assets/images/user-placeholder.png'
+                            : notifier.userStats[2].user!.profilePictureUrl!,
                         thirdPlaceName: notifier.userStats[2].user?.username ?? 'thirduser',
                       ),
                       Gap(16),
@@ -163,18 +175,26 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                         notifier.otherStats.length,
                         (i) {
                           final userStat = notifier.otherStats[i];
+                          final user = userStat.user;
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 16.0),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12),
                               child: Stack(
                                 children: [
-                                  Image.asset(
-                                    'assets/images/demo-short.png',
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    height: 100,
-                                  ),
+                                  user?.bannerUrl == null
+                                      ? Image.asset(
+                                          'assets/carbon/leaderboard-bg.jpg',
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: 100,
+                                        )
+                                      : Image.network(
+                                          user?.bannerUrl ?? '',
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: 100,
+                                        ),
                                   Positioned(
                                     left: 0,
                                     right: 0,
@@ -194,10 +214,23 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                       ),
                                       child: Row(
                                         children: [
-                                          CircleAvatar(
-                                            radius: 25,
-                                            backgroundImage: const NetworkImage(
-                                              'https://picsum.photos/200',
+                                          InkWell(
+                                            borderRadius: BorderRadius.circular(30),
+                                            onTap: () async {
+                                              await context.push(
+                                                ProfileScreen.routeName,
+                                                extra: userStat.user?.id ?? '',
+                                              );
+                                            },
+                                            child: CircleAvatar(
+                                              radius: 25,
+                                              backgroundImage: user?.profilePictureUrl == null
+                                                  ? AssetImage(
+                                                      'assets/images/user-placeholder.png',
+                                                    )
+                                                  : const NetworkImage(
+                                                      'https://picsum.photos/200',
+                                                    ),
                                             ),
                                           ),
                                           Gap(12),
@@ -207,7 +240,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                               mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
                                                 Text(
-                                                  userStat.user?.fullName ?? 'No Name',
+                                                  user?.fullName ?? 'Full Name',
                                                   style: context.textTheme.bodyMedium?.copyWith(
                                                     color: Colors.white,
                                                     fontSize: 18,
@@ -215,7 +248,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                                   ),
                                                 ),
                                                 Text(
-                                                  "@${userStat.user?.username ?? 'username'}",
+                                                  "@${user?.username ?? 'username'}",
                                                   style: context.textTheme.bodyMedium?.copyWith(
                                                     color: Colors.white70,
                                                     fontSize: 14,

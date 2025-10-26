@@ -39,15 +39,30 @@ class UserService {
   //   }
   // }
 
-  Future<UserModel?> getUser() async {
+  Future<UserModel?> getUser([String? uid]) async {
     try {
-      final res = await _client
-          .from(usersTbl)
-          .select()
-          .eq('id', _client.auth.currentUser!.id)
-          .maybeSingle();
+      final id = uid ?? _client.auth.currentUser!.id;
+      final res = await _client.from(usersTbl).select().eq('id', id).maybeSingle();
       if (res == null) return null;
       return UserModel.fromJson(res);
+    } on SocketException catch (e) {
+      throw KException('No internet connection. ${e.message}');
+    } on AuthException catch (e) {
+      throw KException(e.message);
+    } catch (e) {
+      throw KException(e.toString());
+    }
+  }
+
+  Future<List<UserModel>> getUsers([String? query]) async {
+    try {
+      dynamic pq = _client.from(usersTbl).select();
+      if (query != null && query.isNotEmpty) {
+        pq = pq.or('username.ilike.%$query%,first_name.ilike.%$query%,last_name.ilike.%$query%');
+      }
+      final res = await pq;
+      if (res.isEmpty) return [];
+      return res.map<UserModel>((e) => UserModel.fromJson(e)).toList();
     } on SocketException catch (e) {
       throw KException('No internet connection. ${e.message}');
     } on AuthException catch (e) {
