@@ -267,6 +267,26 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     onMapCreated: (MapboxMap map) =>
                         _onMapCreated(map, _sortedCarSpots),
                   ),
+                  // Black gradient overlay at the top
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 200,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.8),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.7],
+                        ),
+                      ),
+                    ),
+                  ),
                   Positioned(
                     top:
                         MediaQuery.of(context).padding.top +

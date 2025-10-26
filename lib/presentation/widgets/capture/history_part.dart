@@ -38,10 +38,14 @@ class HistoryPart extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('SIGNIFICANCE', style: context.textTheme.headlineSmall),
+                      Text(
+                        'SIGNIFICANCE',
+                        style: context.textTheme.headlineSmall,
+                      ),
                       Gap(8),
                       Text(
-                        history!.significance ?? 'No significance data available.',
+                        history!.significance ??
+                            'No significance data available.',
                         style: context.textTheme.bodyMedium?.copyWith(
                           fontSize: 14,
                           color: Colors.white,
@@ -75,7 +79,8 @@ class HistoryPart extends StatelessWidget {
                       ),
                       Gap(8),
                       Text(
-                        history!.heritage ?? 'No motorsport heritage data available.',
+                        history!.heritage ??
+                            'No motorsport heritage data available.',
                         style: context.textTheme.bodyMedium?.copyWith(
                           fontSize: 14,
                           color: Colors.white,
@@ -93,7 +98,8 @@ class HistoryPart extends StatelessWidget {
               ),
             ],
           ),
-          Gap(8),
+
+          //  Gap(8),
           ...List.generate(
             history!.funFacts?.length ?? 0,
             (i) => Padding(
@@ -123,15 +129,28 @@ class HistoryPart extends StatelessWidget {
                             style: context.textTheme.headlineSmall,
                           ),
                           Gap(8),
-                          Text(
-                            history!.funFacts![i],
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              fontSize: 14,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
+                          // Text(
+                          //   history!.funFacts![i],
+                          //   style: context.textTheme.bodyMedium?.copyWith(
+                          //     fontSize: 14,
+                          //     color: Colors.white,
+                          //     fontWeight: FontWeight.w400,
+                          //   ),
+                          // ),
                         ],
+                      ),
+                      Gap(8),
+                      Expanded(
+                        child: Text(
+                          history!.funFacts![i],
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontSize: 14,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          maxLines: 5,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
@@ -147,19 +166,19 @@ class HistoryPart extends StatelessWidget {
               children: [
                 Text(
                   'DESIGNED BY',
-                  style: context.textTheme.headlineSmall?.copyWith(
-                    fontSize: 14,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: context.textTheme.headlineSmall,
                 ),
                 Gap(8),
-                Text(
-                  history!.designerName ?? 'N/A',
-                  style: context.textTheme.headlineSmall?.copyWith(
-                    fontSize: 22,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    history!.designerName ?? 'N/A',
+                    style: context.textTheme.headlineSmall?.copyWith(
+                      fontSize: 14,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
               ],

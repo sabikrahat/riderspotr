@@ -84,6 +84,31 @@ final router = GoRouter(
       // redirect: authHandler,
       builder: (_, _) => ExploreScreen(),
     ),
+    // ShellRoute(
+    //   redirect: authHandler,
+    //   builder: (context, state, child) {
+    //     final path = state.fullPath?.split('/').last.toLowerCase();
+    //     return NavScreen(path: path, body: child);
+    //   },
+    //   routes: [
+    //     GoRoute(
+    //       path: HomeScreen.routeName,
+    //       builder: (_, _) => HomeScreen(),
+    //     ),
+    //     GoRoute(
+    //       path: GarageScreen.routeName,
+    //       builder: (_, _) => GarageScreen(),
+    //     ),
+    //     GoRoute(
+    //       path: LeaderboardScreen.routeName,
+    //       builder: (_, _) => LeaderboardScreen(),
+    //     ),
+    //     GoRoute(
+    //       path: ProfileScreen.routeName,
+    //       builder: (_, _) => ProfileScreen(),
+    //     ),
+    //   ],
+    // ),
     ShellRoute(
       redirect: authHandler,
       builder: (context, state, child) {
@@ -93,22 +118,23 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: HomeScreen.routeName,
-          builder: (_, _) => HomeScreen(),
+          pageBuilder: (_, __) => NoTransitionPage(child: HomeScreen()),
         ),
         GoRoute(
           path: GarageScreen.routeName,
-          builder: (_, _) => GarageScreen(),
+          pageBuilder: (_, __) => NoTransitionPage(child: GarageScreen()),
         ),
         GoRoute(
           path: LeaderboardScreen.routeName,
-          builder: (_, _) => LeaderboardScreen(),
+          pageBuilder: (_, __) => NoTransitionPage(child: LeaderboardScreen()),
         ),
         GoRoute(
           path: ProfileScreen.routeName,
-          builder: (_, _) => ProfileScreen(),
+          pageBuilder: (_, __) => NoTransitionPage(child: ProfileScreen()),
         ),
       ],
     ),
+
     GoRoute(
       path: CameraScreen.routeName,
       redirect: authHandler,
