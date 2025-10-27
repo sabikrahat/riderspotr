@@ -9,7 +9,7 @@ import '../../widgets/leaderboard/comparison_bar.dart';
 import '../../widgets/leaderboard/summary_card.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/page_padding.dart';
-import '../profile/profile_screen.dart';
+import '../profile/user_profile_screen.dart';
 import 'search_friend.dart';
 
 class LeaderboardScreen extends ConsumerStatefulWidget {
@@ -218,7 +218,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                             borderRadius: BorderRadius.circular(30),
                                             onTap: () async {
                                               await context.push(
-                                                ProfileScreen.routeName,
+                                                UserProfileScreen.routeName,
                                                 extra: userStat.user?.id ?? '',
                                               );
                                             },

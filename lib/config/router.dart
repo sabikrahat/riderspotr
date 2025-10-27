@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridespotr/presentation/pages/profile/user_profile_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/car/car_spot_model.dart';
@@ -19,7 +20,7 @@ import '../presentation/pages/home/home_screen.dart';
 import '../presentation/pages/leaderboard/leaderboard_screen.dart';
 import '../presentation/pages/leaderboard/search_friend.dart';
 import '../presentation/pages/nav_screen.dart';
-import '../presentation/pages/profile/profile_screen.dart';
+import '../presentation/pages/profile/own_profile_screen.dart';
 import '../presentation/pages/settings/settings_screen.dart';
 import '../services/auth/user_service.dart';
 
@@ -69,8 +70,7 @@ final router = GoRouter(
     GoRoute(
       path: AboutYouScreen.routeName,
       // redirect: authHandler,
-      builder: (_, state) =>
-          AboutYouScreen(fromUpdateProfile: state.extra as bool? ?? false),
+      builder: (_, state) => AboutYouScreen(fromUpdateProfile: state.extra as bool? ?? false),
     ),
     GoRoute(
       path: YourExperienceScreen.routeName,
@@ -82,8 +82,7 @@ final router = GoRouter(
     GoRoute(
       path: YourLocationScreen.routeName,
       // redirect: authHandler,
-      builder: (_, state) =>
-          YourLocationScreen(fromUpdateProfile: state.extra as bool? ?? false),
+      builder: (_, state) => YourLocationScreen(fromUpdateProfile: state.extra as bool? ?? false),
     ),
     GoRoute(
       path: ExploreScreen.routeName,
@@ -116,10 +115,14 @@ final router = GoRouter(
         ),
         // TODO: Wrap in NoTransitionPage
         GoRoute(
-          path: ProfileScreen.routeName,
-          builder: (_, state) => ProfileScreen(id: state.extra as String?),
+          path: OwnProfileScreen.routeName,
+          builder: (_, state) => OwnProfileScreen(),
         ),
       ],
+    ),
+    GoRoute(
+      path: UserProfileScreen.routeName,
+      builder: (_, state) => UserProfileScreen(id: state.extra as String),
     ),
 
     GoRoute(
@@ -135,14 +138,12 @@ final router = GoRouter(
     GoRoute(
       path: ScanDeatilScreen.routeName,
       redirect: authHandler,
-      builder: (_, state) =>
-          ScanDeatilScreen(carSpot: state.extra as CarSpotModel?),
+      builder: (_, state) => ScanDeatilScreen(carSpot: state.extra as CarSpotModel?),
     ),
     GoRoute(
       path: CarDetailScreen.routeName,
       redirect: authHandler,
-      builder: (_, state) =>
-          CarDetailScreen(carSpot: state.extra as CarSpotModel?),
+      builder: (_, state) => CarDetailScreen(carSpot: state.extra as CarSpotModel?),
     ),
   ],
 );

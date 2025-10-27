@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../pages/profile/profile_screen.dart';
+import 'package:ridespotr/presentation/pages/profile/user_profile_screen.dart';
 
 class LeaderboardComparisonBar extends StatelessWidget {
   final String firstUid;
@@ -208,7 +207,7 @@ class LeaderboardComparisonBar extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(top: topPadding),
       child: InkWell(
-        onTap: () async => await context.push(ProfileScreen.routeName, extra: uid),
+        onTap: () async => await context.push(UserProfileScreen.routeName, extra: uid),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

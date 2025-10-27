@@ -8,23 +8,21 @@ import '../../providers/auth/profile_provider.dart';
 // import '../../widgets/shared/car_card.dart';
 import '../settings/settings_screen.dart';
 
-class ProfileScreen extends ConsumerWidget {
-  const ProfileScreen({super.key, this.id});
+class OwnProfileScreen extends ConsumerWidget {
+  const OwnProfileScreen({super.key});
 
   static const String routeName = '/profile';
-
-  final String? id;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: ref
-          .watch(profileProvider(id))
+          .watch(profileProvider(null))
           .when(
             loading: () => Center(child: CircularProgressIndicator()),
             error: (error, stackTrace) => Center(child: Text(error.toString())),
             data: (_) {
-              final notifier = ref.read(profileProvider(id).notifier);
+              final notifier = ref.read(profileProvider(null).notifier);
               final user = notifier.user;
               return SingleChildScrollView(
                 child: Column(
@@ -50,48 +48,46 @@ class ProfileScreen extends ConsumerWidget {
                                     fit: BoxFit.cover,
                                   ),
                           ),
-                          if (id == null)
-                            Positioned(
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                padding: const EdgeInsets.fromLTRB(
-                                  16.0,
-                                  48.0,
-                                  16.0,
-                                  0.0,
-                                ),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Colors.black.withValues(alpha: 0.6),
-                                      Colors.black.withValues(alpha: 0.53),
-                                      Colors.transparent,
-                                    ],
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    SizedBox.shrink(),
-                                    IconButton(
-                                      onPressed: () async => await context.push(
-                                        SettingsScreen.routeName,
-                                      ),
-                                      icon: Icon(
-                                        Icons.settings,
-                                        color: Colors.white,
-                                        size: 20,
-                                      ),
-                                    ),
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              padding: const EdgeInsets.fromLTRB(
+                                16.0,
+                                48.0,
+                                16.0,
+                                0.0,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.black.withValues(alpha: 0.6),
+                                    Colors.black.withValues(alpha: 0.53),
+                                    Colors.transparent,
                                   ],
                                 ),
                               ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox.shrink(),
+                                  IconButton(
+                                    onPressed: () async => await context.push(
+                                      SettingsScreen.routeName,
+                                    ),
+                                    icon: Icon(
+                                      Icons.settings,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
+                          ),
                           Positioned(
                             bottom: 0,
                             left: 0,
@@ -113,8 +109,7 @@ class ProfileScreen extends ConsumerWidget {
                                 children: [
                                   CircleAvatar(
                                     radius: 35,
-                                    backgroundImage:
-                                        user?.profilePictureUrl == null
+                                    backgroundImage: user?.profilePictureUrl == null
                                         ? AssetImage(
                                             'assets/images/user-placeholder.png',
                                           )
@@ -125,30 +120,26 @@ class ProfileScreen extends ConsumerWidget {
                                   Gap(12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           user?.fullName ?? 'Full Name',
-                                          style: context.textTheme.bodyMedium
-                                              ?.copyWith(
-                                                color: Colors.white,
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                          style: context.textTheme.bodyMedium?.copyWith(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                         Text(
                                           '@${user?.username ?? 'username'}',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: context.textTheme.bodyMedium
-                                              ?.copyWith(
-                                                color: Colors.white70,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                          style: context.textTheme.bodyMedium?.copyWith(
+                                            color: Colors.white70,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
                                       ],
                                     ),
