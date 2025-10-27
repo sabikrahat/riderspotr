@@ -20,7 +20,7 @@ class MapNotifier extends _$MapNotifier {
 
   List<CarSpotModel> get carSpots => _carSpots;
 
-  Future<void> refresh() async {
+  Future<void> refresh([String? query]) async {
     _carSpots = await CarService().getAllCarSpots();
     state = AsyncValue.data(_carSpots);
   }
