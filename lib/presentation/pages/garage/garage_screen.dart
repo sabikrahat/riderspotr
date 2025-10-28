@@ -123,7 +123,7 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                           child: Text(
                             'Found ${sortedCars.length} car${sortedCars.length != 1 ? 's' : ''} for "$_searchQuery"',
                             style: context.textTheme.bodyMedium?.copyWith(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                               fontSize: 14,
                             ),
                           ),
@@ -177,7 +177,7 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
           Icon(
             Icons.search_off,
             size: 64,
-            color: Colors.white.withOpacity(0.5),
+            color: Colors.white.withValues(alpha: 0.5),
           ),
           const Gap(16),
           Text(
