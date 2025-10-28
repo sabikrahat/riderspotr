@@ -1,10 +1,9 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:ridespotr/core/enums.dart';
 import 'package:ridespotr/presentation/widgets/explore/explore_tab_bar.dart';
 import 'package:ridespotr/presentation/widgets/shared/search_text_field.dart';
 
@@ -54,7 +53,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
         return;
       }
 
-      geo.LocationPermission permission = await geo.Geolocator.checkPermission();
+      geo.LocationPermission permission =
+          await geo.Geolocator.checkPermission();
       if (permission == geo.LocationPermission.denied) {
         permission = await geo.Geolocator.requestPermission();
         if (permission == geo.LocationPermission.denied) {
@@ -120,35 +120,39 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   Future<void> _addCircleMarkers(List<CarSpotModel> spots) async {
     if (mapboxMap == null) return;
 
-    final random = Random();
-    final markers = spots.where((s) => s.latitude != null && s.longitude != null).toList().map(
-      (spot) {
-        // Calculate radius based on coordinates
-        // Using a combination of lat/lng to create variation
-        final lat = spot.latitude!.abs();
-        final lng = spot.longitude!.abs();
-        final baseRadius = 20.0;
-        final variation = ((lat + lng) % 60) + 20; // Range: 20-80
-        final calculatedRadius = baseRadius + variation;
+    // Clear existing markers if they exist
+    if (circleAnnotationManager != null) {
+      await circleAnnotationManager!.deleteAll();
+    } else {
+      // Create circle annotation manager if it doesn't exist
+      circleAnnotationManager = await mapboxMap!.annotations
+          .createCircleAnnotationManager();
+    }
 
-        return MapMarkerModel(
-          id: spot.id,
-          latitude: spot.latitude!,
-          longitude: spot.longitude!,
-          borderColor: Color.fromRGBO(
-            random.nextInt(256),
-            random.nextInt(256),
-            random.nextInt(256),
-            1,
-          ),
-          radius: calculatedRadius,
-          carName: spot.car?.model,
-        );
-      },
-    ).toList();
+    final markers = spots
+        .where((s) => s.latitude != null && s.longitude != null)
+        .toList()
+        .map(
+          (spot) {
+            // Calculate radius based on coordinates
+            // Using a combination of lat/lng to create variation
+            final lat = spot.latitude!.abs();
+            final lng = spot.longitude!.abs();
+            final baseRadius = 20.0;
+            final variation = ((lat + lng) % 60) + 20; // Range: 20-80
+            final calculatedRadius = baseRadius + variation;
 
-    // Create circle annotation manager
-    circleAnnotationManager = await mapboxMap!.annotations.createCircleAnnotationManager();
+            return MapMarkerModel(
+              id: spot.id,
+              latitude: spot.latitude!,
+              longitude: spot.longitude!,
+              borderColor: spot.car!.rarity.color,
+              radius: calculatedRadius,
+              carName: spot.car?.model,
+            );
+          },
+        )
+        .toList();
 
     // Listen to tap events on circles
     circleAnnotationManager!.tapEvents(
@@ -224,13 +228,17 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     List<CarSpotModel> filteredList = [];
     if (selectedTime == availableTimes[0]) {
       // '24 HR'
-      filteredList = filteredList
-          .where((spot) => DateTime.now().difference(spot.createdAt).inHours <= 24)
+      filteredList = carSpots
+          .where(
+            (spot) => DateTime.now().difference(spot.createdAt).inHours <= 24,
+          )
           .toList();
     } else if (selectedTime == availableTimes[1]) {
       // '7 DAYS'
-      filteredList = filteredList
-          .where((spot) => DateTime.now().difference(spot.createdAt).inDays <= 7)
+      filteredList = carSpots
+          .where(
+            (spot) => DateTime.now().difference(spot.createdAt).inDays <= 7,
+          )
           .toList();
     } else {
       // 'ALL TIME'
@@ -238,13 +246,13 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     }
 
     final query = searchController.text.toLowerCase();
-    if (query.isEmpty || query.length < 2) return filteredList;
-
-    filteredList = filteredList.where((spot) {
-      final carModel = spot.car?.model?.toLowerCase() ?? '';
-      final carMake = spot.car?.make?.name.toLowerCase() ?? '';
-      return carModel.contains(query) || carMake.contains(query);
-    }).toList();
+    if (query.isNotEmpty && query.length >= 2) {
+      filteredList = filteredList.where((spot) {
+        final carModel = spot.car?.model?.toLowerCase() ?? '';
+        final carMake = spot.car?.make?.name.toLowerCase() ?? '';
+        return carModel.contains(query) || carMake.contains(query);
+      }).toList();
+    }
 
     _addCircleMarkers(filteredList);
 
@@ -291,7 +299,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       ),
                       zoom: 13.0,
                     ),
-                    onMapCreated: (MapboxMap map) => _onMapCreated(map, _sortedCarSpots),
+                    onMapCreated: (MapboxMap map) =>
+                        _onMapCreated(map, _sortedCarSpots),
                   ),
                   Positioned(
                     child: IgnorePointer(
@@ -300,7 +309,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                         padding: EdgeInsets.only(
                           left: 16,
                           right: 16,
-                          top: MediaQuery.of(context).padding.top + kToolbarHeight + 16,
+                          top:
+                              MediaQuery.of(context).padding.top +
+                              kToolbarHeight +
+                              16,
                         ),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -317,7 +329,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   ),
                   // Interactive elements positioned separately
                   Positioned(
-                    top: MediaQuery.of(context).padding.top + kToolbarHeight + 16,
+                    top:
+                        MediaQuery.of(context).padding.top +
+                        kToolbarHeight +
+                        16,
                     left: 16,
                     right: 16,
                     child: Column(
