@@ -6,10 +6,22 @@ import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toastification/toastification.dart';
+import 'dart:io' show Platform;
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import 'config/constants.dart';
 import 'config/router.dart';
 import 'config/theme.dart';
+
+Future<void> initPlatformState() async {
+  PurchasesConfiguration configuration;
+  if (Platform.isAndroid) {
+    configuration = PurchasesConfiguration(revenueCatApiKeyAndroid);
+  } else {
+    configuration = PurchasesConfiguration(revenueCatApiKeyIos);
+  }
+  await Purchases.configure(configuration);
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +32,8 @@ Future<void> main() async {
   await FastCachedImageConfig.init(clearCacheAfter: const Duration(days: 30));
 
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+
+  await initPlatformState();
 
   MapboxOptions.setAccessToken(mapBoxAccessToken);
 
