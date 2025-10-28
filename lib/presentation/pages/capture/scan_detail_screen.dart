@@ -60,8 +60,7 @@ class ScanDeatilScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        carSpot!.car?.make?.name.toUpperCase() ??
-                            'UNKNOWN MAKE',
+                        carSpot!.car?.make?.name.toUpperCase() ?? 'UNKNOWN MAKE',
                         style: context.textTheme.headlineMedium,
                       ),
                       Container(
@@ -158,12 +157,11 @@ class ScanDeatilScreen extends ConsumerWidget {
                                 Gap(2),
                                 Text(
                                   '250 XP',
-                                  style: context.textTheme.headlineSmall
-                                      ?.copyWith(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.purpleAccent,
-                                      ),
+                                  style: context.textTheme.headlineSmall?.copyWith(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.purpleAccent,
+                                  ),
                                 ),
                               ],
                             ),
@@ -203,9 +201,7 @@ class ScanDeatilScreen extends ConsumerWidget {
                           FilledButton.icon(
                             onPressed: () async {
                               try {
-                                final garageNotifier = ref.read(
-                                  garageProvider.notifier,
-                                );
+                                final garageNotifier = ref.read(garageProvider(null).notifier);
                                 await garageNotifier.deleteCar(carSpot!.id);
                                 if (!context.mounted) return;
                                 context.pop();
@@ -243,9 +239,7 @@ class ScanDeatilScreen extends ConsumerWidget {
                                 ),
                                 onPressed: () async {
                                   try {
-                                    final garageNotifier = ref.read(
-                                      garageProvider.notifier,
-                                    );
+                                    final garageNotifier = ref.read(garageProvider(null).notifier);
                                     await garageNotifier.claimCar(carSpot!.id);
                                     showSuccessMessage(
                                       'Car spot claimed successfully!',
@@ -261,11 +255,10 @@ class ScanDeatilScreen extends ConsumerWidget {
                                 icon: Icon(Icons.check),
                                 label: Text(
                                   'CLAIM',
-                                  style: context.textTheme.headlineSmall
-                                      ?.copyWith(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  style: context.textTheme.headlineSmall?.copyWith(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),

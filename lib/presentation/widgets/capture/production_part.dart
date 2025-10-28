@@ -4,8 +4,8 @@ import 'package:arc_progress_bar_new/arc_progress_bar_new.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
-import 'package:ridespotr/core/enums.dart';
-import 'package:ridespotr/models/car/car_model.dart';
+import '../../../core/enums.dart';
+import '../../../models/car/car_model.dart';
 
 import '../../../core/extensions.dart';
 

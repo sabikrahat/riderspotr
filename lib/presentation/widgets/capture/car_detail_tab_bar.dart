@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glass/glass.dart';
-import 'package:ridespotr/core/extensions.dart';
+import '../../../core/extensions.dart';
 
 class CarDetailTabBar extends StatelessWidget {
   final int selectedIndex;

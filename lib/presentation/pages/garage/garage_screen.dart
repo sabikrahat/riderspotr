@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:ridespotr/presentation/widgets/shared/search_text_field.dart';
+import '../../widgets/shared/search_text_field.dart';
 
 import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
@@ -79,12 +79,12 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
         imgPath: 'assets/carbon/garage-bg.jpg',
         child: PagePadding(
           child: ref
-              .watch(garageProvider)
+              .watch(garageProvider(null))
               .when(
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (error, stack) => Center(child: Text('Error: $error')),
                 data: (data) {
-                  final notifier = ref.read(garageProvider.notifier);
+                  final notifier = ref.read(garageProvider(null).notifier);
                   final sortedCars = notifier.getFilteredCars(
                     searchQuery: _searchQuery,
                     rarity: _selectedRarity,
@@ -156,8 +156,7 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                                       carSpot: sortedCars[index],
                                     );
                                   },
-                                  separatorBuilder: (context, index) =>
-                                      const Gap(24),
+                                  separatorBuilder: (context, index) => const Gap(24),
                                 ),
                         ),
                       ),

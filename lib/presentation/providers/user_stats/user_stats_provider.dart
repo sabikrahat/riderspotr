@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:ridespotr/services/auth/user_service.dart';
+import '../../../services/auth/user_service.dart';
 
 import '../../../models/user_stats/user_stats_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

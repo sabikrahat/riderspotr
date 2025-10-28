@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-import 'package:ridespotr/presentation/widgets/capture/car_detail_tab_bar.dart';
-import 'package:ridespotr/presentation/widgets/shared/rarity_chip.dart';
+import '../../widgets/capture/car_detail_tab_bar.dart';
+import '../../widgets/shared/rarity_chip.dart';
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../widgets/capture/history_part.dart';

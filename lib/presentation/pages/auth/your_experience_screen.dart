@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'login_screen.dart' show LoginScreen;
 
 import '../../../core/exception.dart';
 import '../../../core/extensions.dart';
@@ -13,6 +12,7 @@ import '../../widgets/shared/dropdown_textfield.dart';
 import '../../widgets/shared/loading_overlay.dart';
 import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
+import 'login_screen.dart' show LoginScreen;
 import 'your_location_screen.dart';
 
 class YourExperienceScreen extends ConsumerStatefulWidget {

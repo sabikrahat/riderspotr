@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:ridespotr/presentation/widgets/capture/speedometer_widget.dart';
+import 'speedometer_widget.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/car/car_specs_model.dart';

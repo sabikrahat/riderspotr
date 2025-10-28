@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:ridespotr/core/extensions.dart';
+import '../../../core/extensions.dart';
 
 class SpeedometerWidget extends StatefulWidget {
   final double value;

@@ -22,12 +22,13 @@ class CarService {
   // ========== Car Spot Methods ==========
 
   /// Get all car spots for the current user (claimed only)
-  Future<List<CarSpotModel>> getCarSpots() async {
+  Future<List<CarSpotModel>> getCarSpots([String? id]) async {
     try {
+      final userId = id ?? _client.auth.currentUser!.id;
       final res = await _client
           .from('car_spots')
           .select(CarSpotModel.query)
-          .eq('user', _client.auth.currentUser!.id)
+          .eq('user', userId)
           .eq('is_claimed', true);
       debugPrint('Car Spots fetched: ${res.toString()}');
       return res.map((e) => CarSpotModel.fromJson(e)).toList();
@@ -44,10 +45,7 @@ class CarService {
   /// Get all car spots from all users (claimed only)
   Future<List<CarSpotModel>> getAllCarSpots() async {
     try {
-      final res = await _client
-          .from('car_spots')
-          .select(CarSpotModel.query)
-          .eq('is_claimed', true);
+      final res = await _client.from('car_spots').select(CarSpotModel.query).eq('is_claimed', true);
       debugPrint('All Car Spots fetched: ${res.toString()}');
       return res.map((e) => CarSpotModel.fromJson(e)).toList();
     } on SocketException catch (e) {
@@ -178,8 +176,7 @@ class CarService {
         latLng,
       );
 
-      String formattedAddress =
-          placeDetails?.formattedAddress ?? 'Unknown location';
+      String formattedAddress = placeDetails?.formattedAddress ?? 'Unknown location';
 
       // Return location data in the format expected by CarSpotModel
       return {

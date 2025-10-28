@@ -148,8 +148,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                                 setState(() {
                                   _isUploading = true;
                                 });
-                                final XFile? file = await _controller
-                                    ?.takePicture();
+                                final XFile? file = await _controller?.takePicture();
                                 if (file == null) {
                                   showAlertMessage(
                                     'Failed to capture image. Please try again.',
@@ -159,7 +158,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
 
                                 // Use garage provider's scanCar method
                                 final carSpotModel = await ref
-                                    .read(garageProvider.notifier)
+                                    .read(garageProvider(null).notifier)
                                     .scanCar(file);
 
                                 setState(() {

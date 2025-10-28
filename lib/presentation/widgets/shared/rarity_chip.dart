@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ridespotr/core/enums.dart';
-import 'package:ridespotr/core/extensions.dart';
+import '../../../core/enums.dart';
+import '../../../core/extensions.dart';
 
 class RarityChip extends StatelessWidget {
   final Rarity rarity;

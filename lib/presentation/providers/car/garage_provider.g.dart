@@ -10,39 +10,82 @@ part of 'garage_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(GarageNotifier)
-const garageProvider = GarageNotifierProvider._();
+const garageProvider = GarageNotifierFamily._();
 
 final class GarageNotifierProvider
     extends $AsyncNotifierProvider<GarageNotifier, List<CarSpotModel>> {
-  const GarageNotifierProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'garageProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
+  const GarageNotifierProvider._({
+    required GarageNotifierFamily super.from,
+    required String? super.argument,
+  }) : super(
+         retry: null,
+         name: r'garageProvider',
+         isAutoDispose: false,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$garageNotifierHash();
 
+  @override
+  String toString() {
+    return r'garageProvider'
+        ''
+        '($argument)';
+  }
+
   @$internal
   @override
   GarageNotifier create() => GarageNotifier();
+
+  @override
+  bool operator ==(Object other) {
+    return other is GarageNotifierProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
-String _$garageNotifierHash() => r'e6a9e82aaf16c6def85019f648f05641ba167f15';
+String _$garageNotifierHash() => r'1b996ed7856345d0d74cea5e2a371a28189d5092';
+
+final class GarageNotifierFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          GarageNotifier,
+          AsyncValue<List<CarSpotModel>>,
+          List<CarSpotModel>,
+          FutureOr<List<CarSpotModel>>,
+          String?
+        > {
+  const GarageNotifierFamily._()
+    : super(
+        retry: null,
+        name: r'garageProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: false,
+      );
+
+  GarageNotifierProvider call(String? arg) => GarageNotifierProvider._(argument: arg, from: this);
+
+  @override
+  String toString() => r'garageProvider';
+}
 
 abstract class _$GarageNotifier extends $AsyncNotifier<List<CarSpotModel>> {
-  FutureOr<List<CarSpotModel>> build();
+  late final _$args = ref.$arg as String?;
+  String? get arg => _$args;
+
+  FutureOr<List<CarSpotModel>> build(String? arg);
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
-    final ref =
-        this.ref as $Ref<AsyncValue<List<CarSpotModel>>, List<CarSpotModel>>;
+    final created = build(_$args);
+    final ref = this.ref as $Ref<AsyncValue<List<CarSpotModel>>, List<CarSpotModel>>;
     final element =
         ref.element
             as $ClassProviderElement<

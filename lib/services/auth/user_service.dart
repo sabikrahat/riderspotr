@@ -6,7 +6,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../config/constants.dart';
 import '../../core/exception.dart';
 import '../../models/auth/user_model.dart';
-
 import '../../models/user_stats/user_stats_model.dart';
 
 class UserService {

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import '../../providers/car/garage_provider.dart';
+import '../../widgets/shared/back.dart';
 
+import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
 import '../../providers/auth/profile_provider.dart';
+import '../../widgets/shared/car_card.dart';
 
 class UserProfileScreen extends ConsumerStatefulWidget {
   const UserProfileScreen({super.key, required this.id});
@@ -76,6 +80,11 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                     user!.bannerUrl!,
                                     fit: BoxFit.cover,
                                   ),
+                          ),
+                          Positioned(
+                            top: MediaQuery.of(context).padding.top,
+                            left: 8,
+                            child: Back(),
                           ),
                           Positioned(
                             bottom: 0,
@@ -165,19 +174,41 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TabBar(
-                            controller: _tabController,
-                            tabs: [
-                              Tab(text: 'Stats'),
-                              Tab(text: 'Garage'),
-                            ],
+                          Container(
+                            height: 38,
+                            margin: const EdgeInsets.only(bottom: 16),
+                            clipBehavior: Clip.hardEdge,
+                            decoration: BoxDecoration(
+                              color: context.theme.dividerColor.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(45),
+                            ),
+                            child: TabBar(
+                              controller: _tabController,
+                              padding: EdgeInsets.zero,
+                              indicatorPadding: EdgeInsets.zero,
+                              splashBorderRadius: BorderRadius.circular(45),
+                              physics: const BouncingScrollPhysics(),
+                              indicatorColor: Colors.white,
+                              automaticIndicatorColorAdjustment: true,
+                              unselectedLabelColor: context.textTheme.titleMedium!.color,
+                              indicatorSize: TabBarIndicatorSize.tab,
+                              labelColor: Colors.black,
+                              indicator: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(45),
+                              ),
+                              dividerColor: Colors.transparent,
+                              tabs: [
+                                Tab(text: 'Stats'),
+                                Tab(text: 'Garage'),
+                              ],
+                            ),
                           ),
-                          Gap(16),
                           IndexedStack(
                             index: _currentTabIndex,
                             children: [
                               const _Stats(),
-                              const Text('Garage Content Here'),
+                              _Garages(widget.id),
                             ],
                           ),
                         ],
@@ -189,6 +220,120 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
               );
             },
           ),
+    );
+  }
+}
+
+class _Garages extends ConsumerStatefulWidget {
+  const _Garages(this.id);
+
+  final String id;
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => __GaragesState();
+}
+
+class __GaragesState extends ConsumerState<_Garages> {
+  SortOptions _selectedSort = SortOptions.recent;
+
+  void _onSortChanged(SortOptions sort) {
+    setState(() {
+      _selectedSort = sort;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ref
+        .watch(garageProvider(widget.id))
+        .when(
+          loading: () => Center(child: CircularProgressIndicator()),
+          error: (error, stackTrace) => Center(child: Text(error.toString())),
+          data: (_) {
+            final notifier = ref.read(garageProvider(widget.id).notifier);
+            final sortedCars = notifier.sortCars(notifier.carSpots, _selectedSort);
+            return Column(
+              children: [
+                _SortDropdown(
+                  selectedSort: _selectedSort,
+                  onSortChanged: _onSortChanged,
+                ),
+                const Gap(16),
+                ...List.generate(
+                  sortedCars.length,
+                  (index) => Padding(
+                    padding: const EdgeInsets.only(bottom: 24.0),
+                    child: CarCard(
+                      carSpot: sortedCars[index],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+  }
+}
+
+// Sort Dropdown Widget
+class _SortDropdown extends StatelessWidget {
+  const _SortDropdown({
+    required this.selectedSort,
+    required this.onSortChanged,
+  });
+
+  final SortOptions selectedSort;
+  final void Function(SortOptions) onSortChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Icon(
+          Icons.swap_vert_rounded,
+          color: Colors.white,
+          size: 16,
+        ),
+        const Gap(4),
+        Text(
+          'Sort by',
+          style: context.textTheme.bodyMedium,
+        ),
+        const Gap(16),
+        DropdownButton<SortOptions>(
+          isDense: true,
+          value: selectedSort,
+          onChanged: (value) {
+            if (value != null) {
+              onSortChanged(value);
+            }
+          },
+          underline: const SizedBox.shrink(),
+          dropdownColor: Colors.grey[900],
+          icon: const Icon(
+            Icons.arrow_drop_down,
+            color: Colors.white,
+            size: 20,
+          ),
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
+          items: SortOptions.values.map((option) {
+            return DropdownMenuItem<SortOptions>(
+              value: option,
+              child: Text(
+                option.name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 }

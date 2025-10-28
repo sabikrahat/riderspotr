@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridespotr/presentation/pages/capture/car_detail_screen.dart';
+import '../../pages/capture/car_detail_screen.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';

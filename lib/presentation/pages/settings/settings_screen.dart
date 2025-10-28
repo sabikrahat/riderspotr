@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import '../auth/about_you_screen.dart';
-import '../auth/your_experience_screen.dart';
-import '../auth/your_location_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/extensions.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/page_padding.dart';
+import '../auth/about_you_screen.dart';
 import '../auth/login_screen.dart';
+import '../auth/your_experience_screen.dart';
+import '../auth/your_location_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});

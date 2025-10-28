@@ -33,7 +33,7 @@ final class MapNotifierProvider
   MapNotifier create() => MapNotifier();
 }
 
-String _$mapNotifierHash() => r'75aed9f5d26b4d0e456c0359aa08bd382220dcf0';
+String _$mapNotifierHash() => r'c1516d675c2c93a2d83a720a0d805b34949d3570';
 
 abstract class _$MapNotifier extends $AsyncNotifier<List<CarSpotModel>> {
   FutureOr<List<CarSpotModel>> build();

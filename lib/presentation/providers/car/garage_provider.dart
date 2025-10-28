@@ -14,15 +14,15 @@ class GarageNotifier extends _$GarageNotifier {
   List<CarSpotModel> _carSpots = [];
 
   @override
-  FutureOr<List<CarSpotModel>> build() async {
-    _carSpots = await CarService().getCarSpots();
+  FutureOr<List<CarSpotModel>> build(String? arg) async {
+    _carSpots = await CarService().getCarSpots(arg);
     return _carSpots;
   }
 
   List<CarSpotModel> get carSpots => _carSpots;
 
   Future<void> refresh() async {
-    _carSpots = await CarService().getCarSpots();
+    _carSpots = await CarService().getCarSpots(arg);
     state = AsyncValue.data(_carSpots);
   }
 
@@ -71,14 +71,10 @@ class GarageNotifier extends _$GarageNotifier {
 
     final lowercaseQuery = query.toLowerCase();
     return cars.where((car) {
-      final modelMatch =
-          car.car?.model?.toLowerCase().contains(lowercaseQuery) ?? false;
+      final modelMatch = car.car?.model?.toLowerCase().contains(lowercaseQuery) ?? false;
       final makeName = car.car?.make?.name;
-      final makeMatch =
-          makeName?.toLowerCase().contains(lowercaseQuery) ?? false;
-      final carName = '${makeName ?? ''} ${car.car?.model ?? ''}'
-          .toLowerCase()
-          .trim();
+      final makeMatch = makeName?.toLowerCase().contains(lowercaseQuery) ?? false;
+      final carName = '${makeName ?? ''} ${car.car?.model ?? ''}'.toLowerCase().trim();
       final nameMatch = carName.contains(lowercaseQuery);
 
       return modelMatch || makeMatch || nameMatch;
