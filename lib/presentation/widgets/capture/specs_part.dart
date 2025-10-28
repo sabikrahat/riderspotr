@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'speedometer_widget.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/car/car_specs_model.dart';
+import 'speedometer_widget.dart';
 
 class SpecsPart extends StatelessWidget {
   const SpecsPart({super.key, required this.specs});

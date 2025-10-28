@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../presentation/pages/profile/user_profile_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/car/car_spot_model.dart';
@@ -21,6 +20,7 @@ import '../presentation/pages/leaderboard/leaderboard_screen.dart';
 import '../presentation/pages/leaderboard/search_friend.dart';
 import '../presentation/pages/nav_screen.dart';
 import '../presentation/pages/profile/own_profile_screen.dart';
+import '../presentation/pages/profile/user_profile_screen.dart';
 import '../presentation/pages/settings/settings_screen.dart';
 import '../services/auth/user_service.dart';
 

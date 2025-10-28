@@ -5,15 +5,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
-import '../../widgets/explore/explore_tab_bar.dart';
-import '../../widgets/shared/search_text_field.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../../models/map/map_marker_model.dart';
 import '../../providers/car/map_provider.dart';
+import '../../widgets/explore/explore_tab_bar.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/car_card.dart';
+import '../../widgets/shared/search_text_field.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});

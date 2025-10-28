@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import '../../../services/auth/user_service.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../models/user_stats/user_stats_model.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../services/auth/user_service.dart';
 
 part 'user_stats_provider.g.dart';
 

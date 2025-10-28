@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import '../../widgets/shared/search_text_field.dart';
 
 import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
@@ -11,6 +10,7 @@ import '../../widgets/garage/animated_privacy_toggle.dart';
 import '../../widgets/shared/car_card.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/page_padding.dart';
+import '../../widgets/shared/search_text_field.dart';
 
 class GarageScreen extends ConsumerStatefulWidget {
   const GarageScreen({super.key});

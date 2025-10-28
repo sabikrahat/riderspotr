@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import '../../providers/car/garage_provider.dart';
-import '../../widgets/shared/back.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
 import '../../providers/auth/profile_provider.dart';
+import '../../providers/car/garage_provider.dart';
+import '../../widgets/shared/back.dart';
 import '../../widgets/shared/car_card.dart';
 
 class UserProfileScreen extends ConsumerStatefulWidget {
@@ -142,24 +143,29 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                       ],
                                     ),
                                   ),
-                                  Gap(8),
-                                  ElevatedButton.icon(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.transparent,
-                                      foregroundColor: Colors.white,
-                                      elevation: 0,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 8,
+                                  if (widget.id !=
+                                      Supabase.instance.client.auth.currentUser?.id) ...[
+                                    Gap(8),
+                                    ElevatedButton.icon(
+                                      onPressed: () async => await notifier.followUnfollowUser(),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.transparent,
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 8,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
                                       ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
+                                      icon: notifier.isFollowing
+                                          ? const Icon(Icons.person_remove)
+                                          : const Icon(Icons.person_add),
+                                      label: Text(notifier.isFollowing ? 'Remove' : 'ADD'),
                                     ),
-                                    icon: Icon(Icons.person_add),
-                                    label: Text('ADD'),
-                                  ),
+                                  ],
                                 ],
                               ),
                             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glass/glass.dart';
+
 import '../../../core/extensions.dart';
 
 class CarDetailTabBar extends StatelessWidget {

@@ -4,10 +4,10 @@ import 'package:arc_progress_bar_new/arc_progress_bar_new.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
-import '../../../core/enums.dart';
-import '../../../models/car/car_model.dart';
 
+import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
+import '../../../models/car/car_model.dart';
 
 class ProductionPart extends StatelessWidget {
   const ProductionPart({super.key, required this.car});

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/extensions.dart';
 
 class ExploreTabBar extends StatefulWidget {
