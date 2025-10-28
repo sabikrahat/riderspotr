@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-import '../../widgets/capture/car_detail_tab_bar.dart';
-import '../../widgets/shared/rarity_chip.dart';
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
+import '../../widgets/capture/car_detail_tab_bar.dart';
 import '../../widgets/capture/history_part.dart';
 import '../../widgets/capture/production_part.dart';
 import '../../widgets/capture/specs_part.dart';
 import '../../widgets/shared/back.dart';
+import '../../widgets/shared/rarity_chip.dart';
 
 class CarDetailScreen extends StatefulWidget {
   static const String routeName = '/car-detail';

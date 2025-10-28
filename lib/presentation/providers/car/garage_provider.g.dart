@@ -50,7 +50,7 @@ final class GarageNotifierProvider
   }
 }
 
-String _$garageNotifierHash() => r'1b996ed7856345d0d74cea5e2a371a28189d5092';
+String _$garageNotifierHash() => r'b0ae6231b5b84ff4e73acd300ce723c53ea3d86a';
 
 final class GarageNotifierFamily extends $Family
     with
@@ -70,7 +70,8 @@ final class GarageNotifierFamily extends $Family
         isAutoDispose: false,
       );
 
-  GarageNotifierProvider call(String? arg) => GarageNotifierProvider._(argument: arg, from: this);
+  GarageNotifierProvider call(String? arg) =>
+      GarageNotifierProvider._(argument: arg, from: this);
 
   @override
   String toString() => r'garageProvider';
@@ -85,7 +86,8 @@ abstract class _$GarageNotifier extends $AsyncNotifier<List<CarSpotModel>> {
   @override
   void runBuild() {
     final created = build(_$args);
-    final ref = this.ref as $Ref<AsyncValue<List<CarSpotModel>>, List<CarSpotModel>>;
+    final ref =
+        this.ref as $Ref<AsyncValue<List<CarSpotModel>>, List<CarSpotModel>>;
     final element =
         ref.element
             as $ClassProviderElement<

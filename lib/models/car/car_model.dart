@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
-import '../../core/enums.dart';
 
+import '../../core/enums.dart';
 import 'car_history_model.dart';
 import 'car_make_model.dart';
 import 'car_production_model.dart';

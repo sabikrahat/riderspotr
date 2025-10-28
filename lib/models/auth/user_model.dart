@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'user_xp_stats_model.dart';
+
 part 'user_model.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
@@ -33,6 +35,7 @@ class UserModel {
   String? profilePictureUrl;
   String? bannerUrl;
   DateTime createdAt;
+  UserXPStatsModel? stats;
 
   UserModel({
     required this.id,
@@ -49,6 +52,7 @@ class UserModel {
     this.profilePictureUrl,
     this.bannerUrl,
     required this.createdAt,
+    this.stats,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
@@ -73,6 +77,8 @@ class UserModel {
     Location? location,
     String? profilePictureUrl,
     String? bannerUrl,
+    DateTime? createdAt,
+    UserXPStatsModel? stats,
   }) => UserModel(
     id: id,
     email: email,
@@ -87,8 +93,11 @@ class UserModel {
     address: address ?? this.address,
     profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
     bannerUrl: bannerUrl ?? this.bannerUrl,
-    createdAt: createdAt,
+    createdAt: createdAt ?? this.createdAt,
+    stats: stats ?? this.stats,
   );
 
   String get fullName => "$firstName$lastName";
+
+  static const query = '*, stats: user_stats!id(*)';
 }

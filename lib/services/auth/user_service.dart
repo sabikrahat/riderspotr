@@ -41,7 +41,7 @@ class UserService {
   Future<UserModel?> getUser([String? uid]) async {
     try {
       final id = uid ?? _client.auth.currentUser!.id;
-      final res = await _client.from(usersTbl).select().eq('id', id).maybeSingle();
+      final res = await _client.from(usersTbl).select(UserModel.query).eq('id', id).maybeSingle();
       if (res == null) return null;
       return UserModel.fromJson(res);
     } on SocketException catch (e) {
@@ -55,7 +55,7 @@ class UserService {
 
   Future<List<UserModel>> getUsers([String? query]) async {
     try {
-      dynamic pq = _client.from(usersTbl).select();
+      dynamic pq = _client.from(usersTbl).select(UserModel.query);
       if (query != null && query.isNotEmpty) {
         pq = pq.or('username.ilike.%$query%,first_name.ilike.%$query%,last_name.ilike.%$query%');
       }
