@@ -13,7 +13,7 @@ class SpeedometerWidget extends StatefulWidget {
     super.key,
     required this.value,
     this.maxValue = 300,
-    this.duration = const Duration(seconds: 2)
+    this.duration = const Duration(seconds: 2),
   });
 
   @override
@@ -143,8 +143,7 @@ class _SpeedometerWidgetState extends State<SpeedometerWidget>
                           height: 120,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border:
-                            Border.all(color: Colors.white, width: 0.6),
+                            border: Border.all(color: Colors.white, width: 0.6),
                             color: Colors.transparent,
                           ),
                           child: Center(
@@ -155,14 +154,14 @@ class _SpeedometerWidgetState extends State<SpeedometerWidget>
                                   _animation.value.toInt().toString(),
                                   style: context.textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 30
+                                    fontSize: 30,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   'km/h',
-                                  style: context.textTheme.bodyMedium?.copyWith(
-                                  ),
+                                  style: context.textTheme.bodyMedium
+                                      ?.copyWith(),
                                 ),
                               ],
                             ),
@@ -311,12 +310,20 @@ class _SpeedometerPainter extends CustomPainter {
     const needleBaseWidth = 5.0;
 
     final baseLeft = Offset(
-      center.dx + innerR * cos(needleAngle) - needleBaseWidth * sin(needleAngle),
-      center.dy + innerR * sin(needleAngle) + needleBaseWidth * cos(needleAngle),
+      center.dx +
+          innerR * cos(needleAngle) -
+          needleBaseWidth * sin(needleAngle),
+      center.dy +
+          innerR * sin(needleAngle) +
+          needleBaseWidth * cos(needleAngle),
     );
     final baseRight = Offset(
-      center.dx + innerR * cos(needleAngle) + needleBaseWidth * sin(needleAngle),
-      center.dy + innerR * sin(needleAngle) - needleBaseWidth * cos(needleAngle),
+      center.dx +
+          innerR * cos(needleAngle) +
+          needleBaseWidth * sin(needleAngle),
+      center.dy +
+          innerR * sin(needleAngle) -
+          needleBaseWidth * cos(needleAngle),
     );
     final tip = Offset(
       center.dx + outerR * cos(needleAngle),

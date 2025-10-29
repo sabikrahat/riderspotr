@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/exception.dart';
@@ -76,11 +77,15 @@ class AuthService {
     required String token,
   }) async {
     try {
-      await _client.auth.verifyOTP(
+      final res = await _client.auth.verifyOTP(
         type: OtpType.email,
         email: email,
         token: token,
       );
+
+      if (res.user != null) {
+        await Purchases.logIn(res.user!.id);
+      }
     } on SocketException catch (e) {
       throw KException('No internet connection. ${e.message}', code: '500');
     } on AuthException catch (e) {

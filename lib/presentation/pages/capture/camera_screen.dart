@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,6 +27,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
   bool _isLoading = true;
 
   bool _isUploading = false;
+  XFile? _capturedImage;
 
   @override
   void initState() {
@@ -77,8 +80,16 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          // Camera Preview
-          if (_isLoading)
+          // Camera Preview or Captured Image
+          if (_capturedImage != null)
+            // Show captured image during scanning
+            SizedBox.expand(
+              child: Image.file(
+                File(_capturedImage!.path),
+                fit: BoxFit.cover,
+              ),
+            )
+          else if (_isLoading)
             const Center(child: CircularProgressIndicator(color: Colors.white))
           else if (_controller != null && _controller!.value.isInitialized)
             SizedBox.expand(
@@ -98,126 +109,268 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                 style: TextStyle(color: Colors.white),
               ),
             ),
-          Stack(
-            children: [
-              Scanner(),
-              Positioned(
-                child: SizedBox(
-                  height: context.height * 0.225,
-                  width: context.width,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 24,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          'CAPTURE',
-                          style: context.textTheme.headlineMedium,
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Keep the car within the boundaries of the frame',
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: Colors.white70,
+          // Scanning overlay or camera controls
+          if (_isUploading)
+            _buildScanningOverlay(context)
+          else
+            Stack(
+              children: [
+                Scanner(),
+                Positioned(
+                  child: SizedBox(
+                    height: context.height * 0.225,
+                    width: context.width,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 24,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            'CAPTURE',
+                            style: context.textTheme.headlineMedium,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                          SizedBox(height: 8),
+                          Text(
+                            'Keep the car within the boundaries of the frame',
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white70,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              // Widget below the camera view
-              Positioned(
-                top: context.height * 0.775 + 24,
-                left: 0,
-                right: 0,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GestureDetector(
-                      onTap: _isUploading
-                          ? null
-                          : () async {
-                              // capture image
-                              try {
-                                setState(() {
-                                  _isUploading = true;
-                                });
-                                final XFile? file = await _controller?.takePicture();
-                                if (file == null) {
-                                  showAlertMessage(
-                                    'Failed to capture image. Please try again.',
-                                  );
-                                  return;
-                                }
+                // Widget below the camera view
+                Positioned(
+                  top: context.height * 0.775 + 24,
+                  left: 0,
+                  right: 0,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          // capture image
+                          try {
+                            final XFile? file = await _controller
+                                ?.takePicture();
+                            if (file == null) {
+                              showAlertMessage(
+                                'Failed to capture image. Please try again.',
+                              );
+                              return;
+                            }
 
-                                // Use garage provider's scanCar method
-                                final carSpotModel = await ref
-                                    .read(garageProvider(null).notifier)
-                                    .scanCar(file);
+                            setState(() {
+                              _capturedImage = file;
+                              _isUploading = true;
+                            });
 
-                                setState(() {
-                                  _isUploading = false;
-                                });
-                                if (!context.mounted) return;
-                                await context.push(
-                                  ScanDeatilScreen.routeName,
-                                  extra: carSpotModel,
-                                );
-                              } catch (e) {
-                                debugPrint('Error capturing image: $e');
-                                showAlertMessage('Error capturing image: $e');
-                              } finally {
-                                setState(() {
-                                  _isUploading = false;
-                                });
-                              }
-                            },
-                      child: Container(
+                            // Use garage provider's scanCar method
+                            final carSpotModel = await ref
+                                .read(garageProvider.notifier)
+                                .scanCar(file);
+
+                            setState(() {
+                              _isUploading = false;
+                              _capturedImage = null;
+                            });
+                            if (!context.mounted) return;
+                            await context.push(
+                              ScanDeatilScreen.routeName,
+                              extra: carSpotModel,
+                            );
+                          } catch (e) {
+                            debugPrint('Error capturing image: $e');
+                            showAlertMessage('Error capturing image: $e');
+                          } finally {
+                            setState(() {
+                              _isUploading = false;
+                              _capturedImage = null;
+                            });
+                          }
+                        },
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.white.withValues(alpha: 0.3),
+                                blurRadius: 30,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Tap to capture',
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScanningOverlay(BuildContext context) {
+    return Container(
+      width: context.width,
+      height: context.height,
+      color: Colors.black.withValues(alpha: 0.7),
+      child: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Animated scanning indicator
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0.0, end: 1.0),
+              duration: const Duration(seconds: 2),
+              builder: (context, value, child) {
+                return SizedBox(
+                  width: 120,
+                  height: 120,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Outer pulsing circle
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(
+                              alpha: 1.0 - value,
+                            ),
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                      // Middle circle
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(
+                              alpha: 0.6,
+                            ),
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                      // Inner spinning indicator
+                      SizedBox(
                         width: 80,
                         height: 80,
-                        decoration: BoxDecoration(
+                        child: CircularProgressIndicator(
                           color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              blurRadius: 30,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
+                          strokeWidth: 3,
+                          strokeCap: StrokeCap.round,
                         ),
-                        child: _isUploading
-                            ? Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: CircularProgressIndicator(
-                                  color: Colors.black.withValues(alpha: 0.7),
-                                  strokeCap: StrokeCap.round,
-                                ),
-                              )
-                            : const Icon(
-                                Icons.camera_alt,
-                                color: Colors.black,
-                              ),
                       ),
+                      // Center icon
+                      Icon(
+                        Icons.search,
+                        size: 40,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                );
+              },
+              onEnd: () {
+                // Restart animation for continuous pulsing effect
+                if (mounted && _isUploading) {
+                  setState(() {});
+                }
+              },
+            ),
+            const SizedBox(height: 32),
+            // Scanning text
+            Text(
+              'ANALYZING YOUR CAR',
+              style: context.textTheme.headlineMedium?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Time estimate
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.access_time,
+                      color: Colors.white,
+                      size: 18,
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Tap to capture',
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white70,
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        'This may take 30-60 seconds',
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(height: 24),
+            // Additional info
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Text(
+                'Please wait while we identify the make, model, and details of your vehicle',
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white70,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
