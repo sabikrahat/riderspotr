@@ -12,6 +12,7 @@ import '../auth/about_you_screen.dart';
 import '../auth/login_screen.dart';
 import '../auth/your_experience_screen.dart';
 import '../auth/your_location_screen.dart';
+import '../payment/payment_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -55,6 +56,12 @@ class SettingsScreen extends StatelessWidget {
                       title: 'YOUR LOCATION',
                       onTap: () async =>
                           await context.push(YourLocationScreen.routeName, extra: true),
+                    ),
+                    Gap(8),
+                    _Tile(
+                      icon: Icons.payment,
+                      title: 'PAYMENT METHODS',
+                      onTap: () async => await context.push(PaymentScreen.routeName),
                     ),
                   ],
                 ),

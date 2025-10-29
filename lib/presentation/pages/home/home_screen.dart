@@ -17,15 +17,15 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SingleChildScrollView(
-      child: ref
-          .watch(profileProvider(null))
-          .when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stackTrace) => Center(child: Text(error.toString())),
-            data: (_) {
-              final notifier = ref.read(profileProvider(null).notifier);
-              return Column(
+    return ref
+        .watch(profileProvider(null))
+        .when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stackTrace) => Center(child: Text(error.toString())),
+          data: (_) {
+            final notifier = ref.read(profileProvider(null).notifier);
+            return SingleChildScrollView(
+              child: Column(
                 children: [
                   Stack(
                     children: [
@@ -111,10 +111,10 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   Gap(200),
                 ],
-              );
-            },
-          ),
-    );
+              ),
+            );
+          },
+        );
   }
 }
 

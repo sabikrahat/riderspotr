@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../presentation/pages/payment/payment_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/car/car_spot_model.dart';
@@ -124,7 +125,6 @@ final router = GoRouter(
       path: UserProfileScreen.routeName,
       builder: (_, state) => UserProfileScreen(id: state.extra as String),
     ),
-
     GoRoute(
       path: SettingsScreen.routeName,
       redirect: authHandler,
@@ -144,6 +144,11 @@ final router = GoRouter(
       path: CarDetailScreen.routeName,
       redirect: authHandler,
       builder: (_, state) => CarDetailScreen(carSpot: state.extra as CarSpotModel?),
+    ),
+    GoRoute(
+      path: PaymentScreen.routeName,
+      redirect: authHandler,
+      builder: (_, _) => PaymentScreen(),
     ),
   ],
 );

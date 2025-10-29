@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import '../../../core/extensions.dart';
-import 'car_card.dart';
 
+import '../../../core/extensions.dart';
 import '../../../models/auth/user_model.dart';
+import 'car_card.dart';
 
 class ProfileXPCard extends StatelessWidget {
   const ProfileXPCard({
