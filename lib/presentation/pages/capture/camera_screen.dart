@@ -173,7 +173,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
 
                             // Use garage provider's scanCar method
                             final carSpotModel = await ref
-                                .read(garageProvider.notifier)
+                                .read(garageProvider(null).notifier)
                                 .scanCar(file);
 
                             setState(() {
