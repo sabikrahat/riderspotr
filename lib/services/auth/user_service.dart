@@ -42,6 +42,7 @@ class UserService {
     try {
       final id = uid ?? _client.auth.currentUser!.id;
       final res = await _client.from(usersTbl).select(UserModel.query).eq('id', id).maybeSingle();
+      debugPrint('User fetched: ${res.toString()}');
       if (res == null) return null;
       return UserModel.fromJson(res);
     } on SocketException catch (e) {

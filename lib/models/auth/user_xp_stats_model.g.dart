@@ -8,7 +8,7 @@ part of 'user_xp_stats_model.dart';
 
 UserXPStatsModel _$UserXPStatsModelFromJson(Map<String, dynamic> json) =>
     UserXPStatsModel(
-      id: json['id'] as String,
+      user: json['user'] as String,
       totalXp: (json['total_xp'] as num).toDouble(),
       xpToNextLevel: (json['xp_to_next_level'] as num).toDouble(),
       xpToNextLevelProgress: (json['xp_to_next_level_progress'] as num)
@@ -18,7 +18,7 @@ UserXPStatsModel _$UserXPStatsModelFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$UserXPStatsModelToJson(UserXPStatsModel instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      'user': instance.user,
       'total_xp': instance.totalXp,
       'xp_to_next_level': instance.xpToNextLevel,
       'xp_to_next_level_progress': instance.xpToNextLevelProgress,

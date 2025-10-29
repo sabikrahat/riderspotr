@@ -99,5 +99,5 @@ class UserModel {
 
   String get fullName => "$firstName$lastName";
 
-  static const query = '*, stats: user_stats!id(*)';
+  static const query = '*, stats: user_xp_stats(*)';
 }

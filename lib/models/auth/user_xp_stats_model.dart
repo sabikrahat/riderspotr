@@ -4,14 +4,14 @@ part 'user_xp_stats_model.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class UserXPStatsModel {
-  final String id;
+  final String user;
   double totalXp;
   double xpToNextLevel;
   double xpToNextLevelProgress;
   int level;
 
   UserXPStatsModel({
-    required this.id,
+    required this.user,
     required this.totalXp,
     required this.xpToNextLevel,
     required this.xpToNextLevelProgress,
@@ -24,14 +24,14 @@ class UserXPStatsModel {
 
   // Create a copy with method
   UserXPStatsModel copyWith({
-    String? id,
+    String? user,
     double? totalXp,
     double? xpToNextLevel,
     double? xpToNextLevelProgress,
     int? level,
   }) {
     return UserXPStatsModel(
-      id: id ?? this.id,
+      user: user ?? this.user,
       totalXp: totalXp ?? this.totalXp,
       xpToNextLevel: xpToNextLevel ?? this.xpToNextLevel,
       xpToNextLevelProgress: xpToNextLevelProgress ?? this.xpToNextLevelProgress,
