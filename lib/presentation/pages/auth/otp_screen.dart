@@ -10,6 +10,7 @@ import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
 import '../../providers/auth/user_provider.dart';
 import '../../widgets/shared/back.dart';
+import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/loading_overlay.dart';
 import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
@@ -62,172 +63,165 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
           leading: Back(),
         ),
         extendBodyBehindAppBar: true,
-        body: Stack(
-          children: [
-            Image.asset(
-              'assets/onboarding/otp.png',
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: context.height * 0.36,
-            ),
-            PagePadding(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'ENTER OTP',
-                              style: context.textTheme.headlineSmall,
-                            ),
-                            Gap(4),
-                            Text('Check your email for a 6 digit OTP code'),
-                            Gap(24),
-                            Center(
-                              child: Form(
-                                key: _formKey,
-                                child: Pinput(
-                                  validator: FormBuilderValidators.compose([
-                                    FormBuilderValidators.required(),
-                                    FormBuilderValidators.equalLength(
-                                      6,
-                                      errorText: 'Please enter a valid OTP',
-                                    ),
-                                  ]),
-                                  controller: pinController,
-                                  length: 6,
-                                  defaultPinTheme: PinTheme(
-                                    width: 100,
-                                    height: 60,
-                                    textStyle: context.textTheme.headlineMedium?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: context.theme.primaryColor,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          color: context.theme.primaryColor,
-                                          width: 0.5,
-                                        ),
+        body: CarbonBackground(
+          imgPath: 'assets/carbon/leaderboard-bg.jpg',
+          child: PagePadding(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'ENTER OTP',
+                            style: context.textTheme.headlineSmall,
+                          ),
+                          Gap(4),
+                          Text('Check your email for a 6 digit OTP code'),
+                          Gap(24),
+                          Center(
+                            child: Form(
+                              key: _formKey,
+                              child: Pinput(
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.required(),
+                                  FormBuilderValidators.equalLength(
+                                    6,
+                                    errorText: 'Please enter a valid OTP',
+                                  ),
+                                ]),
+                                controller: pinController,
+                                length: 6,
+                                defaultPinTheme: PinTheme(
+                                  width: 100,
+                                  height: 60,
+                                  textStyle: context.textTheme.headlineMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: context.theme.primaryColor,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: context.theme.primaryColor,
+                                        width: 0.5,
                                       ),
                                     ),
                                   ),
-                                  focusedPinTheme: PinTheme(
-                                    width: 100,
-                                    height: 60,
-                                    textStyle: context.textTheme.headlineMedium?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: context.theme.primaryColor,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          color: context.theme.primaryColor,
-                                          width: 2,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  textInputAction: TextInputAction.done,
                                 ),
+                                focusedPinTheme: PinTheme(
+                                  width: 100,
+                                  height: 60,
+                                  textStyle: context.textTheme.headlineMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: context.theme.primaryColor,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: context.theme.primaryColor,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                textInputAction: TextInputAction.done,
                               ),
                             ),
-                            Gap(24),
-                            LongButton(
-                              text: 'Continue',
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  try {
-                                    setState(() {
-                                      isLoading = true;
-                                    });
-                                    await ref
-                                        .read(userProvider.notifier)
-                                        .verifyOtp(
-                                          context: context,
-                                          email: widget.params.email,
-                                          token: pinController.text,
-                                          shouldCreateUser: widget.params.shouldCreateUser,
-                                        );
+                          ),
+                          Gap(24),
+                          LongButton(
+                            text: 'Continue',
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                try {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  await ref
+                                      .read(userProvider.notifier)
+                                      .verifyOtp(
+                                        context: context,
+                                        email: widget.params.email,
+                                        token: pinController.text,
+                                        shouldCreateUser: widget.params.shouldCreateUser,
+                                      );
 
-                                    if (context.mounted) {
-                                      if (widget.params.shouldCreateUser) {
-                                        context.push(AboutYouScreen.routeName);
-                                      } else {
-                                        context.pushReplacement(HomeScreen.routeName);
-                                      }
+                                  if (context.mounted) {
+                                    if (widget.params.shouldCreateUser) {
+                                      context.push(AboutYouScreen.routeName);
+                                    } else {
+                                      context.pushReplacement(HomeScreen.routeName);
                                     }
-                                  } on KException catch (e) {
-                                    showErrorMessage(e.message);
-                                  } catch (e) {
-                                    showErrorMessage(e.toString());
-                                  } finally {
-                                    setState(() {
-                                      isLoading = false;
-                                    });
                                   }
+                                } on KException catch (e) {
+                                  showErrorMessage(e.message);
+                                } catch (e) {
+                                  showErrorMessage(e.toString());
+                                } finally {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
                                 }
-                              },
-                              // onPressed: pin != null && pin!.length == 6
-                              //     ? () async {
-                              //         await notifier.verifyOtp(
-                              //           context: context,
-                              //           email: widget.params.email,
-                              //           token: pin!,
-                              //           shouldCreateUser:
-                              //               widget.params.shouldCreateUser,
-                              //         );
-                              //       }
-                              //     : null,
-                            ),
-                            // Gap(16),
-                            // Row(
-                            //   mainAxisAlignment: MainAxisAlignment.center,
-                            //   children: [
-                            //     Text('Didn\'t get a code?'),
-                            //     Gap(4),
-                            //     GestureDetector(
-                            //       onTap: () async => await notifier.resendOtp(
-                            //         context: context,
-                            //         email: widget.params.email,
-                            //         shouldCreateUser:
-                            //             widget.params.shouldCreateUser,
-                            //       ),
-                            //       child: Text(
-                            //         'Resend',
-                            //         style: TextStyle(
-                            //           fontWeight: FontWeight.bold,
-                            //           shadows: [
-                            //             Shadow(
-                            //               color:
-                            //                   context.textTheme.bodySmall!.color!,
-                            //               offset: Offset(0, -2),
-                            //             ),
-                            //           ],
-                            //           color: Colors.transparent,
-                            //           decoration: TextDecoration.underline,
-                            //           decorationColor:
-                            //               context.textTheme.bodySmall!.color!,
-                            //           decorationThickness: 1,
-                            //           decorationStyle: TextDecorationStyle.solid,
-                            //         ),
-                            //       ),
-                            //     ),
-                            //   ],
-                            // ),
-                          ],
-                        ),
+                              }
+                            },
+                            // onPressed: pin != null && pin!.length == 6
+                            //     ? () async {
+                            //         await notifier.verifyOtp(
+                            //           context: context,
+                            //           email: widget.params.email,
+                            //           token: pin!,
+                            //           shouldCreateUser:
+                            //               widget.params.shouldCreateUser,
+                            //         );
+                            //       }
+                            //     : null,
+                          ),
+                          // Gap(16),
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.center,
+                          //   children: [
+                          //     Text('Didn\'t get a code?'),
+                          //     Gap(4),
+                          //     GestureDetector(
+                          //       onTap: () async => await notifier.resendOtp(
+                          //         context: context,
+                          //         email: widget.params.email,
+                          //         shouldCreateUser:
+                          //             widget.params.shouldCreateUser,
+                          //       ),
+                          //       child: Text(
+                          //         'Resend',
+                          //         style: TextStyle(
+                          //           fontWeight: FontWeight.bold,
+                          //           shadows: [
+                          //             Shadow(
+                          //               color:
+                          //                   context.textTheme.bodySmall!.color!,
+                          //               offset: Offset(0, -2),
+                          //             ),
+                          //           ],
+                          //           color: Colors.transparent,
+                          //           decoration: TextDecoration.underline,
+                          //           decorationColor:
+                          //               context.textTheme.bodySmall!.color!,
+                          //           decorationThickness: 1,
+                          //           decorationStyle: TextDecorationStyle.solid,
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
+                        ],
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
