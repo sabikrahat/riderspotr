@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import '../../widgets/shared/profile_xp_card.dart';
 
 import '../../../core/extensions.dart';
 import '../../providers/auth/profile_provider.dart';
 import '../../widgets/shared/car_card.dart';
+import '../../widgets/shared/profile_xp_card.dart';
 import '../explore/explore_screen.dart';
 
 class HomeScreen extends ConsumerWidget {

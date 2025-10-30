@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
-import 'package:ridespotr/core/enums.dart';
-import 'package:ridespotr/presentation/widgets/explore/explore_tab_bar.dart';
-import 'package:ridespotr/presentation/widgets/shared/search_text_field.dart';
+import '../../../core/enums.dart';
+import '../../widgets/explore/explore_tab_bar.dart';
+import '../../widgets/shared/search_text_field.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';

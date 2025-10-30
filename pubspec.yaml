@@ -55,8 +55,8 @@ dependencies:
   loader_overlay: ^5.0.0
   mapbox_maps_flutter: ^2.12.0-rc.1
   pinput: ^5.0.2
-  purchases_flutter: ^9.9.0
-  purchases_ui_flutter: ^9.9.0
+  purchases_flutter: ^9.9.1
+  purchases_ui_flutter: ^9.9.1
   rename_app: ^1.6.5
   riverpod_annotation: ^3.0.0
   stylish_bottom_bar: ^1.1.1
