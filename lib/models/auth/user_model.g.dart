@@ -53,5 +53,4 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
   'profile_picture_url': instance.profilePictureUrl,
   'banner_url': instance.bannerUrl,
   'created_at': instance.createdAt.toIso8601String(),
-  'stats': instance.stats,
 };

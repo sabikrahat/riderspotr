@@ -40,7 +40,8 @@ class UserService {
 
   Future<UserModel?> getUser([String? uid]) async {
     try {
-      final id = uid ?? _client.auth.currentUser!.id;
+      final id = uid ?? _client.auth.currentUser?.id;
+      if (id == null) return null;
       final res = await _client.from(usersTbl).select(UserModel.query).eq('id', id).maybeSingle();
       debugPrint('User fetched: ${res.toString()}');
       if (res == null) return null;

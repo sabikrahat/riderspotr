@@ -35,6 +35,7 @@ class UserModel {
   String? profilePictureUrl;
   String? bannerUrl;
   DateTime createdAt;
+  @JsonKey(includeToJson: false)
   UserXPStatsModel? stats;
 
   UserModel({
