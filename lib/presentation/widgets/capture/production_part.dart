@@ -50,17 +50,21 @@ class ProductionPart extends StatelessWidget {
                       ProductionCard(
                         icon: Icons.attach_money_rounded,
                         title: 'ORIGINAL MSRP',
-                        subtitle: NumberFormat.currency(
-                          symbol: '\$',
-                          decimalDigits: 0,
-                        ).format(production.msrp),
+                        subtitle: production.msrp == null
+                            ? "Unkown"
+                            : NumberFormat.currency(
+                                symbol: '\$',
+                                decimalDigits: 0,
+                              ).format(production.msrp),
                       ),
                       ProductionCard(
                         icon: Icons.numbers_rounded,
                         title: 'TOTAL MADE',
-                        subtitle: NumberFormat.decimalPattern().format(
-                          production.totalMade,
-                        ),
+                        subtitle: production.totalMade == null
+                            ? "Unkown"
+                            : NumberFormat.decimalPattern().format(
+                                production.totalMade,
+                              ),
                       ),
                       if (car.description != null)
                         Padding(
@@ -98,7 +102,10 @@ class ProductionPart extends StatelessWidget {
           Stack(
             children: [
               ArcProgressBar(
-                percentage: min(production.minValue! / 1000000 * 100, 100),
+                percentage: min(
+                  (production.minValue ?? 0) / 1000000 * 100,
+                  100,
+                ),
                 backgroundColor: Colors.grey.shade800,
                 foregroundColor: Colors.white,
                 arcThickness: 2,
@@ -115,7 +122,7 @@ class ProductionPart extends StatelessWidget {
                     ),
                     Gap(12),
                     Text(
-                      'EST. VALUE',
+                      'EST. VALUE (USD)',
                       style: context.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
@@ -166,9 +173,11 @@ class ProductionPart extends StatelessWidget {
               Expanded(
                 child: ProductionCard(
                   title: 'TOTAL PRODUCED',
-                  subtitle: NumberFormat.decimalPattern().format(
-                    production.totalMade ?? 0,
-                  ),
+                  subtitle: production.totalMade == null
+                      ? "Unkown"
+                      : NumberFormat.decimalPattern().format(
+                          production.totalMade ?? 0,
+                        ),
                   icon: Icons.create,
                 ),
               ),
@@ -176,9 +185,11 @@ class ProductionPart extends StatelessWidget {
               Expanded(
                 child: ProductionCard(
                   title: 'EST. IN CIRCULATION',
-                  subtitle: NumberFormat.decimalPattern().format(
-                    production.circulationCount ?? 0,
-                  ),
+                  subtitle: production.circulationCount == null
+                      ? 'Unkown'
+                      : NumberFormat.decimalPattern().format(
+                          production.circulationCount,
+                        ),
                   icon: Icons.recycling,
                 ),
               ),
@@ -199,7 +210,7 @@ class ProductionPart extends StatelessWidget {
               Gap(16),
               Expanded(
                 child: Text(
-                  production.description!,
+                  production.description ?? '',
                   style: context.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w200,
                   ),

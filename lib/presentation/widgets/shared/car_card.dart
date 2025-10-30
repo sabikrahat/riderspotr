@@ -34,6 +34,7 @@ class CarCard extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(26),
                 child: FastCachedImage(
+                  key: Key(carSpot.id),
                   url: carSpot.car?.make?.logoUrl ?? '',
                   fit: BoxFit.cover,
                   fadeInDuration: const Duration(milliseconds: 300),
@@ -80,6 +81,7 @@ class CarCard extends StatelessWidget {
                     borderRadius: 24,
                   ),
                   child: FastCachedImage(
+                    key: Key(carSpot.id),
                     url: carSpot.imageUrl,
                     fit: BoxFit.cover,
                     width: double.infinity,
