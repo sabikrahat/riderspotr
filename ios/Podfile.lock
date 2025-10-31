@@ -18,6 +18,9 @@ PODS:
   - GoogleMaps/Base (8.4.0)
   - GoogleMaps/Maps (8.4.0):
     - GoogleMaps/Base
+  - image_cropper (0.0.4):
+    - Flutter
+    - TOCropViewController (~> 2.8.0)
   - image_picker_ios (0.0.1):
     - Flutter
   - mapbox_maps_flutter (2.12.0-rc.1):
@@ -35,6 +38,8 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - permission_handler_apple (9.3.0):
+    - Flutter
   - purchases_flutter (9.9.1):
     - Flutter
     - PurchasesHybridCommon (= 17.12.0)
@@ -52,6 +57,7 @@ PODS:
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - TOCropViewController (2.8.0)
   - Turf (4.0.0)
   - url_launcher_ios (0.0.1):
     - Flutter
@@ -65,9 +71,11 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
   - google_maps_flutter_ios (from `.symlinks/plugins/google_maps_flutter_ios/ios`)
+  - image_cropper (from `.symlinks/plugins/image_cropper/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - mapbox_maps_flutter (from `.symlinks/plugins/mapbox_maps_flutter/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - purchases_flutter (from `.symlinks/plugins/purchases_flutter/ios`)
   - purchases_ui_flutter (from `.symlinks/plugins/purchases_ui_flutter/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
@@ -85,6 +93,7 @@ SPEC REPOS:
     - PurchasesHybridCommonUI
     - RevenueCat
     - RevenueCatUI
+    - TOCropViewController
     - Turf
 
 EXTERNAL SOURCES:
@@ -98,12 +107,16 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/geolocator_apple/darwin"
   google_maps_flutter_ios:
     :path: ".symlinks/plugins/google_maps_flutter_ios/ios"
+  image_cropper:
+    :path: ".symlinks/plugins/image_cropper/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
   mapbox_maps_flutter:
     :path: ".symlinks/plugins/mapbox_maps_flutter/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
   purchases_flutter:
     :path: ".symlinks/plugins/purchases_flutter/ios"
   purchases_ui_flutter:
@@ -123,12 +136,14 @@ SPEC CHECKSUMS:
   Google-Maps-iOS-Utils: 66d6de12be1ce6d3742a54661e7a79cb317a9321
   google_maps_flutter_ios: e31555a04d1986ab130f2b9f24b6cdc861acc6d3
   GoogleMaps: 8939898920281c649150e0af74aa291c60f2e77d
+  image_cropper: b8ef14d3fcff4040b0f9da2ca28d98219a5cba0e
   image_picker_ios: 4f2f91b01abdb52842a8e277617df877e40f905b
   mapbox_maps_flutter: 1e8c089a1a7e77c1c961273b5fcf525ae28ef082
   MapboxCommon: da94d0473ede78c1a1f43c468fafcf8ac9190b0c
   MapboxCoreMaps: 0aff67a7fd64d84737c03bf6b81a274be2a62825
   MapboxMaps: cfa3aabb6e9521daec72a1585f94eeeeeeaa731d
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
+  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   purchases_flutter: 12d4ebe1b8dca4db62be7b892bd4e8e323cb994d
   purchases_ui_flutter: 96d6d27bb8ec94b7d1a4c2eae92be5fb46a06765
   PurchasesHybridCommon: c8f805e0f6d3a557a6d63300d0402b8ae5219a48
@@ -136,10 +151,11 @@ SPEC CHECKSUMS:
   RevenueCat: 9d0328a098bd0e1b425d91d136e643b72cd70326
   RevenueCatUI: cb286b7918570546c01b6b84b7444d7d8600ddd2
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
+  TOCropViewController: 797deaf39c90e6e9ddd848d88817f6b9a8a09888
   Turf: c9eb11a65d96af58cac523460fd40fec5061b081
   url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
   video_player_avfoundation: 7c6c11d8470e1675df7397027218274b6d2360b3
 
-PODFILE CHECKSUM: e30f02f9d1c72c47bb6344a0a748c9d268180865
+PODFILE CHECKSUM: fe37b0047e6a468a47ddd7c52a99d644c578e27d
 
 COCOAPODS: 1.16.2

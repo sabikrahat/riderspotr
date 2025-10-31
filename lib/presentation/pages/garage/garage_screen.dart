@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:ridespotr/presentation/providers/auth/user_provider.dart';
+import 'package:ridespotr/presentation/widgets/shared/loading_overlay.dart';
 
 import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
@@ -27,7 +29,6 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
   String _searchQuery = '';
   Rarity? _selectedRarity;
   SortOptions _selectedSort = SortOptions.recent;
-  bool _isPublic = true;
 
   @override
   void initState() {
@@ -66,104 +67,123 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
     });
   }
 
-  void _togglePrivacy() {
-    setState(() {
-      _isPublic = !_isPublic;
-    });
-  }
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CarbonBackground(
         imgPath: 'assets/carbon/garage-bg.jpg',
-        child: PagePadding(
-          child: ref
-              .watch(garageProvider(null))
-              .when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stack) => Center(child: Text('Error: $error')),
-                data: (data) {
-                  final notifier = ref.read(garageProvider(null).notifier);
-                  final sortedCars = notifier.getFilteredCars(
-                    searchQuery: _searchQuery,
-                    rarity: _selectedRarity,
-                    sortBy: _selectedSort,
-                  );
+        child: LoadingOverlay(
+          isLoading: _isLoading,
+          child: PagePadding(
+            child: ref
+                .watch(garageProvider(null))
+                .when(
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (error, stack) => Center(child: Text('Error: $error')),
+                  data: (data) {
+                    final notifier = ref.read(garageProvider(null).notifier);
+                    final sortedCars = notifier.getFilteredCars(
+                      searchQuery: _searchQuery,
+                      rarity: _selectedRarity,
+                      sortBy: _selectedSort,
+                    );
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'GARAGE',
-                            style: context.textTheme.headlineMedium,
-                          ),
-                          AnimatedPrivacyToggle(
-                            isPublic: _isPublic,
-                            onToggle: _togglePrivacy,
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'GARAGE',
+                              style: context.textTheme.headlineMedium,
+                            ),
+                            Consumer(
+                              builder: (_, ref, _) {
+                                ref.watch(userProvider);
+                                final notifier = ref.read(userProvider.notifier);
+                                return AnimatedPrivacyToggle(
+                                  isPublic: notifier.user?.isGaragePrivate == false,
+                                  onToggle: () async {
+                                    if (notifier.user == null) return;
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    await notifier.updateUser(
+                                      user: notifier.user!.copyWith(
+                                        isGaragePrivate: !(notifier.user?.isGaragePrivate ?? false),
+                                      ),
+                                    );
+                                    await ref.read(userProvider.notifier).refreshUser();
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        const Gap(16),
+                        // Search Bar
+                        SearchTextField(
+                          hintText: 'Search by car name, make or model...',
+                          controller: _searchController,
+                          onChanged: _onSearchChanged,
+                          showClearButton: _searchQuery.isNotEmpty,
+                          onClear: _clearSearch,
+                        ),
+                        if (_searchQuery.isNotEmpty) ...[
+                          const Gap(8),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Text(
+                              'Found ${sortedCars.length} car${sortedCars.length != 1 ? 's' : ''} for "$_searchQuery"',
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                fontSize: 14,
+                              ),
+                            ),
                           ),
                         ],
-                      ),
-                      const Gap(16),
-                      // Search Bar
-                      SearchTextField(
-                        hintText: 'Search by car name, make or model...',
-                        controller: _searchController,
-                        onChanged: _onSearchChanged,
-                        showClearButton: _searchQuery.isNotEmpty,
-                        onClear: _clearSearch,
-                      ),
-                      if (_searchQuery.isNotEmpty) ...[
-                        const Gap(8),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: Text(
-                            'Found ${sortedCars.length} car${sortedCars.length != 1 ? 's' : ''} for "$_searchQuery"',
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              color: Colors.white.withValues(alpha: 0.8),
-                              fontSize: 14,
-                            ),
+                        const Gap(16),
+                        // Choice Chips
+                        _FilterChips(
+                          allCars: data,
+                          selectedRarity: _selectedRarity,
+                          onFilterChanged: _onFilterChanged,
+                        ),
+                        const Gap(16),
+                        // Sort Options
+                        _SortDropdown(
+                          selectedSort: _selectedSort,
+                          onSortChanged: _onSortChanged,
+                        ),
+                        const Gap(16),
+                        // Car Cards List
+                        Expanded(
+                          child: RefreshIndicator(
+                            onRefresh: () async => await notifier.refresh(),
+                            child: sortedCars.isEmpty
+                                ? _buildEmptyState(data)
+                                : ListView.separated(
+                                    itemCount: sortedCars.length,
+                                    itemBuilder: (context, index) {
+                                      return CarCard(
+                                        carSpot: sortedCars[index],
+                                      );
+                                    },
+                                    separatorBuilder: (context, index) => const Gap(24),
+                                  ),
                           ),
                         ),
                       ],
-                      const Gap(16),
-                      // Choice Chips
-                      _FilterChips(
-                        allCars: data,
-                        selectedRarity: _selectedRarity,
-                        onFilterChanged: _onFilterChanged,
-                      ),
-                      const Gap(16),
-                      // Sort Options
-                      _SortDropdown(
-                        selectedSort: _selectedSort,
-                        onSortChanged: _onSortChanged,
-                      ),
-                      const Gap(16),
-                      // Car Cards List
-                      Expanded(
-                        child: RefreshIndicator(
-                          onRefresh: () async => await notifier.refresh(),
-                          child: sortedCars.isEmpty
-                              ? _buildEmptyState(data)
-                              : ListView.separated(
-                                  itemCount: sortedCars.length,
-                                  itemBuilder: (context, index) {
-                                    return CarCard(
-                                      carSpot: sortedCars[index],
-                                    );
-                                  },
-                                  separatorBuilder: (context, index) => const Gap(24),
-                                ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
+                    );
+                  },
+                ),
+          ),
         ),
       ),
     );

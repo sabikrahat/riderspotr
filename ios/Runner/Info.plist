@@ -51,5 +51,10 @@
     <string>your usage description here</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>This app needs access to your location to tag car spots with precise location data.</string>
+		<!-- image_picker config -->
+		<key>NSCameraUsageDescription</key>
+		<string>Riderspotr uses your camera to let you take a profile picture directly within the app.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Riderspotr accesses your photo library so you can select and upload a profile picture.</string>
   </dict>
 </plist>
