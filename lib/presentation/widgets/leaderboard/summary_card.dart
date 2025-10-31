@@ -9,12 +9,24 @@ class LeaderboardSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 150,
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.grey[900]?.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[800]!),
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: 0.06),
+            Colors.white.withValues(alpha: 0.02),
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.4),
+            blurRadius: 24,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -25,32 +37,17 @@ class LeaderboardSummaryCard extends StatelessWidget {
               value: '190 XP',
             ),
           ),
-          // HorizonTalDivider
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            width: 1,
-            height: 100,
-            color: Colors.grey[800],
-          ),
           Expanded(
             child: _Tile(
               icon: Icons.language,
-              title: 'GLOBAL',
+              title: 'Global',
               value: '#14',
             ),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            width: 1,
-            height: 100,
-            color: Colors.grey[800],
           ),
           Expanded(
             child: _Tile(
               icon: Icons.directions_car_rounded,
-              title: 'LEGANDARIES',
+              title: 'Legendaries',
               value: '#14',
             ),
           ),
@@ -76,27 +73,35 @@ class _Tile extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(icon, color: Colors.white, size: 28),
-        Gap(8),
-        Text(
-          title.toUpperCase(),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: Colors.white70,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
+        Icon(
+          icon,
+          color: Colors.white.withValues(alpha: 0.8),
+          size: 28,
         ),
-        Gap(4),
+        Gap(12),
         Text(
           value,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
           style: context.textTheme.bodyMedium?.copyWith(
             color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
+            fontSize: 26,
+            fontWeight: FontWeight.w300,
+            letterSpacing: -0.5,
+          ),
+        ),
+        Gap(6),
+        Text(
+          title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: Colors.white.withValues(alpha: 0.4),
+            fontSize: 11,
+            fontWeight: FontWeight.w400,
+            letterSpacing: 0.3,
           ),
         ),
       ],

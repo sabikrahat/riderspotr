@@ -6,9 +6,9 @@ import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../providers/car/garage_provider.dart';
-import '../../widgets/garage/animated_privacy_toggle.dart';
 import '../../widgets/shared/car_card.dart';
 import '../../widgets/shared/carbon_background.dart';
+import '../../widgets/shared/filter_chips.dart';
 import '../../widgets/shared/page_padding.dart';
 import '../../widgets/shared/search_text_field.dart';
 
@@ -26,6 +26,7 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
   late TextEditingController _searchController;
   String _searchQuery = '';
   Rarity? _selectedRarity;
+  String _selectedFilterLabel = 'All (0)'; // Track the display label
   SortOptions _selectedSort = SortOptions.recent;
   bool _isPublic = true;
 
@@ -54,22 +55,48 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
     });
   }
 
-  void _onFilterChanged(Rarity? rarity) {
-    setState(() {
-      _selectedRarity = rarity;
-    });
-  }
-
   void _onSortChanged(SortOptions sort) {
     setState(() {
       _selectedSort = sort;
     });
   }
 
-  void _togglePrivacy() {
-    setState(() {
-      _isPublic = !_isPublic;
-    });
+  List<String> _buildFilterOptions(List<CarSpotModel> allCars) {
+    final filters = <String>[];
+
+    // Add "All" with count
+    final allLabel = 'All';
+    filters.add(allLabel);
+
+    // Update selected label if it was "All"
+    if (_selectedRarity == null) {
+      _selectedFilterLabel = allLabel;
+    }
+
+    // Add each rarity with count
+    for (final rarity in Rarity.values) {
+      // final count = allCars.where((car) => car.car?.rarity == rarity).length;
+      final label = rarity.name;
+      filters.add(label);
+
+      // Update selected label if this rarity is selected
+      if (_selectedRarity == rarity) {
+        _selectedFilterLabel = label;
+      }
+    }
+
+    return filters;
+  }
+
+  Rarity? _parseRarityFromLabel(String label) {
+    if (label.startsWith('All')) return null;
+
+    // Extract rarity name from "RarityName (count)"
+    final rarityName = label.split(' (')[0];
+    return Rarity.values.firstWhere(
+      (r) => r.name == rarityName,
+      orElse: () => Rarity.values.first,
+    );
   }
 
   @override
@@ -94,16 +121,58 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Header with Visibility Toggle
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             'GARAGE',
-                            style: context.textTheme.headlineMedium,
+                            style: context.textTheme.headlineMedium!.copyWith(
+                              fontWeight: FontWeight.w300,
+                            ),
                           ),
-                          AnimatedPrivacyToggle(
-                            isPublic: _isPublic,
-                            onToggle: _togglePrivacy,
+                          // Visibility Toggle Button
+                          GestureDetector(
+                            onTap: () => setState(() => _isPublic = !_isPublic),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Colors.white.withValues(alpha: 0.08),
+                                    Colors.white.withValues(alpha: 0.03),
+                                  ],
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    _isPublic ? Icons.public : Icons.lock,
+                                    size: 16,
+                                    color: Colors.white.withValues(alpha: 0.8),
+                                  ),
+                                  Gap(8),
+                                  Text(
+                                    _isPublic ? 'Public' : 'Private',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      letterSpacing: 0.3,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.8,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -131,10 +200,15 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                       ],
                       const Gap(16),
                       // Choice Chips
-                      _FilterChips(
-                        allCars: data,
-                        selectedRarity: _selectedRarity,
-                        onFilterChanged: _onFilterChanged,
+                      FilterChips(
+                        options: _buildFilterOptions(data),
+                        selectedValue: _selectedFilterLabel,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedFilterLabel = value;
+                            _selectedRarity = _parseRarityFromLabel(value);
+                          });
+                        },
                       ),
                       const Gap(16),
                       // Sort Options
@@ -156,7 +230,8 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                                       carSpot: sortedCars[index],
                                     );
                                   },
-                                  separatorBuilder: (context, index) => const Gap(24),
+                                  separatorBuilder: (context, index) =>
+                                      const Gap(24),
                                 ),
                         ),
                       ),
@@ -307,78 +382,7 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
 //   }
 // }
 
-// Filter Chips Widget
-class _FilterChips extends StatelessWidget {
-  const _FilterChips({
-    required this.allCars,
-    required this.selectedRarity,
-    required this.onFilterChanged,
-  });
-
-  final List<CarSpotModel> allCars;
-  final Rarity? selectedRarity;
-  final void Function(Rarity?) onFilterChanged;
-
-  int _getCountForRarity(Rarity? rarity) {
-    if (rarity == null) {
-      return allCars.length;
-    }
-    return allCars.where((car) => car.car?.rarity == rarity).length;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Create filter options: null (All) + all rarity values
-    final filters = <({String label, Rarity? value})>[
-      (label: 'All', value: null),
-      ...Rarity.values.map((r) => (label: r.name, value: r)),
-    ];
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: filters.map((filter) {
-          final isSelected = selectedRarity == filter.value;
-          final count = _getCountForRarity(filter.value);
-          final displayLabel = '${filter.label} ($count)';
-
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              label: Text(displayLabel),
-              selected: isSelected,
-              onSelected: (selected) {
-                if (selected) {
-                  onFilterChanged(filter.value);
-                }
-              },
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.black : Colors.white,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 14,
-              ),
-              backgroundColor: Colors.grey[900],
-              selectedColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(
-                  color: isSelected ? Colors.white : Colors.grey[850]!,
-                  width: 1,
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-}
-
-// Sort Dropdown Widget
+// Sort Dropdown Widget - Leaderboard Style
 class _SortDropdown extends StatelessWidget {
   const _SortDropdown({
     required this.selectedSort,
@@ -392,17 +396,14 @@ class _SortDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(
-          Icons.swap_vert_rounded,
-          color: Colors.white,
-          size: 16,
-        ),
-        const Gap(4),
         Text(
           'Sort by',
-          style: context.textTheme.bodyMedium,
+          style: context.textTheme.bodyMedium?.copyWith(
+            fontSize: 13,
+            color: Colors.white.withValues(alpha: 0.5),
+          ),
         ),
-        const Gap(16),
+        const Gap(12),
         DropdownButton<SortOptions>(
           isDense: true,
           value: selectedSort,
@@ -412,27 +413,21 @@ class _SortDropdown extends StatelessWidget {
             }
           },
           underline: const SizedBox.shrink(),
-          dropdownColor: Colors.grey[900],
-          icon: const Icon(
-            Icons.arrow_drop_down,
-            color: Colors.white,
+          dropdownColor: Color(0xFF0A0A0A),
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.white.withValues(alpha: 0.6),
             size: 20,
           ),
           style: context.textTheme.bodyMedium?.copyWith(
             color: Colors.white,
-            fontSize: 15,
+            fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
           items: SortOptions.values.map((option) {
             return DropdownMenuItem<SortOptions>(
               value: option,
-              child: Text(
-                option.name,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                ),
-              ),
+              child: Text(option.name),
             );
           }).toList(),
         ),

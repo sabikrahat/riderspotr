@@ -3,7 +3,6 @@ import 'package:gap/gap.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/auth/user_model.dart';
-import 'car_card.dart';
 
 class ProfileXPCard extends StatelessWidget {
   const ProfileXPCard({
@@ -15,117 +14,142 @@ class ProfileXPCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned(
-          child: CircleAvatar(
-            backgroundColor: Colors.grey.shade800,
-            radius: 26,
-            child: ClipRRect(
-              borderRadius: BorderRadiusGeometry.circular(
-                269,
-              ),
-              child: Icon(
-                Icons.electric_bolt,
-                size: 30,
-                color: Colors.white,
-              ),
-            ),
-          ),
+    return Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: 0.06),
+            Colors.white.withValues(alpha: 0.02),
+          ],
         ),
-        SizedBox(
-          height: 160,
-          width: context.width,
-          child: Stack(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.4),
+            blurRadius: 20,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // XP Icon and Level
+          Row(
             children: [
-              // Clipped background
-              ClipPath(
-                clipper: CarCardClipper(
-                  circleRadius: 30,
-                  borderRadius: 24,
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withValues(alpha: 0.15),
+                      Colors.white.withValues(alpha: 0.05),
+                    ],
+                  ),
                 ),
-                child: Container(),
+                child: Icon(
+                  Icons.electric_bolt,
+                  color: Colors.white,
+                  size: 24,
+                ),
               ),
-
-              // Border drawn on top
-              CustomPaint(
-                painter: CarCardOverlayPainter(
-                  circleRadius: 30,
-                  borderRadius: 24,
-                  borderColor: Colors.grey.shade800,
-                  borderWidth: 1,
-                ),
-                child: Container(),
+              Gap(16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'LEVEL ${user?.stats?.level ?? 0}',
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 2,
+                      color: Colors.white.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  Gap(4),
+                  Text(
+                    '${user?.stats?.totalXp.toInt() ?? 0} XP',
+                    style: context.textTheme.headlineLarge?.copyWith(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w300,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ],
               ),
-
-              // Black gradient
-              ClipPath(
-                clipper: CarCardClipper(
-                  circleRadius: 30,
-                  borderRadius: 24,
-                ),
+            ],
+          ),
+          Gap(20),
+          // Progress Bar Section
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Progress to Level ${(user?.stats?.level ?? 0) + 1}',
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 0.3,
+                      color: Colors.white.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  Text(
+                    '${(user?.stats?.xpToNextLevelProgress ?? 0).toInt()}%',
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
+              ),
+              Gap(10),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(color: Colors.grey.shade900),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              'LVL ${user?.stats?.level ?? 0}',
-                              style: context.textTheme.headlineLarge?.copyWith(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Spacer(),
-                            Text(
-                              '${user?.stats?.totalXp.toInt() ?? 0} XP',
-                              style: context.textTheme.headlineLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: FractionallySizedBox(
+                    widthFactor:
+                        (user?.stats?.xpToNextLevelProgress ?? 0) / 100,
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withValues(alpha: 0.9),
+                            Colors.white.withValues(alpha: 0.7),
                           ],
                         ),
-                        Gap(12),
-                        Container(
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                blurRadius: 30,
-                                spreadRadius: 2,
-                              ),
-                            ],
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.white.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: Offset(0, 0),
                           ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(45),
-                            child: LinearProgressIndicator(
-                              value: (user?.stats?.xpToNextLevelProgress ?? 0.0) / 100,
-                              backgroundColor: Colors.grey.withValues(
-                                alpha: 0.3,
-                              ),
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
-                              ),
-                              minHeight: 5,
-                              borderRadius: BorderRadius.circular(45),
-                            ),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

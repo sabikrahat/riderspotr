@@ -29,7 +29,7 @@ class SearchTextField extends StatelessWidget {
           fontSize: 14,
         ),
         filled: true,
-        fillColor: Colors.grey.shade900,
+        fillColor: Colors.black,
         prefixIcon: Icon(
           Icons.search,
           color: Colors.white,
@@ -50,21 +50,21 @@ class SearchTextField extends StatelessWidget {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.grey[850]!,
+            color: Colors.grey[900]!,
             width: 1,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.grey[850]!,
+            color: Colors.grey[900]!,
             width: 1,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.grey[850]!,
+            color: Colors.grey[900]!,
             width: 1,
           ),
         ),

@@ -23,9 +23,9 @@ class _ExploreTabBarState extends State<ExploreTabBar> {
       height: 50,
       width: double.infinity,
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[850]!),
+        border: Border.all(color: Colors.grey[900]!),
         borderRadius: BorderRadius.circular(100),
-        color: Colors.grey.shade900,
+        color: Colors.black,
       ),
       child: ClipRRect(
         borderRadius: BorderRadiusGeometry.circular(100),

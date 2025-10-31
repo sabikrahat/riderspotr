@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:ridespotr/presentation/widgets/shared/search_text_field.dart';
 
 import '../../../core/extensions.dart';
 import '../../providers/leaderboard/search_friend_provider.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/page_padding.dart';
+import '../../widgets/shared/user_tile.dart';
 
 class SearchFriendScreen extends ConsumerStatefulWidget {
   const SearchFriendScreen({super.key});
@@ -14,7 +16,8 @@ class SearchFriendScreen extends ConsumerStatefulWidget {
   static const String routeName = '/search-friend';
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _SearchFriendScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _SearchFriendScreenState();
 }
 
 class _SearchFriendScreenState extends ConsumerState<SearchFriendScreen> {
@@ -36,12 +39,18 @@ class _SearchFriendScreenState extends ConsumerState<SearchFriendScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Back(),
-        title: Text('SEARCH FOR FRIEND', style: context.textTheme.headlineMedium),
+        title: Text(
+          'SEARCH FRIEND',
+          style: context.textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.w300,
+          ),
+        ),
         centerTitle: true,
       ),
       body: ref
@@ -53,199 +62,102 @@ class _SearchFriendScreenState extends ConsumerState<SearchFriendScreen> {
               final notifier = ref.read(searchFriendProvider.notifier);
               return CarbonBackground(
                 imgPath: 'assets/carbon/leaderboard-bg.jpg',
-                child: PagePadding(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                controller: _searchController,
-                                style: const TextStyle(color: Colors.white),
-                                decoration: InputDecoration(
-                                  hintText: 'Search',
-                                  hintStyle: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.grey[900],
-                                  prefixIcon: Icon(
-                                    Icons.search,
-                                    color: Colors.white,
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                    horizontal: 16,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[800]!,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[800]!,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[800]!,
-                                      width: 1,
-                                    ),
-                                  ),
+                heightPercent: 0.3,
+                child: SafeArea(
+                  child: PagePadding(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Gap(16),
+                          // Search Bar
+                          Row(
+                            children: [
+                              Expanded(
+                                child: SearchTextField(
+                                  controller: _searchController,
+                                  hintText: 'Search by username...',
+                                  onChanged: (value) {
+                                    // Search as you type could be added here
+                                  },
                                 ),
                               ),
-                            ),
-                            Gap(8),
-                            InkWell(
-                              onTap: _isSearching ? null : () async => await search(),
-                              borderRadius: BorderRadius.circular(12),
-                              child: Container(
-                                padding: const EdgeInsets.all(11),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[900],
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.grey[800]!,
-                                    width: 1,
+                              Gap(12),
+                              GestureDetector(
+                                onTap: _isSearching
+                                    ? null
+                                    : () async => await search(),
+                                child: Container(
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Colors.white.withValues(alpha: 0.08),
+                                        Colors.white.withValues(alpha: 0.03),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                child: _isSearching
-                                    ? const SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 2,
+                                  child: _isSearching
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : Icon(
+                                          Icons.search,
+                                          color: Colors.white.withValues(
+                                            alpha: 0.8,
+                                          ),
+                                          size: 20,
                                         ),
-                                      )
-                                    : const Icon(
-                                        Icons.search,
-                                        color: Colors.white,
-                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Gap(32),
+                          Text(
+                            'Suggested Friends',
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                          Gap(16),
+                          if (notifier.users.isEmpty) ...[
+                            Gap(32),
+                            Center(
+                              child: Text(
+                                'No users found.',
+                                style: context.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.5),
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
+                            Gap(32),
                           ],
-                        ),
-                        Gap(16),
-                        Text(
-                          'Suggested Friends',
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
+                          ...List.generate(
+                            notifier.users.length,
+                            (i) {
+                              final user = notifier.users[i];
+                              return UserTile(
+                                user: user,
+                                onTap: () {
+                                  // TODO: Navigate to user profile or add friend
+                                },
+                              );
+                            },
                           ),
-                        ),
-                        Gap(16),
-                        if (notifier.users.isEmpty) ...[
-                          Gap(32),
-                          Center(
-                            child: Text(
-                              'No users found.',
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                color: Colors.white70,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                          Gap(32),
                         ],
-                        ...List.generate(
-                          notifier.users.length,
-                          (i) {
-                            final user = notifier.users[i];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Stack(
-                                  children: [
-                                    user.bannerUrl == null
-                                        ? Image.asset(
-                                            'assets/carbon/leaderboard-bg.jpg',
-                                            fit: BoxFit.cover,
-                                            width: double.infinity,
-                                            height: 100,
-                                          )
-                                        : Image.network(
-                                            user.bannerUrl!,
-                                            fit: BoxFit.cover,
-                                            width: double.infinity,
-                                            height: 100,
-                                          ),
-                                    Positioned(
-                                      left: 0,
-                                      right: 0,
-                                      bottom: 0,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(8.0),
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [
-                                              Colors.transparent,
-                                              Colors.black.withValues(alpha: 0.7),
-                                              Colors.black,
-                                            ],
-                                          ),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            CircleAvatar(
-                                              radius: 25,
-                                              backgroundImage: user.profilePictureUrl == null
-                                                  ? AssetImage(
-                                                      'assets/images/user-placeholder.png',
-                                                    )
-                                                  : const NetworkImage(
-                                                      'https://picsum.photos/200',
-                                                    ),
-                                            ),
-                                            Gap(12),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    user.fullName,
-                                                    style: context.textTheme.bodyMedium?.copyWith(
-                                                      color: Colors.white,
-                                                      fontSize: 18,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    '@${user.username ?? 'username'}',
-                                                    style: context.textTheme.bodyMedium?.copyWith(
-                                                      color: Colors.white70,
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),

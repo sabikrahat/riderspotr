@@ -305,7 +305,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   Positioned(
                     child: IgnorePointer(
                       child: Container(
-                        height: context.height * 0.5,
+                        height: context.height * 0.4,
                         padding: EdgeInsets.only(
                           left: 16,
                           right: 16,
@@ -319,6 +319,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
+                              Colors.black,
                               Colors.black,
                               Colors.transparent,
                             ],
