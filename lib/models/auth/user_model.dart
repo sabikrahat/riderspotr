@@ -35,6 +35,7 @@ class UserModel {
   String? profilePictureUrl;
   String? bannerUrl;
   DateTime createdAt;
+  bool isGaragePrivate;
   @JsonKey(includeToJson: false)
   UserXPStatsModel? stats;
 
@@ -53,6 +54,7 @@ class UserModel {
     this.profilePictureUrl,
     this.bannerUrl,
     required this.createdAt,
+    required this.isGaragePrivate,
     this.stats,
   });
 
@@ -79,6 +81,7 @@ class UserModel {
     String? profilePictureUrl,
     String? bannerUrl,
     DateTime? createdAt,
+    bool? isGaragePrivate,
     UserXPStatsModel? stats,
   }) => UserModel(
     id: id,
@@ -95,6 +98,7 @@ class UserModel {
     profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
     bannerUrl: bannerUrl ?? this.bannerUrl,
     createdAt: createdAt ?? this.createdAt,
+    isGaragePrivate: isGaragePrivate ?? this.isGaragePrivate,
     stats: stats ?? this.stats,
   );
 

@@ -103,6 +103,7 @@ class UserService {
               id: _client.auth.currentUser!.id,
               email: _client.auth.currentUser!.email!.toLowerCase(),
               createdAt: DateTime.now(),
+              isGaragePrivate: false,
             ).toJson(),
           );
     } on SocketException catch (e) {
@@ -159,10 +160,7 @@ class UserService {
           .order('total_points', ascending: false);
       debugPrint('Car Spots fetched: ${res.toString()}');
       final ids = res.map((e) => e['id'] as String).toList();
-      final usersRes = await _client
-          .from('users')
-          .select('*')
-          .inFilter('id', ids);
+      final usersRes = await _client.from('users').select('*').inFilter('id', ids);
       final users = usersRes.map((e) => UserModel.fromJson(e)).toList();
       final list = res.map((e) {
         UserStatsModel stats = UserStatsModel.fromJson(e);
