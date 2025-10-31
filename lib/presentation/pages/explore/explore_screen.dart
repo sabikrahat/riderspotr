@@ -9,7 +9,6 @@ import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../../models/map/map_marker_model.dart';
 import '../../providers/car/map_provider.dart';
-import '../../widgets/explore/explore_tab_bar.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/car_card.dart';
 import '../../widgets/shared/search_text_field.dart';
@@ -26,7 +25,7 @@ class ExploreScreen extends ConsumerStatefulWidget {
 class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   final searchController = TextEditingController();
   List<String> availableTimes = ['24 HR', '7 DAYS', 'ALL TIME'];
-  String? selectedTime = '24 HR';
+  String selectedTime = '24 HR';
   MapboxMap? mapboxMap;
   CircleAnnotationManager? circleAnnotationManager;
   geo.Position? _userPosition;
@@ -134,20 +133,15 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
         .toList()
         .map(
           (spot) {
-            // Calculate radius based on coordinates
-            // Using a combination of lat/lng to create variation
-            final lat = spot.latitude!.abs();
-            final lng = spot.longitude!.abs();
-            final baseRadius = 20.0;
-            final variation = ((lat + lng) % 60) + 20; // Range: 20-80
-            final calculatedRadius = baseRadius + variation;
+            // Calculate radius based on rarity for glowing orbs
+            final baseRadius = _getRadiusForRarity(spot.car!.rarity);
 
             return MapMarkerModel(
               id: spot.id,
               latitude: spot.latitude!,
               longitude: spot.longitude!,
               borderColor: spot.car!.rarity.color,
-              radius: calculatedRadius,
+              radius: baseRadius,
               carName: spot.car?.model,
             );
           },
@@ -181,21 +175,54 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       },
     );
 
-    // Add circles for each marker
+    // Add glowing orbs for each marker
     for (var marker in markers) {
-      final circleAnnotationOptions = CircleAnnotationOptions(
+      // Outer glow ring
+      final outerRingOptions = CircleAnnotationOptions(
+        geometry: Point(
+          coordinates: Position(marker.longitude, marker.latitude),
+        ),
+        circleRadius: marker.radius * 1.5,
+        circleColor: marker.colorToInt(marker.borderColor),
+        circleBlur: 1.5,
+        circleOpacity: 0.15,
+        circleStrokeWidth: 0,
+      );
+
+      // Inner glowing core
+      final coreOptions = CircleAnnotationOptions(
         geometry: Point(
           coordinates: Position(marker.longitude, marker.latitude),
         ),
         circleRadius: marker.radius,
         circleColor: marker.colorToInt(marker.borderColor),
-        circleStrokeWidth: 3.0,
+        circleBlur: 1.0,
+        circleOpacity: 0.6,
+        circleStrokeWidth: 6.0,
         circleStrokeColor: marker.colorToInt(marker.borderColor),
-        circleOpacity: 0.3,
-        circleStrokeOpacity: 1.0,
+        circleStrokeOpacity: 0.25,
       );
 
-      await circleAnnotationManager!.create(circleAnnotationOptions);
+      await circleAnnotationManager!.create(outerRingOptions);
+      await circleAnnotationManager!.create(coreOptions);
+    }
+  }
+
+  // Get radius based on rarity for consistent sizing
+  double _getRadiusForRarity(Rarity rarity) {
+    switch (rarity) {
+      case Rarity.mythic:
+        return 30.0;
+      case Rarity.legendary:
+        return 25.0;
+      case Rarity.epic:
+        return 20.0;
+      case Rarity.rare:
+        return 16.0;
+      case Rarity.uncommon:
+        return 13.0;
+      case Rarity.common:
+        return 10.0;
     }
   }
 
@@ -226,6 +253,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
   List<CarSpotModel> filtering(List<CarSpotModel> carSpots) {
     List<CarSpotModel> filteredList = [];
+
+    // Time filtering
     if (selectedTime == availableTimes[0]) {
       // '24 HR'
       filteredList = carSpots
@@ -245,6 +274,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       filteredList = carSpots;
     }
 
+    // Search filtering
     final query = searchController.text.toLowerCase();
     if (query.isNotEmpty && query.length >= 2) {
       filteredList = filteredList.where((spot) {
@@ -287,6 +317,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               _sortedCarSpots = _sortCarSpotsByDistance(filterData);
               return Stack(
                 children: [
+                  // Map Layer
                   MapWidget(
                     key: const ValueKey('mapbox-explore'),
                     styleUri: MapboxStyles.DARK,
@@ -302,6 +333,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     onMapCreated: (MapboxMap map) =>
                         _onMapCreated(map, _sortedCarSpots),
                   ),
+                  // Gradient Overlay
                   Positioned(
                     child: IgnorePointer(
                       child: Container(
@@ -337,10 +369,13 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     left: 16,
                     right: 16,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ExploreTabBar(
-                          selectedText: selectedTime!,
-                          onChanged: (value) {
+                        // Filter Section
+                        _FilterSection(
+                          selectedTime: selectedTime,
+                          availableTimes: availableTimes,
+                          onTimeChanged: (value) {
                             setState(() {
                               selectedTime = value;
                             });
@@ -357,30 +392,154 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       ],
                     ),
                   ),
+                  // Draggable Car Cards
                   if (_sortedCarSpots.isNotEmpty)
-                    Positioned(
-                      bottom: 24,
-                      left: 0,
-                      right: 0,
-                      height: context.height * 0.25,
-                      child: PageView.builder(
-                        controller: _pageController,
-                        onPageChanged: _onPageChanged,
-                        itemCount: _sortedCarSpots.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: CarCard(
-                              carSpot: _sortedCarSpots[index],
+                    DraggableScrollableSheet(
+                      initialChildSize: 0.28,
+                      minChildSize: 0.08,
+                      maxChildSize: 0.45,
+                      snap: true,
+                      snapSizes: [0.08, 0.28, 0.45],
+                      builder: (context, scrollController) {
+                        return SafeArea(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
                             ),
-                          );
-                        },
-                      ),
+                            child: SingleChildScrollView(
+                              controller: scrollController,
+                              physics: ClampingScrollPhysics(),
+                              child: Column(
+                                children: [
+                                  // Drag Handle - Always visible
+                                  GestureDetector(
+                                    onTap: () {
+                                      // Tap to expand to default size
+                                      if (scrollController.hasClients) {
+                                        scrollController.animateTo(
+                                          0,
+                                          duration: Duration(milliseconds: 300),
+                                          curve: Curves.easeInOut,
+                                        );
+                                      }
+                                    },
+                                    child: Container(
+                                      color: Colors.transparent,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 12,
+                                      ),
+                                      child: Center(
+                                        child: Container(
+                                          width: 40,
+                                          height: 4,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              2,
+                                            ),
+                                            color: Colors.white.withValues(
+                                              alpha: 0.4,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  // Car Cards
+                                  SizedBox(
+                                    height: context.height * 0.25,
+                                    child: PageView.builder(
+                                      controller: _pageController,
+                                      onPageChanged: _onPageChanged,
+                                      itemCount: _sortedCarSpots.length,
+                                      itemBuilder: (context, index) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                          ),
+                                          child: CarCard(
+                                            carSpot: _sortedCarSpots[index],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(height: 24),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                 ],
               );
             },
           ),
+    );
+  }
+}
+
+// Filter Section Widget
+class _FilterSection extends StatelessWidget {
+  const _FilterSection({
+    required this.selectedTime,
+    required this.availableTimes,
+    required this.onTimeChanged,
+  });
+
+  final String selectedTime;
+  final List<String> availableTimes;
+  final Function(String) onTimeChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: availableTimes.map((option) {
+        final isSelected = selectedTime == option;
+        final isLast = option == availableTimes.last;
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(right: isLast ? 0 : 12),
+            child: GestureDetector(
+              onTap: () => onTimeChanged(option),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: isSelected
+                      ? LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white.withValues(alpha: 0.15),
+                            Colors.white.withValues(alpha: 0.05),
+                          ],
+                        )
+                      : null,
+                  border: Border.all(
+                    color: isSelected
+                        ? Colors.white.withValues(alpha: 0.3)
+                        : Colors.white.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  option,
+                  textAlign: TextAlign.center,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    fontSize: 13,
+                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.w500,
+                    color: isSelected
+                        ? Colors.white.withValues(alpha: 0.9)
+                        : Colors.white.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }

@@ -59,22 +59,57 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'LEADERBOARD',
-                                style: context.textTheme.headlineMedium
-                                    ?.copyWith(
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'LEADERBOARD',
+                                    style: context.textTheme.headlineMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w300,
+                                          // letterSpacing: -0.5,
+                                        ),
+                                  ),
+                                  Gap(4),
+                                  Text(
+                                    'Global Rankings',
+                                    style: context.textTheme.bodySmall?.copyWith(
+                                      color: Colors.white.withValues(alpha: 0.4),
+                                      fontSize: 12,
                                       fontWeight: FontWeight.w300,
-                                      // letterSpacing: -0.5,
                                     ),
+                                  ),
+                                ],
                               ),
                               GestureDetector(
                                 onTap: () async => await context.push(
                                   SearchFriendScreen.routeName,
                                 ),
-                                child: Icon(
-                                  Icons.person_add_alt_1_rounded,
-                                  color: Colors.white.withValues(alpha: 0.8),
-                                  size: 26,
+                                child: Container(
+                                  padding: EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Colors.white.withValues(alpha: 0.08),
+                                        Colors.white.withValues(alpha: 0.03),
+                                      ],
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.3),
+                                        blurRadius: 10,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    Icons.person_add_alt_1_rounded,
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    size: 20,
+                                  ),
                                 ),
                               ),
                             ],

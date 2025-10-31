@@ -45,35 +45,20 @@ class HistoryPart extends StatelessWidget {
             backgroundImage: 'assets/carbon/47.jpg',
           ),
 
-          Gap(32),
+          Gap(48),
 
           // Fun Facts Header
-          Row(
-            children: [
-              Container(
-                height: 1,
-                width: 40,
-                color: Colors.white.withValues(alpha: 0.3),
-              ),
-              Gap(12),
-              Text(
-                'FUN FACTS',
-                style: context.textTheme.headlineSmall?.copyWith(
-                  fontSize: 20,
-                  letterSpacing: 2,
-                ),
-              ),
-              Gap(12),
-              Expanded(
-                child: Container(
-                  height: 1,
-                  color: Colors.white.withValues(alpha: 0.3),
-                ),
-              ),
-            ],
+          Text(
+            'FUN FACTS',
+            style: context.textTheme.headlineSmall?.copyWith(
+              fontSize: 13,
+              letterSpacing: 2.5,
+              fontWeight: FontWeight.w500,
+              color: Colors.white.withValues(alpha: 0.5),
+            ),
           ),
 
-          Gap(24),
+          Gap(20),
 
           // Fun Facts List
           ...List.generate(
@@ -88,54 +73,72 @@ class HistoryPart extends StatelessWidget {
             ),
           ),
 
-          Gap(32),
+          Gap(48),
 
           // Designer Section
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(28),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.2),
-                width: 1,
-              ),
+              borderRadius: BorderRadius.circular(24),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.grey[900]!.withValues(alpha: 0.5),
-                  Colors.grey[800]!.withValues(alpha: 0.3),
+                  Colors.white.withValues(alpha: 0.08),
+                  Colors.white.withValues(alpha: 0.03),
                 ],
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 20,
+                  offset: Offset(0, 8),
+                ),
+              ],
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.design_services_outlined,
-                  color: Colors.white.withValues(alpha: 0.7),
-                  size: 24,
+                Container(
+                  padding: EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white.withValues(alpha: 0.1),
+                        Colors.white.withValues(alpha: 0.05),
+                      ],
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.design_services_outlined,
+                    color: Colors.white.withValues(alpha: 0.8),
+                    size: 22,
+                  ),
                 ),
-                Gap(16),
+                Gap(20),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'DESIGNED BY',
                       style: context.textTheme.bodyMedium?.copyWith(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w300,
-                        letterSpacing: 1.5,
-                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 2,
+                        color: Colors.white.withValues(alpha: 0.4),
                       ),
                     ),
-                    Gap(4),
+                    Gap(6),
                     Text(
                       history!.designerName ?? 'N/A',
                       style: context.textTheme.bodyMedium?.copyWith(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 0.3,
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
@@ -156,106 +159,51 @@ class HistoryPart extends StatelessWidget {
     required String content,
     required String backgroundImage,
   }) {
-    return Stack(
-      children: [
-        // Carbon fiber background with edge fade
-        ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Stack(
-            children: [
-              Image.asset(
-                backgroundImage,
-                width: double.infinity,
-                height: 250,
-                fit: BoxFit.cover,
-              ),
-              // Vignette effect - darker in center, fades at edges
-              Container(
-                height: 250,
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: Alignment.center,
-                    radius: 1.2,
-                    colors: [
-                      Colors.black.withValues(alpha: 0.4),
-                      Colors.black.withValues(alpha: 0.7),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
-              // Edge fade for seamless blending
-              Container(
-                height: 250,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withValues(alpha: 0.3),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+    return Container(
+      padding: const EdgeInsets.all(28.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: 0.06),
+            Colors.white.withValues(alpha: 0.02),
+          ],
         ),
-        // Content with text shadow for readability
-        Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: context.textTheme.headlineSmall?.copyWith(
-                  fontSize: 16,
-                  letterSpacing: 3,
-                  fontWeight: FontWeight.w600,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withValues(alpha: 0.8),
-                      blurRadius: 8,
-                    ),
-                  ],
-                ),
-              ),
-              Gap(16),
-              Container(
-                width: 60,
-                height: 2,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      blurRadius: 4,
-                    ),
-                  ],
-                ),
-              ),
-              Gap(16),
-              Text(
-                content,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  fontSize: 15,
-                  height: 1.6,
-                  fontWeight: FontWeight.w300,
-                  color: Colors.white.withValues(alpha: 0.95),
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withValues(alpha: 0.8),
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
-              ),
-            ],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: Offset(0, 8),
           ),
-        ),
-      ],
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: context.textTheme.headlineSmall?.copyWith(
+              fontSize: 14,
+              letterSpacing: 2.5,
+              fontWeight: FontWeight.w500,
+              color: Colors.white.withValues(alpha: 0.5),
+            ),
+          ),
+          Gap(20),
+          Text(
+            content,
+            style: context.textTheme.bodyMedium?.copyWith(
+              fontSize: 16,
+              height: 1.7,
+              fontWeight: FontWeight.w300,
+              color: Colors.white.withValues(alpha: 0.9),
+              letterSpacing: 0.2,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -265,42 +213,49 @@ class HistoryPart extends StatelessWidget {
     required int index,
   }) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: Colors.grey[800]!,
-          width: 1,
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: 0.06),
+            Colors.white.withValues(alpha: 0.02),
+          ],
         ),
-        color: Colors.grey[900]!.withValues(alpha: 0.4),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.blue.withValues(alpha: 0.3),
-                  Colors.purple.withValues(alpha: 0.3),
+                  Colors.white.withValues(alpha: 0.15),
+                  Colors.white.withValues(alpha: 0.05),
                 ],
-              ),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.2),
-                width: 1,
               ),
             ),
             child: Center(
               child: Text(
                 '$index',
                 style: context.textTheme.bodyMedium?.copyWith(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withValues(alpha: 0.7),
                 ),
               ),
             ),
@@ -311,9 +266,10 @@ class HistoryPart extends StatelessWidget {
               fact,
               style: context.textTheme.bodyMedium?.copyWith(
                 fontSize: 15,
-                height: 1.5,
-                color: Colors.white.withValues(alpha: 0.9),
+                height: 1.6,
+                color: Colors.white.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w300,
+                letterSpacing: 0.2,
               ),
             ),
           ),

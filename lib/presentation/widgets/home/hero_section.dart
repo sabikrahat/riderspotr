@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:geolocator/geolocator.dart' as geo;
 import 'package:go_router/go_router.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
+import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
+import '../../../models/car/car_spot_model.dart';
+import '../../../models/map/map_marker_model.dart';
 import '../../pages/explore/explore_screen.dart';
+import '../../providers/car/map_provider.dart';
 
 class HeroSection extends StatelessWidget {
   const HeroSection({super.key, required this.user});
@@ -191,18 +197,203 @@ class HeroSection extends StatelessWidget {
 }
 
 // Map Preview Widget
-class _MapPreview extends StatefulWidget {
+class _MapPreview extends ConsumerStatefulWidget {
   const _MapPreview();
 
   @override
-  State<_MapPreview> createState() => _MapPreviewState();
+  ConsumerState<_MapPreview> createState() => _MapPreviewState();
 }
 
-class _MapPreviewState extends State<_MapPreview> {
+class _MapPreviewState extends ConsumerState<_MapPreview> {
   MapboxMap? mapboxMap;
+  CircleAnnotationManager? circleAnnotationManager;
+  geo.Position? _userPosition;
+  bool _isLoadingLocation = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserLocation();
+  }
+
+  Future<void> _getUserLocation() async {
+    try {
+      bool serviceEnabled = await geo.Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        setState(() => _isLoadingLocation = false);
+        return;
+      }
+
+      geo.LocationPermission permission =
+          await geo.Geolocator.checkPermission();
+      if (permission == geo.LocationPermission.denied) {
+        permission = await geo.Geolocator.requestPermission();
+        if (permission == geo.LocationPermission.denied) {
+          setState(() => _isLoadingLocation = false);
+          return;
+        }
+      }
+
+      if (permission == geo.LocationPermission.deniedForever) {
+        setState(() => _isLoadingLocation = false);
+        return;
+      }
+
+      final position = await geo.Geolocator.getCurrentPosition();
+      setState(() {
+        _userPosition = position;
+        _isLoadingLocation = false;
+      });
+
+      // Update camera to user location if map is ready
+      if (mapboxMap != null && _userPosition != null) {
+        await _animateCameraToUserLocation();
+      }
+    } catch (e) {
+      setState(() => _isLoadingLocation = false);
+      print('Error getting location: $e');
+    }
+  }
+
+  Future<void> _animateCameraToUserLocation() async {
+    if (mapboxMap == null || _userPosition == null) return;
+
+    await mapboxMap!.flyTo(
+      CameraOptions(
+        center: Point(
+          coordinates: Position(
+            _userPosition!.longitude,
+            _userPosition!.latitude,
+          ),
+        ),
+        zoom: 12.0,
+        pitch: 0.0,
+      ),
+      MapAnimationOptions(duration: 5000, startDelay: 1000),
+    );
+  }
+
+  Future<void> _addCircleMarkers(List<CarSpotModel> carSpots) async {
+    if (mapboxMap == null || _userPosition == null) return;
+
+    // Clear existing markers
+    if (circleAnnotationManager != null) {
+      await circleAnnotationManager!.deleteAll();
+    }
+
+    // Create circle annotation manager if needed
+    circleAnnotationManager ??= await mapboxMap!.annotations
+        .createCircleAnnotationManager();
+
+    // Convert car spots to map markers
+    List<MapMarkerModel> markers = carSpots
+        .where(
+          (spot) =>
+              spot.latitude != null &&
+              spot.longitude != null &&
+              spot.car?.rarity != null,
+        )
+        .map((spot) {
+          // Safe to use ! here because we filtered out nulls above
+          final rarity = spot.car!.rarity;
+          return MapMarkerModel(
+            id: spot.id,
+            latitude: spot.latitude!,
+            longitude: spot.longitude!,
+            borderColor: _getBorderColorForRarity(rarity),
+            radius: _getRadiusForRarity(rarity),
+            carName: spot.car?.model ?? 'Unknown',
+          );
+        })
+        .toList();
+
+    // Add glowing orbs for each marker
+    for (var marker in markers) {
+      // Outer glow ring
+      final outerRingOptions = CircleAnnotationOptions(
+        geometry: Point(
+          coordinates: Position(marker.longitude, marker.latitude),
+        ),
+        circleRadius: marker.radius * 1.5,
+        circleColor: marker.colorToInt(marker.borderColor),
+        circleBlur: 1.5,
+        circleOpacity: 0.15,
+        circleStrokeWidth: 0,
+      );
+
+      // Inner glowing core
+      final coreOptions = CircleAnnotationOptions(
+        geometry: Point(
+          coordinates: Position(marker.longitude, marker.latitude),
+        ),
+        circleRadius: marker.radius,
+        circleColor: marker.colorToInt(marker.borderColor),
+        circleBlur: 1.0,
+        circleOpacity: 0.6,
+        circleStrokeWidth: 6.0,
+        circleStrokeColor: marker.colorToInt(marker.borderColor),
+        circleStrokeOpacity: 0.25,
+      );
+
+      await circleAnnotationManager!.create(outerRingOptions);
+      await circleAnnotationManager!.create(coreOptions);
+    }
+  }
+
+  // Get radius based on rarity for consistent sizing
+  double _getRadiusForRarity(Rarity rarity) {
+    switch (rarity) {
+      case Rarity.mythic:
+        return 30.0;
+      case Rarity.legendary:
+        return 25.0;
+      case Rarity.epic:
+        return 20.0;
+      case Rarity.rare:
+        return 15.0;
+      case Rarity.uncommon:
+        return 12.0;
+      case Rarity.common:
+        return 10.0;
+    }
+  }
+
+  Color _getBorderColorForRarity(Rarity rarity) {
+    switch (rarity) {
+      case Rarity.common:
+        return Colors.grey.shade300;
+      case Rarity.uncommon:
+        return Colors.greenAccent;
+      case Rarity.rare:
+        return Colors.blueAccent;
+      case Rarity.epic:
+        return Colors.purpleAccent;
+      case Rarity.legendary:
+        return Colors.orangeAccent;
+      case Rarity.mythic:
+        return Colors.redAccent;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Watch car spots from provider
+    final carSpotsAsync = ref.watch(mapProvider);
+
+    return carSpotsAsync.when(
+      loading: () => _buildMap(),
+      error: (error, stack) => _buildMap(),
+      data: (carSpots) {
+        // Add markers when data is loaded and map is ready
+        if (mapboxMap != null && _userPosition != null && carSpots.isNotEmpty) {
+          Future.microtask(() => _addCircleMarkers(carSpots));
+        }
+        return _buildMap();
+      },
+    );
+  }
+
+  Widget _buildMap() {
     return Stack(
       children: [
         // Actual Mapbox Map - Full bleed
@@ -212,17 +403,17 @@ class _MapPreviewState extends State<_MapPreview> {
           cameraOptions: CameraOptions(
             center: Point(
               coordinates: Position(
-                10.0, // Longitude (centered on Europe/Mediterranean)
-                30.0, // Latitude
+                _userPosition?.longitude ?? 10.0,
+                _userPosition?.latitude ?? 30.0,
               ),
             ),
-            zoom: 2.0, // World view
+            zoom: _userPosition != null ? 12.0 : 2.0,
             pitch: 0.0,
           ),
-          onMapCreated: (MapboxMap map) {
+          onMapCreated: (MapboxMap map) async {
             mapboxMap = map;
             // Disable all user interactions for preview
-            map.gestures.updateSettings(
+            await map.gestures.updateSettings(
               GesturesSettings(
                 rotateEnabled: false,
                 pinchToZoomEnabled: false,
@@ -233,24 +424,12 @@ class _MapPreviewState extends State<_MapPreview> {
                 quickZoomEnabled: false,
               ),
             );
-          },
-        ),
 
-        // Glowing pins overlay (decorative)
-        Positioned(
-          top: 40,
-          left: 60,
-          child: _GlowingPin(),
-        ),
-        Positioned(
-          bottom: 80,
-          right: 50,
-          child: _GlowingPin(),
-        ),
-        Positioned(
-          top: 100,
-          right: 80,
-          child: _GlowingPin(color: Colors.purple),
+            // Animate to user location if available
+            if (_userPosition != null && !_isLoadingLocation) {
+              await _animateCameraToUserLocation();
+            }
+          },
         ),
 
         // Map indicator
@@ -273,13 +452,13 @@ class _MapPreviewState extends State<_MapPreview> {
             child: Row(
               children: [
                 Icon(
-                  Icons.public,
+                  _userPosition != null ? Icons.location_on : Icons.public,
                   size: 12,
                   color: Colors.white.withValues(alpha: 0.8),
                 ),
                 Gap(5),
                 Text(
-                  'Global View',
+                  _userPosition != null ? 'Your Area' : 'Global View',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
@@ -292,32 +471,6 @@ class _MapPreviewState extends State<_MapPreview> {
           ),
         ),
       ],
-    );
-  }
-}
-
-// Glowing Pin Widget
-class _GlowingPin extends StatelessWidget {
-  const _GlowingPin({this.color = Colors.blue});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 12,
-      height: 12,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color,
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.6),
-            blurRadius: 12,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
     );
   }
 }

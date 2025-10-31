@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -75,5 +76,67 @@ class UserNotifier extends _$UserNotifier {
   }) async {
     await UserService().update(user: user);
     await refreshUser();
+  }
+
+  Future<void> updateProfilePicture({
+    required XFile profilePicture,
+  }) async {
+    if (_user == null) return;
+
+    final profileImagePath = await UserService().uploadProfilePictureToStorage(
+      profilePicture,
+    );
+
+    await updateUser(
+      user: _user!.copyWith(
+        profilePictureUrl: profileImagePath,
+      ),
+    );
+  }
+
+  Future<void> updateBannerPicture({
+    required XFile bannerPicture,
+  }) async {
+    if (_user == null) return;
+
+    final bannerImagePath = await UserService().uploadBannerPictureToStorage(
+      bannerPicture,
+    );
+
+    await updateUser(
+      user: _user!.copyWith(
+        bannerUrl: bannerImagePath,
+      ),
+    );
+  }
+
+  Future<void> updateProfileAndBannerPictures({
+    XFile? profilePicture,
+    XFile? bannerPicture,
+  }) async {
+    if (_user == null) return;
+    if (profilePicture == null && bannerPicture == null) return;
+
+    String? profileImagePath;
+    String? bannerImagePath;
+
+    if (profilePicture != null) {
+      profileImagePath = await UserService().uploadProfilePictureToStorage(
+        profilePicture,
+      );
+    }
+
+    if (bannerPicture != null) {
+      bannerImagePath = await UserService().uploadBannerPictureToStorage(
+        bannerPicture,
+      );
+    }
+
+    await updateUser(
+      user: _user!.copyWith(
+        profilePictureUrl: profileImagePath ?? _user!.profilePictureUrl,
+        bannerUrl: bannerImagePath ?? _user!.bannerUrl,
+      ),
+    );
   }
 }
