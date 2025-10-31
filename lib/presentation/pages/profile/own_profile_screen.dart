@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
@@ -5,134 +8,290 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/auth/user_model.dart';
-import '../../providers/auth/profile_provider.dart';
+import '../../providers/auth/user_provider.dart';
+import '../../widgets/image_process/pick_photo.dart';
 import '../../widgets/shared/carbon_background.dart';
+import '../../widgets/shared/loading_overlay.dart';
 import '../../widgets/shared/profile_xp_card.dart';
+import '../../../services/auth/user_service.dart';
 import '../settings/settings_screen.dart';
 
-class OwnProfileScreen extends ConsumerWidget {
+class OwnProfileScreen extends ConsumerStatefulWidget {
   const OwnProfileScreen({super.key});
-
   static const String routeName = '/profile';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _OwnProfileScreenState();
+}
+
+class _OwnProfileScreenState extends ConsumerState<OwnProfileScreen> {
+  bool _isLoading = false;
+  XFile? _pickedProfilePicture;
+  XFile? _pickedBannerPicture;
+
+  Future<void> _updateImages(UserNotifier notifier) async {
+    if (_pickedProfilePicture == null && _pickedBannerPicture == null) return;
+    if (notifier.user == null) return;
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      String? profileImagePath;
+      String? bannerImagePath;
+      if (_pickedProfilePicture != null) {
+        profileImagePath = await UserService().uploadProfilePictureToStorage(
+          _pickedProfilePicture!,
+        );
+      }
+      if (_pickedBannerPicture != null) {
+        bannerImagePath = await UserService().uploadBannerPictureToStorage(
+          _pickedBannerPicture!,
+        );
+      }
+      await notifier.updateUser(
+        user: notifier.user!.copyWith(
+          profilePictureUrl:
+              profileImagePath ?? notifier.user!.profilePictureUrl,
+          bannerUrl: bannerImagePath ?? notifier.user!.bannerUrl,
+        ),
+      );
+      await notifier.refreshUser();
+    } catch (e) {
+      throw Exception('Error updating images: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
+      floatingActionButton:
+          _pickedProfilePicture == null && _pickedBannerPicture == null
+          ? null
+          : FloatingActionButton.extended(
+              backgroundColor: Colors.white,
+              onPressed: () async {
+                final notifier = ref.read(userProvider.notifier);
+                await _updateImages(notifier);
+                setState(() {
+                  _pickedProfilePicture = null;
+                  _pickedBannerPicture = null;
+                });
+              },
+              icon: Icon(Icons.upload, color: Colors.black),
+              label: Text(
+                'Update',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
       body: ref
-          .watch(profileProvider(null))
+          .watch(userProvider)
           .when(
             loading: () => Center(child: CircularProgressIndicator()),
             error: (error, stackTrace) => Center(child: Text(error.toString())),
             data: (_) {
-              final notifier = ref.read(profileProvider(null).notifier);
+              final notifier = ref.read(userProvider.notifier);
               final user = notifier.user;
-              return CarbonBackground(
-                imgPath: 'assets/carbon/leaderboard-bg.jpg',
-                heightPercent: 0.35,
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header Section with Profile
-                      SafeArea(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              // Settings Button Row
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: GestureDetector(
-                                  onTap: () async => await context.push(
-                                    SettingsScreen.routeName,
-                                  ),
-                                  child: Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          Colors.white.withValues(alpha: 0.08),
-                                          Colors.white.withValues(alpha: 0.03),
-                                        ],
+              return LoadingOverlay(
+                isLoading: _isLoading,
+                child: CarbonBackground(
+                  imgPath: 'assets/carbon/leaderboard-bg.jpg',
+                  heightPercent: 0.35,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Header Section with Profile
+                        SafeArea(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: [
+                                // Settings & Edit Buttons Row
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        if (user == null) return;
+                                        await pickPhoto(context).then((
+                                          pk,
+                                        ) async {
+                                          if (pk == null) return;
+                                          setState(() {
+                                            _pickedBannerPicture = pk;
+                                          });
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [
+                                              Colors.white.withValues(
+                                                alpha: 0.08,
+                                              ),
+                                              Colors.white.withValues(
+                                                alpha: 0.03,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          Icons.edit,
+                                          color: Colors.white.withValues(
+                                            alpha: 0.8,
+                                          ),
+                                          size: 20,
+                                        ),
                                       ),
                                     ),
-                                    child: Icon(
-                                      Icons.settings,
-                                      color: Colors.white.withValues(
-                                        alpha: 0.8,
+                                    Gap(12),
+                                    GestureDetector(
+                                      onTap: () async => await context.push(
+                                        SettingsScreen.routeName,
                                       ),
-                                      size: 20,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Gap(16),
-                              // Profile Picture
-                              Container(
-                                width: 100,
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.4,
+                                      child: Container(
+                                        padding: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [
+                                              Colors.white.withValues(
+                                                alpha: 0.08,
+                                              ),
+                                              Colors.white.withValues(
+                                                alpha: 0.03,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          Icons.settings,
+                                          color: Colors.white.withValues(
+                                            alpha: 0.8,
+                                          ),
+                                          size: 20,
+                                        ),
                                       ),
-                                      blurRadius: 20,
-                                      offset: Offset(0, 8),
                                     ),
                                   ],
                                 ),
-                                child: CircleAvatar(
-                                  radius: 50,
-                                  backgroundImage:
-                                      user?.profilePictureUrl == null
-                                      ? AssetImage(
-                                          'assets/images/user-placeholder.png',
-                                        )
-                                      : NetworkImage(user!.profilePictureUrl!)
-                                            as ImageProvider,
-                                ),
-                              ),
-                              Gap(16),
-                              // Name
-                              Text(
-                                user?.fullName ?? 'Full Name',
-                                style: context.textTheme.headlineMedium
-                                    ?.copyWith(
-                                      color: Colors.white,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.3,
+                                Gap(16),
+                                // Profile Picture with Edit
+                                Stack(
+                                  children: [
+                                    Container(
+                                      width: 100,
+                                      height: 100,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(
+                                              alpha: 0.4,
+                                            ),
+                                            blurRadius: 20,
+                                            offset: Offset(0, 8),
+                                          ),
+                                        ],
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: 50,
+                                        backgroundImage:
+                                            _pickedProfilePicture != null
+                                            ? FileImage(
+                                                File(
+                                                  _pickedProfilePicture!.path,
+                                                ),
+                                              )
+                                            : user?.profilePictureUrl == null
+                                            ? AssetImage(
+                                                'assets/images/user-placeholder.png',
+                                              )
+                                            : NetworkImage(
+                                                    user!.profilePictureUrl!,
+                                                  )
+                                                  as ImageProvider,
+                                      ),
                                     ),
-                              ),
-                              Gap(4),
-                              // Username
-                              Text(
-                                '@${user?.username ?? 'username'}',
-                                style: context.textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.5),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          if (user == null) return;
+                                          await pickPhoto(context).then((
+                                            pk,
+                                          ) async {
+                                            if (pk == null) return;
+                                            setState(() {
+                                              _pickedProfilePicture = pk;
+                                            });
+                                          });
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.white,
+                                          ),
+                                          child: Icon(
+                                            Icons.edit,
+                                            color: Colors.black,
+                                            size: 16,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                                Gap(16),
+                                // Name
+                                Text(
+                                  user?.fullName ?? 'Full Name',
+                                  style: context.textTheme.headlineMedium
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.3,
+                                      ),
+                                ),
+                                Gap(4),
+                                // Username
+                                Text(
+                                  '@${user?.username ?? 'username'}',
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.5),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      Gap(24),
-                      // Stats Section
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: _Stats(user),
-                      ),
-                      Gap(100),
-                    ],
+                        Gap(24),
+                        // Stats Section
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: _Stats(user),
+                        ),
+                        Gap(100),
+                      ],
+                    ),
                   ),
                 ),
               );

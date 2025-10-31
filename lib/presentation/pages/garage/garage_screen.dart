@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:ridespotr/presentation/providers/auth/user_provider.dart';
 
 import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
@@ -28,7 +29,6 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
   Rarity? _selectedRarity;
   String _selectedFilterLabel = 'All (0)'; // Track the display label
   SortOptions _selectedSort = SortOptions.recent;
-  bool _isPublic = true;
 
   @override
   void initState() {
@@ -131,48 +131,75 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                               fontWeight: FontWeight.w300,
                             ),
                           ),
-                          // Visibility Toggle Button
-                          GestureDetector(
-                            onTap: () => setState(() => _isPublic = !_isPublic),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    Colors.white.withValues(alpha: 0.08),
-                                    Colors.white.withValues(alpha: 0.03),
-                                  ],
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    _isPublic ? Icons.public : Icons.lock,
-                                    size: 16,
-                                    color: Colors.white.withValues(alpha: 0.8),
+                          // Visibility Toggle Button with Optimistic Updates
+                          Consumer(
+                            builder: (_, ref, _) {
+                              ref.watch(userProvider);
+                              final userNotifier = ref.read(
+                                userProvider.notifier,
+                              );
+                              final isPublic =
+                                  userNotifier.user?.isGaragePrivate == false;
+
+                              return GestureDetector(
+                                onTap: () async {
+                                  if (userNotifier.user == null) return;
+
+                                  // Optimistic update - update backend without loading state
+                                  await userNotifier.updateUser(
+                                    user: userNotifier.user!.copyWith(
+                                      isGaragePrivate:
+                                          !(userNotifier
+                                                  .user
+                                                  ?.isGaragePrivate ??
+                                              false),
+                                    ),
+                                  );
+                                  await userNotifier.refreshUser();
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 10,
                                   ),
-                                  Gap(8),
-                                  Text(
-                                    _isPublic ? 'Public' : 'Private',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                      letterSpacing: 0.3,
-                                      color: Colors.white.withValues(
-                                        alpha: 0.8,
-                                      ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Colors.white.withValues(alpha: 0.08),
+                                        Colors.white.withValues(alpha: 0.03),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        isPublic ? Icons.public : Icons.lock,
+                                        size: 16,
+                                        color: Colors.white.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                      ),
+                                      Gap(8),
+                                      Text(
+                                        isPublic ? 'Public' : 'Private',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          letterSpacing: 0.3,
+                                          color: Colors.white.withValues(
+                                            alpha: 0.8,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -199,7 +226,7 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                         ),
                       ],
                       const Gap(16),
-                      // Choice Chips
+                      // Filter Chips
                       FilterChips(
                         options: _buildFilterOptions(data),
                         selectedValue: _selectedFilterLabel,

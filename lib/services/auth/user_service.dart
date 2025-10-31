@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:camera/camera.dart';
 import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../config/constants.dart';
 import '../../core/exception.dart';
@@ -179,6 +181,44 @@ class UserService {
     } catch (e) {
       debugPrint(e.toString());
       throw KException(e.toString());
+    }
+  }
+
+  /// Upload a profile picture to storage
+  Future<String?> uploadProfilePictureToStorage(XFile file) async {
+    try {
+      final path = '${const Uuid().v4()}.jpg';
+      // upload to supabase storage bucket 'banner-picture'
+      final res = await _client.storage
+          .from('profile-picture')
+          .upload(
+            path,
+            File(file.path),
+            fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+          );
+      debugPrint('Supabase photo upload in <$res>');
+      return '$supabaseStorageUrl/profile-picture/$path';
+    } catch (e) {
+      throw Exception('Error uploading file: $e');
+    }
+  }
+
+  /// Upload a banner picture to storage
+  Future<String?> uploadBannerPictureToStorage(XFile file) async {
+    try {
+      final path = '${const Uuid().v4()}.jpg';
+      // upload to supabase storage bucket 'banner-picture'
+      final res = await _client.storage
+          .from('banner-picture')
+          .upload(
+            path,
+            File(file.path),
+            fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+          );
+      debugPrint('Supabase photo upload in <$res>');
+      return '$supabaseStorageUrl/banner-picture/$path';
+    } catch (e) {
+      throw Exception('Error uploading file: $e');
     }
   }
 }
