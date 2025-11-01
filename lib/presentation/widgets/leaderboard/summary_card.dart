@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
 import '../../../core/extensions.dart';
+import '../../providers/auth/user_provider.dart';
+import '../../providers/leaderboard/user_rank_provider.dart';
 
-class LeaderboardSummaryCard extends StatelessWidget {
+class LeaderboardSummaryCard extends ConsumerWidget {
   const LeaderboardSummaryCard({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
       decoration: BoxDecoration(
@@ -31,25 +34,67 @@ class LeaderboardSummaryCard extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: _Tile(
-              icon: Icons.electric_bolt_rounded,
-              title: 'Your Points',
-              value: '190 XP',
-            ),
+            child: ref
+                .watch(userProvider)
+                .when(
+                  loading: () => _Tile(
+                    icon: Icons.electric_bolt_rounded,
+                    title: 'Your Points',
+                    value: '...',
+                  ),
+                  error: (_, __) => _Tile(
+                    icon: Icons.electric_bolt_rounded,
+                    title: 'Your Points',
+                    value: 'N/A',
+                  ),
+                  data: (user) => _Tile(
+                    icon: Icons.electric_bolt_rounded,
+                    title: 'Your Points',
+                    value: '${user?.stats?.totalXp ?? 0} XP',
+                  ),
+                ),
           ),
           Expanded(
-            child: _Tile(
-              icon: Icons.language,
-              title: 'Global',
-              value: '#14',
-            ),
+            child: ref
+                .watch(userRankProvider)
+                .when(
+                  loading: () => _Tile(
+                    icon: Icons.language,
+                    title: 'Global',
+                    value: '...',
+                  ),
+                  error: (_, __) => _Tile(
+                    icon: Icons.language,
+                    title: 'Global',
+                    value: 'N/A',
+                  ),
+                  data: (rank) => _Tile(
+                    icon: Icons.language,
+                    title: 'Global',
+                    value: '#$rank',
+                  ),
+                ),
           ),
           Expanded(
-            child: _Tile(
-              icon: Icons.directions_car_rounded,
-              title: 'Legendaries',
-              value: '#14',
-            ),
+            child: ref
+                .watch(userProvider)
+                .when(
+                  loading: () => _Tile(
+                    icon: Icons.directions_car_rounded,
+                    title: 'Legendaries',
+                    value: '...',
+                  ),
+                  error: (_, __) => _Tile(
+                    icon: Icons.directions_car_rounded,
+                    title: 'Legendaries',
+                    value: 'N/A',
+                  ),
+                  data: (user) => _Tile(
+                    icon: Icons.directions_car_rounded,
+                    title: 'Legendaries',
+                    value: '#${user?.stats?.legendarySpots ?? 0}',
+                  ),
+                ),
           ),
         ],
       ),

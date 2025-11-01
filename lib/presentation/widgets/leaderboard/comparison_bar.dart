@@ -1,30 +1,20 @@
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../models/leaderboard/user_leaderboard_model.dart';
 import '../../pages/profile/user_profile_screen.dart';
 
 class LeaderboardComparisonBar extends StatelessWidget {
-  final String firstUid;
-  final String firstPlaceImage;
-  final String firstPlaceName;
-  final String secondUid;
-  final String secondPlaceImage;
-  final String secondPlaceName;
-  final String thirdUid;
-  final String thirdPlaceImage;
-  final String thirdPlaceName;
+  final UserLeaderboardModel? firstPlace;
+  final UserLeaderboardModel? secondPlace;
+  final UserLeaderboardModel? thirdPlace;
 
   const LeaderboardComparisonBar({
     super.key,
-    required this.firstUid,
-    required this.firstPlaceImage,
-    required this.firstPlaceName,
-    required this.secondUid,
-    required this.secondPlaceImage,
-    required this.secondPlaceName,
-    required this.thirdUid,
-    required this.thirdPlaceImage,
-    required this.thirdPlaceName,
+    required this.firstPlace,
+    required this.secondPlace,
+    required this.thirdPlace,
   });
 
   @override
@@ -56,9 +46,7 @@ class LeaderboardComparisonBar extends StatelessWidget {
           Expanded(
             child: _buildPodiumProfile(
               context: context,
-              uid: secondUid,
-              image: secondPlaceImage,
-              name: secondPlaceName,
+              user: secondPlace,
               rank: '2',
               podiumHeight: 140,
             ),
@@ -68,9 +56,7 @@ class LeaderboardComparisonBar extends StatelessWidget {
           Expanded(
             child: _buildPodiumProfile(
               context: context,
-              uid: firstUid,
-              image: firstPlaceImage,
-              name: firstPlaceName,
+              user: firstPlace,
               rank: '1',
               podiumHeight: 180,
             ),
@@ -80,9 +66,7 @@ class LeaderboardComparisonBar extends StatelessWidget {
           Expanded(
             child: _buildPodiumProfile(
               context: context,
-              uid: thirdUid,
-              image: thirdPlaceImage,
-              name: thirdPlaceName,
+              user: thirdPlace,
               rank: '3',
               podiumHeight: 100,
             ),
@@ -94,18 +78,35 @@ class LeaderboardComparisonBar extends StatelessWidget {
 
   Widget _buildPodiumProfile({
     required BuildContext context,
-    required String uid,
-    required String image,
-    required String name,
+    required UserLeaderboardModel? user,
     required String rank,
     required double podiumHeight,
   }) {
+    if (user == null) {
+      return SizedBox(
+        height: podiumHeight + 100,
+        child: Center(
+          child: Text(
+            'N/A',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.3),
+              fontSize: 12,
+            ),
+          ),
+        ),
+      );
+    }
+
     final isFirst = rank == '1';
     final profileSize = isFirst ? 70.0 : 60.0;
+    final username = '${user.firstName} ${user.lastName}'.trim();
+    final imageUrl = user.profilePictureUrl;
 
     return GestureDetector(
-      onTap: () async =>
-          await context.push(UserProfileScreen.routeName, extra: uid),
+      onTap: () async => await context.push(
+        UserProfileScreen.routeName,
+        extra: user.user,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -131,13 +132,16 @@ class LeaderboardComparisonBar extends StatelessWidget {
             ),
             child: CircleAvatar(
               radius: profileSize / 2,
-              backgroundImage: _getImageProvider(image),
+              backgroundImage: imageUrl != null
+                  ? FastCachedImageProvider(imageUrl) as ImageProvider
+                  : AssetImage('assets/images/user-placeholder.png')
+                        as ImageProvider,
             ),
           ),
           SizedBox(height: 8),
           // Username
           Text(
-            '@$name',
+            username.isNotEmpty ? username : 'User',
             style: TextStyle(
               fontSize: isFirst ? 12 : 10,
               fontWeight: FontWeight.w500,
@@ -178,14 +182,5 @@ class LeaderboardComparisonBar extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  ImageProvider _getImageProvider(String imagePath) {
-    // Check if the path is a network URL
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return NetworkImage(imagePath);
-    }
-    // Otherwise, treat it as an asset image
-    return AssetImage(imagePath);
   }
 }

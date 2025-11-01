@@ -1,6 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-
-import 'user_xp_stats_model.dart';
+import 'package:ridespotr/models/user/user_stats_model.dart';
 
 part 'user_model.g.dart';
 
@@ -14,7 +13,8 @@ class Location {
     required this.longitude,
   });
 
-  factory Location.fromJson(Map<String, dynamic> json) => _$LocationFromJson(json);
+  factory Location.fromJson(Map<String, dynamic> json) =>
+      _$LocationFromJson(json);
 
   Map<String, dynamic> toJson() => _$LocationToJson(this);
 }
@@ -23,21 +23,21 @@ class Location {
 class UserModel {
   final String id;
   final String email;
-  String? firstName;
-  String? lastName;
-  String? username;
-  DateTime? dob;
-  String? measurement;
-  String? knowledgeLevel;
-  String? experience;
-  String? address;
-  Location? location;
-  String? profilePictureUrl;
-  String? bannerUrl;
-  DateTime createdAt;
-  bool isGaragePrivate;
+  final String? firstName;
+  final String? lastName;
+  final String? username;
+  final DateTime? dob;
+  final String? measurement;
+  final String? knowledgeLevel;
+  final String? experience;
+  final String? address;
+  final Location? location;
+  final String? profilePictureUrl;
+  final String? bannerUrl;
+  final DateTime createdAt;
+  final bool isGaragePrivate;
   @JsonKey(includeToJson: false)
-  UserXPStatsModel? stats;
+  final UserStatsModel? stats;
 
   UserModel({
     required this.id,
@@ -55,10 +55,11 @@ class UserModel {
     this.bannerUrl,
     required this.createdAt,
     required this.isGaragePrivate,
-    this.stats,
+    required this.stats,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserModelToJson(this);
 
@@ -82,7 +83,7 @@ class UserModel {
     String? bannerUrl,
     DateTime? createdAt,
     bool? isGaragePrivate,
-    UserXPStatsModel? stats,
+    UserStatsModel? stats,
   }) => UserModel(
     id: id,
     email: email,
@@ -104,5 +105,5 @@ class UserModel {
 
   String get fullName => "$firstName$lastName";
 
-  static const query = '*, stats: user_xp_stats(*)';
+  static const query = '*, stats: user_stats(*)';
 }

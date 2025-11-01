@@ -10,6 +10,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../core/exception.dart';
 import '../../models/car/car_spot_model.dart';
+import '../../models/user/spot_stat_model.dart';
 import '../google_maps/google_maps_service.dart';
 
 class CarService {
@@ -43,10 +44,17 @@ class CarService {
   }
 
   /// Get all car spots from all users (claimed only)
-  Future<List<CarSpotModel>> getAllCarSpots() async {
+  Future<List<CarSpotModel>> getAllCarSpots([String? userId]) async {
     try {
-      final res = await _client.from('car_spots').select(CarSpotModel.query).eq('is_claimed', true);
-      debugPrint('All Car Spots fetched: ${res.toString()}');
+      var query = _client
+          .from('car_spots')
+          .select(CarSpotModel.query)
+          .eq('is_claimed', true);
+      if (userId != null) {
+        query = query.eq('user', userId);
+      }
+
+      final res = await query;
       return res.map((e) => CarSpotModel.fromJson(e)).toList();
     } on SocketException catch (e) {
       throw KException('No internet connection. ${e.message}');
@@ -61,9 +69,88 @@ class CarService {
   /// Mark a car spot as claimed
   Future<void> markClaimed(String id) async {
     try {
+      // Get the car spot to get the user ID
+      final carSpot = await _client
+          .from('car_spots')
+          .select('user')
+          .eq('id', id)
+          .single();
+
+      final userId = carSpot['user'] as String;
+
+      // Update is_claimed
       await _client.from('car_spots').update({'is_claimed': true}).eq('id', id);
+
+      // Update user stats
+      await _updateUserStats(userId);
     } catch (e) {
       throw Exception('Error marking claimed: $e');
+    }
+  }
+
+  /// Update user stats when a car is claimed
+  Future<void> _updateUserStats(String userId) async {
+    try {
+      // Get current user stats
+      final statsResult = await _client
+          .from('user_stats')
+          .select()
+          .eq('user', userId)
+          .maybeSingle();
+
+      // Get all claimed car spots for this user with car data
+      final carSpotsResult = await _client
+          .from('car_spots')
+          .select('car(id, rarity)')
+          .eq('user', userId)
+          .eq('is_claimed', true);
+
+      // Calculate unique spots (count of unique car IDs)
+      final uniqueCarIds = <String>{};
+      final legendaryCarIds = <String>{};
+
+      for (final spot in carSpotsResult) {
+        final carData = spot['car'] as Map<String, dynamic>?;
+        if (carData != null) {
+          final carId = carData['id'] as String?;
+          final rarity = carData['rarity'] as String?;
+
+          if (carId != null) {
+            uniqueCarIds.add(carId);
+            if (rarity == 'legendary') {
+              legendaryCarIds.add(carId);
+            }
+          }
+        }
+      }
+
+      final uniqueSpots = uniqueCarIds.length;
+      final legendarySpots = legendaryCarIds.length;
+
+      // Calculate total spots
+      final totalSpots = carSpotsResult.length;
+
+      // Update or insert user stats
+      if (statsResult != null) {
+        await _client
+            .from('user_stats')
+            .update({
+              'total_spots': totalSpots,
+              'unique_spots': uniqueSpots,
+              'legendary_spots': legendarySpots,
+            })
+            .eq('user', userId);
+      } else {
+        await _client.from('user_stats').insert({
+          'user': userId,
+          'total_spots': totalSpots,
+          'unique_spots': uniqueSpots,
+          'legendary_spots': legendarySpots,
+        });
+      }
+    } catch (e) {
+      debugPrint('Error updating user stats: $e');
+      // Don't throw - stats update failure shouldn't block claiming
     }
   }
 
@@ -176,7 +263,8 @@ class CarService {
         latLng,
       );
 
-      String formattedAddress = placeDetails?.formattedAddress ?? 'Unknown location';
+      String formattedAddress =
+          placeDetails?.formattedAddress ?? 'Unknown location';
 
       // Return location data in the format expected by CarSpotModel
       return {
@@ -187,6 +275,47 @@ class CarService {
     } catch (e) {
       debugPrint('Error getting location: $e');
       throw Exception('Error getting location: $e');
+    }
+  }
+
+  /// Get spot statistics for a user using the database function
+  Future<SpotStatModel> getSpotStats({
+    String? userId,
+    String timezone = 'Australia/Melbourne',
+  }) async {
+    try {
+      final id = userId ?? _client.auth.currentUser?.id;
+      if (id == null) {
+        throw KException('User ID is required');
+      }
+
+      final res = await _client.rpc(
+        'get_spot_counts',
+        params: {
+          'p_user': id,
+          'p_tz': timezone,
+        },
+      );
+
+      // The function returns a table with a single row
+      final resList = res as List<dynamic>?;
+      if (resList == null || resList.isEmpty) {
+        // Return default values if no data
+        return SpotStatModel(
+          totalSpots: 0,
+          todaysSpots: 0,
+          lastHourSpots: 0,
+        );
+      }
+
+      final stats = resList.first as Map<String, dynamic>;
+      return SpotStatModel.fromJson(stats);
+    } on SocketException catch (e) {
+      throw KException('No internet connection. ${e.message}');
+    } on AuthException catch (e) {
+      throw KException(e.message);
+    } catch (e) {
+      throw KException(e.toString());
     }
   }
 }

@@ -2,7 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../models/auth/user_model.dart';
+import '../../../models/user/user_model.dart';
 import '../../../services/auth/auth_service.dart';
 import '../../../services/auth/user_service.dart';
 

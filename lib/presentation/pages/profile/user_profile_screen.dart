@@ -6,8 +6,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
+import '../../../models/car/car_spot_model.dart';
 import '../../providers/auth/profile_provider.dart';
-import '../../providers/car/garage_provider.dart';
 import '../../widgets/profile/profile_stats_section.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/car_card.dart';
@@ -109,207 +109,170 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                       ],
                     ),
                   ),
-                  // Content
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header Section with Profile
-                      SafeArea(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              // Back Button
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Back(),
-                              ),
-                              // Gap(32),
-                              // Profile Picture
-                              Container(
-                                width: 100,
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.4,
-                                      ),
-                                      blurRadius: 20,
-                                      offset: Offset(0, 8),
-                                    ),
-                                  ],
+                  // Scrollable Content
+                  SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Header Section with Profile
+                        SafeArea(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: [
+                                // Back Button
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Back(),
                                 ),
-                                child: CircleAvatar(
-                                  radius: 50,
-                                  backgroundImage:
-                                      user?.profilePictureUrl == null
-                                      ? AssetImage(
-                                          'assets/images/user-placeholder.png',
-                                        )
-                                      : FastCachedImageProvider(
-                                              user!.profilePictureUrl!,
-                                            )
-                                            as ImageProvider,
-                                ),
-                              ),
-                              Gap(16),
-                              // Name
-                              Text(
-                                user?.fullName ?? 'Full Name',
-                                style: context.textTheme.headlineMedium
-                                    ?.copyWith(
-                                      color: Colors.white,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.3,
-                                    ),
-                              ),
-                              Gap(4),
-                              // Username
-                              Text(
-                                '@${user?.username ?? 'username'}',
-                                style: context.textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.5),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                              // Follow Button
-                              if (widget.id !=
-                                  Supabase
-                                      .instance
-                                      .client
-                                      .auth
-                                      .currentUser
-                                      ?.id) ...[
-                                Gap(16),
-                                GestureDetector(
-                                  onTap: () async =>
-                                      await notifier.followUnfollowUser(),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 24,
-                                      vertical: 12,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(25),
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: notifier.isFollowing
-                                            ? [
-                                                Colors.white.withValues(
-                                                  alpha: 0.08,
-                                                ),
-                                                Colors.white.withValues(
-                                                  alpha: 0.03,
-                                                ),
-                                              ]
-                                            : [
-                                                Colors.white.withValues(
-                                                  alpha: 0.15,
-                                                ),
-                                                Colors.white.withValues(
-                                                  alpha: 0.08,
-                                                ),
-                                              ],
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          notifier.isFollowing
-                                              ? Icons.person_remove
-                                              : Icons.person_add,
-                                          size: 16,
-                                          color: Colors.white.withValues(
-                                            alpha: 0.9,
-                                          ),
+                                // Gap(32),
+                                // Profile Picture
+                                Container(
+                                  width: 100,
+                                  height: 100,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.4,
                                         ),
-                                        Gap(8),
-                                        Text(
-                                          notifier.isFollowing
-                                              ? 'Following'
-                                              : 'Follow',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            letterSpacing: 0.3,
+                                        blurRadius: 20,
+                                        offset: Offset(0, 8),
+                                      ),
+                                    ],
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 50,
+                                    backgroundImage:
+                                        user?.profilePictureUrl == null
+                                        ? AssetImage(
+                                            'assets/images/user-placeholder.png',
+                                          )
+                                        : FastCachedImageProvider(
+                                                user!.profilePictureUrl!,
+                                              )
+                                              as ImageProvider,
+                                  ),
+                                ),
+                                Gap(16),
+                                // Name
+                                Text(
+                                  user?.fullName ?? 'Full Name',
+                                  style: context.textTheme.headlineMedium
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.3,
+                                      ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                Gap(4),
+                                // Username
+                                Text(
+                                  '@${user?.username ?? 'username'}',
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.5),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                // Follow Button
+                                if (widget.id !=
+                                    Supabase
+                                        .instance
+                                        .client
+                                        .auth
+                                        .currentUser
+                                        ?.id) ...[
+                                  Gap(16),
+                                  GestureDetector(
+                                    onTap: () async =>
+                                        await notifier.followUnfollowUser(),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(25),
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: notifier.isFollowing
+                                              ? [
+                                                  Colors.white.withValues(
+                                                    alpha: 0.08,
+                                                  ),
+                                                  Colors.white.withValues(
+                                                    alpha: 0.03,
+                                                  ),
+                                                ]
+                                              : [
+                                                  Colors.white.withValues(
+                                                    alpha: 0.15,
+                                                  ),
+                                                  Colors.white.withValues(
+                                                    alpha: 0.08,
+                                                  ),
+                                                ],
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            notifier.isFollowing
+                                                ? Icons.person_remove
+                                                : Icons.person_add,
+                                            size: 16,
                                             color: Colors.white.withValues(
                                               alpha: 0.9,
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
-                      // Gap(24),
-                      // Tab Section - Fixed
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () => _tabController?.animateTo(0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'STATS',
-                                    style: TextStyle(
-                                      color: _currentTabIndex == 0
-                                          ? Colors.white
-                                          : Colors.white.withValues(
-                                              alpha: 0.5,
+                                          Gap(8),
+                                          Text(
+                                            notifier.isFollowing
+                                                ? 'Following'
+                                                : 'Follow',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              letterSpacing: 0.3,
+                                              color: Colors.white.withValues(
+                                                alpha: 0.9,
+                                              ),
                                             ),
-                                      fontWeight: _currentTabIndex == 0
-                                          ? FontWeight.w600
-                                          : FontWeight.w400,
-                                      fontSize: 12,
-                                      letterSpacing: 0.3,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Container(
-                                    height: 2,
-                                    width: 20,
-                                    decoration: BoxDecoration(
-                                      color: _currentTabIndex == 0
-                                          ? Colors.white
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(
-                                        1,
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
                                 ],
-                              ),
+                              ],
                             ),
-                            if (!isGaragePrivate) ...[
-                              Gap(32),
+                          ),
+                        ),
+                        // Tab Section
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            children: [
                               GestureDetector(
-                                onTap: () => _tabController?.animateTo(1),
+                                onTap: () => _tabController?.animateTo(0),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      'GARAGE',
+                                      'STATS',
                                       style: TextStyle(
-                                        color: _currentTabIndex == 1
+                                        color: _currentTabIndex == 0
                                             ? Colors.white
                                             : Colors.white.withValues(
                                                 alpha: 0.5,
                                               ),
-                                        fontWeight: _currentTabIndex == 1
+                                        fontWeight: _currentTabIndex == 0
                                             ? FontWeight.w600
                                             : FontWeight.w400,
                                         fontSize: 12,
@@ -321,7 +284,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                       height: 2,
                                       width: 20,
                                       decoration: BoxDecoration(
-                                        color: _currentTabIndex == 1
+                                        color: _currentTabIndex == 0
                                             ? Colors.white
                                             : Colors.transparent,
                                         borderRadius: BorderRadius.circular(
@@ -332,50 +295,80 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                   ],
                                 ),
                               ),
+                              if (!isGaragePrivate) ...[
+                                Gap(32),
+                                GestureDetector(
+                                  onTap: () => _tabController?.animateTo(1),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'GARAGE',
+                                        style: TextStyle(
+                                          color: _currentTabIndex == 1
+                                              ? Colors.white
+                                              : Colors.white.withValues(
+                                                  alpha: 0.5,
+                                                ),
+                                          fontWeight: _currentTabIndex == 1
+                                              ? FontWeight.w600
+                                              : FontWeight.w400,
+                                          fontSize: 12,
+                                          letterSpacing: 0.3,
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Container(
+                                        height: 2,
+                                        width: 20,
+                                        decoration: BoxDecoration(
+                                          color: _currentTabIndex == 1
+                                              ? Colors.white
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(
+                                            1,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ],
-                          ],
+                          ),
                         ),
-                      ),
-                      Gap(24),
-                      // Scrollable Content
-                      Expanded(
-                        child: IndexedStack(
+                        Gap(24),
+                        // Tab Content
+                        IndexedStack(
                           index: _currentTabIndex,
                           children: isGaragePrivate
                               ? [
-                                  SingleChildScrollView(
+                                  Padding(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 16.0,
                                     ),
-                                    child: Column(
-                                      children: [
-                                        ProfileStatsSection(
-                                          user: notifier.user,
-                                        ),
-                                        Gap(100),
-                                      ],
+                                    child: ProfileStatsSection(
+                                      user: notifier.user,
+                                      carSpots: notifier.carSpots,
                                     ),
                                   ),
                                 ]
                               : [
-                                  SingleChildScrollView(
+                                  Padding(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 16.0,
                                     ),
-                                    child: Column(
-                                      children: [
-                                        ProfileStatsSection(
-                                          user: notifier.user,
-                                        ),
-                                        Gap(100),
-                                      ],
+                                    child: ProfileStatsSection(
+                                      user: notifier.user,
+                                      carSpots: notifier.carSpots,
                                     ),
                                   ),
                                   _Garages(widget.id),
                                 ],
                         ),
-                      ),
-                    ],
+                        Gap(100),
+                      ],
+                    ),
                   ),
                 ],
               );
@@ -403,20 +396,50 @@ class __GaragesState extends ConsumerState<_Garages> {
     });
   }
 
+  List<CarSpotModel> _sortCars(
+    List<CarSpotModel> cars,
+    SortOptions sortBy,
+  ) {
+    final sortedCars = List<CarSpotModel>.from(cars);
+
+    switch (sortBy) {
+      case SortOptions.recent:
+        sortedCars.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        break;
+      case SortOptions.oldest:
+        sortedCars.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+        break;
+      case SortOptions.alphabetical:
+        sortedCars.sort((a, b) {
+          final carNameA = a.car?.model ?? '';
+          final carNameB = b.car?.model ?? '';
+          return carNameA.compareTo(carNameB);
+        });
+        break;
+      case SortOptions.alphabeticalReverse:
+        sortedCars.sort((a, b) {
+          final carNameA = a.car?.model ?? '';
+          final carNameB = b.car?.model ?? '';
+          return carNameB.compareTo(carNameA);
+        });
+        break;
+    }
+
+    return sortedCars;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ref
-        .watch(garageProvider(widget.id))
+        .watch(profileProvider(widget.id))
         .when(
           loading: () => Center(child: CircularProgressIndicator()),
           error: (error, stackTrace) => Center(child: Text(error.toString())),
           data: (_) {
-            final notifier = ref.read(garageProvider(widget.id).notifier);
-            final sortedCars = notifier.sortCars(
-              notifier.carSpots,
-              _selectedSort,
-            );
-            return SingleChildScrollView(
+            final notifier = ref.read(profileProvider(widget.id).notifier);
+            final carSpots = notifier.carSpots;
+            final sortedCars = _sortCars(carSpots, _selectedSort);
+            return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 children: [
@@ -434,7 +457,6 @@ class __GaragesState extends ConsumerState<_Garages> {
                       ),
                     ),
                   ),
-                  Gap(100),
                 ],
               ),
             );

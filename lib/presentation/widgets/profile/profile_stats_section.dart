@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
 import '../../../core/extensions.dart';
-import '../../../models/auth/user_model.dart';
+import '../../../models/car/car_spot_model.dart';
+import '../../../models/user/user_model.dart';
 import '../home/achievement_card.dart';
 import '../home/stat_card.dart';
 import '../shared/profile_xp_card.dart';
@@ -12,9 +13,11 @@ class ProfileStatsSection extends StatelessWidget {
   const ProfileStatsSection({
     super.key,
     required this.user,
+    required this.carSpots,
   });
 
   final UserModel? user;
+  final List<CarSpotModel> carSpots;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +29,7 @@ class ProfileStatsSection extends StatelessWidget {
         const Gap(16),
 
         // Garage Value Card
-        GarageValueCard(),
+        GarageValueCard(carSpots: carSpots),
         const Gap(40),
 
         // Stats Grid Section (from home page)
@@ -46,8 +49,8 @@ class ProfileStatsSection extends StatelessWidget {
               child: StatCard(
                 icon: Icons.directions_car,
                 title: 'SPOTTED',
-                value: '247',
-                subtitle: '+12 this week',
+                value: '${user?.stats?.totalSpots ?? 0}',
+                subtitle: 'Total spots',
               ),
             ),
             Gap(16),
@@ -55,8 +58,8 @@ class ProfileStatsSection extends StatelessWidget {
               child: StatCard(
                 icon: Icons.emoji_events,
                 title: 'LEGENDARY',
-                value: '8',
-                subtitle: 'Top 3%',
+                value: '${user?.stats?.legendarySpots ?? 0}',
+                subtitle: 'Legendary spots',
                 accentColor: Colors.amber,
               ),
             ),
@@ -67,10 +70,10 @@ class ProfileStatsSection extends StatelessWidget {
           children: [
             Expanded(
               child: StatCard(
-                icon: Icons.diamond_outlined,
-                title: 'RARITY SCORE',
-                value: '9.2k',
-                subtitle: 'Elite hunter',
+                icon: Icons.numbers,
+                title: 'UNIQUE',
+                value: '${user?.stats?.uniqueSpots ?? 0}',
+                subtitle: 'Unique car spots',
                 accentColor: Colors.purple,
               ),
             ),
@@ -78,9 +81,9 @@ class ProfileStatsSection extends StatelessWidget {
             Expanded(
               child: StatCard(
                 icon: Icons.location_on,
-                title: 'LOCATIONS',
-                value: '34',
-                subtitle: '5 countries',
+                title: 'STREAK',
+                value: '${user?.stats?.spottingStreak ?? 0}',
+                subtitle: 'Spotting streak',
               ),
             ),
           ],

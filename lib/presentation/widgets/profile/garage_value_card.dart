@@ -2,12 +2,117 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
 import '../../../core/extensions.dart';
+import '../../../models/car/car_spot_model.dart';
 
 class GarageValueCard extends StatelessWidget {
-  const GarageValueCard({super.key});
+  const GarageValueCard({
+    super.key,
+    required this.carSpots,
+  });
+
+  final List<CarSpotModel> carSpots;
+
+  String _formatValue(double value) {
+    if (value >= 1000000) {
+      return '\$${(value / 1000000).toStringAsFixed(1)}M';
+    } else if (value >= 1000) {
+      return '\$${(value / 1000).toStringAsFixed(1)}K';
+    }
+    return '\$${value.toStringAsFixed(0)}';
+  }
+
+  double _getCarValue(CarSpotModel spot) {
+    final production = spot.car?.production;
+    if (production == null) return 0;
+
+    // Prefer maxValue, then minValue, then msrp
+    if (production.maxValue != null) {
+      return production.maxValue!.toDouble();
+    } else if (production.minValue != null) {
+      return production.minValue!.toDouble();
+    } else if (production.msrp != null) {
+      return production.msrp!.toDouble();
+    }
+    return 0;
+  }
+
+  double _calculateTotalValue(List<CarSpotModel> spots) {
+    double total = 0;
+    for (final spot in spots) {
+      total += _getCarValue(spot);
+    }
+    return total;
+  }
+
+  List<double> _calculate7DayGraph(List<CarSpotModel> spots) {
+    final now = DateTime.now();
+    final sevenDaysAgo = now.subtract(const Duration(days: 7));
+    final dayValues = List<double>.filled(7, 0);
+
+    // Calculate cumulative value for each day
+    for (int day = 0; day < 7; day++) {
+      final dayEnd = sevenDaysAgo.add(Duration(days: day + 1));
+
+      double dayTotal = 0;
+      for (final spot in spots) {
+        // Count cars added up to this day
+        if (spot.createdAt.isBefore(dayEnd)) {
+          dayTotal += _getCarValue(spot);
+        }
+      }
+      dayValues[day] = dayTotal;
+    }
+
+    return dayValues;
+  }
+
+  double? _calculatePercentageChange(List<CarSpotModel> spots) {
+    final now = DateTime.now();
+    final sevenDaysAgo = now.subtract(const Duration(days: 7));
+
+    // Calculate value at the start of the 7-day period
+    double valueAtStart = 0;
+    // Calculate value at the end of the 7-day period (now)
+    double valueAtEnd = 0;
+
+    for (final spot in spots) {
+      final carValue = _getCarValue(spot);
+
+      // Value at end includes all cars
+      valueAtEnd += carValue;
+
+      // Value at start includes only cars added before the 7-day period
+      if (spot.createdAt.isBefore(sevenDaysAgo)) {
+        valueAtStart += carValue;
+      }
+    }
+
+    // If no value at start, return 0% (or we could return null)
+    if (valueAtStart == 0) {
+      // If there are any cars in the last 7 days, show 100% growth
+      if (valueAtEnd > 0) return 100.0;
+      return null;
+    }
+
+    // Calculate percentage increase: (end - start) / start * 100
+    return ((valueAtEnd - valueAtStart) / valueAtStart) * 100;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final totalValue = _calculateTotalValue(carSpots);
+    final formattedValue = _formatValue(totalValue);
+    final numberOfCars = carSpots.length;
+    final graphData = _calculate7DayGraph(carSpots);
+    final maxGraphValue = graphData.isEmpty
+        ? 1.0
+        : (graphData.reduce((a, b) => a > b ? a : b) * 1.1).clamp(
+            1.0,
+            double.infinity,
+          );
+    final percentageChange = _calculatePercentageChange(carSpots);
+    final hasValidGraph = graphData.isNotEmpty && maxGraphValue > 0;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -53,7 +158,7 @@ class GarageValueCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '\$2.5M',
+                        formattedValue,
                         style: context.textTheme.headlineLarge?.copyWith(
                           color: Colors.white,
                           fontSize: 28,
@@ -61,24 +166,26 @@ class GarageValueCard extends StatelessWidget {
                           letterSpacing: -0.5,
                         ),
                       ),
-                      Gap(8),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Text(
-                          '+12%',
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.5),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                      if (percentageChange != null) ...[
+                        Gap(8),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Text(
+                            '${percentageChange >= 0 ? '+' : ''}${percentageChange.toStringAsFixed(0)}%',
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ],
               ),
               Text(
-                '28 Cars',
+                '$numberOfCars ${numberOfCars == 1 ? 'Car' : 'Cars'}',
                 style: context.textTheme.bodyMedium?.copyWith(
                   color: Colors.white.withValues(alpha: 0.4),
                   fontSize: 12,
@@ -90,7 +197,11 @@ class GarageValueCard extends StatelessWidget {
           Gap(20),
 
           // Simple Line Graph
-          _SimpleLineGraph(),
+          if (hasValidGraph)
+            _SimpleLineGraph(
+              dataPoints: graphData,
+              maxValue: maxGraphValue,
+            ),
         ],
       ),
     );
@@ -99,14 +210,25 @@ class GarageValueCard extends StatelessWidget {
 
 // Simple Line Graph Widget
 class _SimpleLineGraph extends StatelessWidget {
-  const _SimpleLineGraph();
+  const _SimpleLineGraph({
+    required this.dataPoints,
+    required this.maxValue,
+  });
+
+  final List<double> dataPoints;
+  final double maxValue;
 
   @override
   Widget build(BuildContext context) {
-    // Mock data points (6 months)
-    final dataPoints = [1.8, 2.0, 1.9, 2.2, 2.3, 2.5];
-    final maxValue = 3.0;
     final graphHeight = 60.0;
+
+    // Generate day labels (last 7 days)
+    final dayLabels = List<String>.generate(7, (index) {
+      final daysAgo = 6 - index;
+      if (daysAgo == 0) return 'Now';
+      if (daysAgo == 1) return '1D';
+      return '${daysAgo}D';
+    });
 
     return Column(
       children: [
@@ -120,56 +242,18 @@ class _SimpleLineGraph extends StatelessWidget {
         Gap(8),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '6M',
+          children: dayLabels.map((label) {
+            return Text(
+              label,
               style: context.textTheme.bodyMedium?.copyWith(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: label == 'Now'
+                    ? Colors.white.withValues(alpha: 0.5)
+                    : Colors.white.withValues(alpha: 0.3),
                 fontSize: 10,
-                fontWeight: FontWeight.w400,
+                fontWeight: label == 'Now' ? FontWeight.w500 : FontWeight.w400,
               ),
-            ),
-            Text(
-              '5M',
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: Colors.white.withValues(alpha: 0.3),
-                fontSize: 10,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            Text(
-              '4M',
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: Colors.white.withValues(alpha: 0.3),
-                fontSize: 10,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            Text(
-              '3M',
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: Colors.white.withValues(alpha: 0.3),
-                fontSize: 10,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            Text(
-              '2M',
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: Colors.white.withValues(alpha: 0.3),
-                fontSize: 10,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            Text(
-              'Now',
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: Colors.white.withValues(alpha: 0.5),
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
+            );
+          }).toList(),
         ),
       ],
     );
@@ -185,6 +269,13 @@ class _LineGraphPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (dataPoints.isEmpty ||
+        maxValue <= 0 ||
+        maxValue.isNaN ||
+        maxValue.isInfinite) {
+      return;
+    }
+
     final paint = Paint()
       ..color = Colors.white.withValues(alpha: 0.6)
       ..strokeWidth = 2
@@ -202,53 +293,61 @@ class _LineGraphPainter extends CustomPainter {
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.fill;
 
-    if (dataPoints.isEmpty) return;
-
     final path = Path();
     final fillPath = Path();
-    final spacing = size.width / (dataPoints.length - 1);
+    final spacing = dataPoints.length > 1
+        ? size.width / (dataPoints.length - 1)
+        : size.width;
 
     // Start paths
     final firstY = size.height - (dataPoints[0] / maxValue * size.height);
-    path.moveTo(0, firstY);
-    fillPath.moveTo(0, size.height);
-    fillPath.lineTo(0, firstY);
+    if (!firstY.isNaN && !firstY.isInfinite) {
+      path.moveTo(0, firstY.clamp(0.0, size.height));
+      fillPath.moveTo(0, size.height);
+      fillPath.lineTo(0, firstY.clamp(0.0, size.height));
 
-    // Draw line and fill
-    for (int i = 0; i < dataPoints.length; i++) {
-      final x = i * spacing;
-      final y = size.height - (dataPoints[i] / maxValue * size.height);
+      // Draw line and fill
+      for (int i = 0; i < dataPoints.length; i++) {
+        final x = i * spacing;
+        final yValue = dataPoints[i] / maxValue;
+        final y = size.height - (yValue * size.height);
 
-      if (i == 0) continue;
+        if (y.isNaN || y.isInfinite) continue;
 
-      path.lineTo(x, y);
-      fillPath.lineTo(x, y);
-    }
+        if (i == 0) continue;
 
-    // Close fill path
-    fillPath.lineTo(size.width, size.height);
-    fillPath.close();
+        final clampedY = y.clamp(0.0, size.height);
+        path.lineTo(x, clampedY);
+        fillPath.lineTo(x, clampedY);
+      }
 
-    // Draw fill then line
-    canvas.drawPath(fillPath, fillPaint);
-    canvas.drawPath(path, paint);
+      // Close fill path
+      fillPath.lineTo(size.width, size.height);
+      fillPath.close();
 
-    // Draw dots on line
-    for (int i = 0; i < dataPoints.length; i++) {
-      final x = i * spacing;
-      final y = size.height - (dataPoints[i] / maxValue * size.height);
+      // Draw fill then line
+      canvas.drawPath(fillPath, fillPaint);
+      canvas.drawPath(path, paint);
 
-      canvas.drawCircle(
-        Offset(x, y),
-        3,
-        Paint()
-          ..color = Colors.white
-          ..style = PaintingStyle.fill,
-      );
+      // Draw dots on line
+      for (int i = 0; i < dataPoints.length; i++) {
+        final x = i * spacing;
+        final yValue = dataPoints[i] / maxValue;
+        final y = size.height - (yValue * size.height);
+
+        if (y.isNaN || y.isInfinite) continue;
+
+        canvas.drawCircle(
+          Offset(x, y.clamp(0.0, size.height)),
+          3,
+          Paint()
+            ..color = Colors.white
+            ..style = PaintingStyle.fill,
+        );
+      }
     }
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-

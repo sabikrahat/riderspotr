@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../models/auth/user_model.dart';
+import '../../../models/user/user_model.dart';
 import '../../../services/auth/user_service.dart';
 
 part 'search_friend_provider.g.dart';

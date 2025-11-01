@@ -1,8 +1,9 @@
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
 import '../../../core/extensions.dart';
-import '../../../models/auth/user_model.dart';
+import '../../../models/user/user_model.dart';
 
 class UserTile extends StatelessWidget {
   const UserTile({
@@ -81,8 +82,8 @@ class UserTile extends StatelessWidget {
                   radius: 24,
                   backgroundImage: user?.profilePictureUrl == null
                       ? AssetImage('assets/images/user-placeholder.png')
-                      : NetworkImage(user?.profilePictureUrl ?? '')
-                            as ImageProvider,
+                      : FastCachedImageProvider(user!.profilePictureUrl!)
+                          as ImageProvider,
                 ),
               ),
               Gap(16),

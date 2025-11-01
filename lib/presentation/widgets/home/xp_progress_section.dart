@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:ridespotr/models/auth/user_model.dart';
+import 'package:ridespotr/models/user/user_model.dart';
 
 import '../../../core/extensions.dart';
 

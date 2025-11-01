@@ -9,14 +9,14 @@ class StatCard extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.value,
-    required this.subtitle,
+    this.subtitle,
     this.accentColor,
   });
 
   final IconData icon;
   final String title;
   final String value;
-  final String subtitle;
+  final String? subtitle;
   final Color? accentColor;
 
   @override
@@ -82,19 +82,22 @@ class StatCard extends StatelessWidget {
               color: color.withValues(alpha: 0.95),
             ),
           ),
-          Gap(6),
-          Text(
-            subtitle,
-            style: context.textTheme.bodyMedium?.copyWith(
-              fontSize: 11,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 0.3,
-              color: Colors.white.withValues(alpha: 0.35),
+          if (subtitle != null) ...[
+            Gap(6),
+            Text(
+              subtitle!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.textTheme.bodyMedium?.copyWith(
+                fontSize: 11,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 0.3,
+                color: Colors.white.withValues(alpha: 0.35),
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );
   }
 }
-

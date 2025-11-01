@@ -7,7 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../core/exception.dart';
 import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
-import '../../../models/auth/user_model.dart';
+import '../../../models/user/user_model.dart';
 import '../../../models/google_maps/map_prediction_model.dart';
 import '../../../services/google_maps/google_maps_service.dart';
 import '../../providers/auth/user_provider.dart';
@@ -26,7 +26,8 @@ class YourLocationScreen extends ConsumerStatefulWidget {
   final bool fromUpdateProfile;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _YourLocationScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _YourLocationScreenState();
 }
 
 class _YourLocationScreenState extends ConsumerState<YourLocationScreen> {
@@ -125,9 +126,10 @@ class _YourLocationScreenState extends ConsumerState<YourLocationScreen> {
                           },
                           displayStringForOption: (v) => v.description!,
                           onSelected: (MapPredictionModel v) async {
-                            final data = await GoogleMapsService().getLocationBasedOnPlaceId(
-                              v.placeId!,
-                            );
+                            final data = await GoogleMapsService()
+                                .getLocationBasedOnPlaceId(
+                                  v.placeId!,
+                                );
 
                             if (data == null) return;
                             if (data.geometry == null) return;

@@ -1,16 +1,16 @@
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridespotr/presentation/providers/leaderboard/leaderboard_provider.dart';
 
 import '../../../core/extensions.dart';
-import '../../providers/user_stats/user_stats_provider.dart';
 import '../../widgets/leaderboard/comparison_bar.dart';
 import '../../widgets/leaderboard/summary_card.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/filter_chips.dart';
 import '../../widgets/shared/page_padding.dart';
-import '../../widgets/shared/user_tile.dart';
 import '../profile/user_profile_screen.dart';
 import 'search_friend.dart';
 
@@ -45,13 +45,12 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
         child: SafeArea(
           child: PagePadding(
             child: ref
-                .watch(userStatsProvider)
+                .watch(leaderboardProviderProvider)
                 .when(
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
                   error: (error, stack) => Center(child: Text('Error: $error')),
-                  data: (data) {
-                    final notifier = ref.read(userStatsProvider.notifier);
+                  data: (leaderboardUsers) {
                     return SingleChildScrollView(
                       child: Column(
                         children: [
@@ -73,11 +72,14 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                   Gap(4),
                                   Text(
                                     'Global Rankings',
-                                    style: context.textTheme.bodySmall?.copyWith(
-                                      color: Colors.white.withValues(alpha: 0.4),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w300,
-                                    ),
+                                    style: context.textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.4,
+                                          ),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w300,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -99,7 +101,9 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.3),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.3,
+                                        ),
                                         blurRadius: 10,
                                         offset: Offset(0, 4),
                                       ),
@@ -132,103 +136,75 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                           LeaderboardSummaryCard(),
                           Gap(16),
 
-                          // Learderboard Bar
-                          LeaderboardComparisonBar(
-                            firstUid: notifier.userStats[0].user?.id ?? '',
-                            firstPlaceImage:
-                                notifier.userStats[0].user?.profilePictureUrl ==
-                                    null
-                                ? 'assets/images/user-placeholder.png'
-                                : notifier
-                                      .userStats[0]
-                                      .user!
-                                      .profilePictureUrl!,
-                            firstPlaceName:
-                                notifier.userStats[0].user?.username ??
-                                'firstuser',
-                            secondUid: notifier.userStats[1].user?.id ?? '',
-                            secondPlaceImage:
-                                notifier.userStats[1].user?.profilePictureUrl ==
-                                    null
-                                ? 'assets/images/user-placeholder.png'
-                                : notifier
-                                      .userStats[1]
-                                      .user!
-                                      .profilePictureUrl!,
-                            secondPlaceName:
-                                notifier.userStats[1].user?.username ??
-                                'seconduser',
-                            thirdUid: notifier.userStats[2].user?.id ?? '',
-                            thirdPlaceImage:
-                                notifier.userStats[2].user?.profilePictureUrl ==
-                                    null
-                                ? 'assets/images/user-placeholder.png'
-                                : notifier
-                                      .userStats[2]
-                                      .user!
-                                      .profilePictureUrl!,
-                            thirdPlaceName:
-                                notifier.userStats[2].user?.username ??
-                                'thirduser',
-                          ),
+                          // Leaderboard Bar
+                          if (leaderboardUsers.length >= 3)
+                            LeaderboardComparisonBar(
+                              firstPlace: leaderboardUsers[0],
+                              secondPlace: leaderboardUsers[1],
+                              thirdPlace: leaderboardUsers[2],
+                            ),
                           Gap(16),
 
                           // Sort Section
-                          Row(
-                            children: [
-                              Text(
-                                'Sort by',
-                                style: context.textTheme.bodyMedium?.copyWith(
-                                  fontSize: 13,
-                                  color: Colors.white.withValues(alpha: 0.5),
-                                ),
-                              ),
-                              Gap(12),
-                              DropdownButton<String>(
-                                isDense: true,
-                                value: selectedSort,
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    setState(() {
-                                      selectedSort = value;
-                                    });
-                                  }
-                                },
-                                underline: const SizedBox.shrink(),
-                                dropdownColor: Color(0xFF0A0A0A),
-                                icon: Icon(
-                                  Icons.keyboard_arrow_down_rounded,
-                                  color: Colors.white.withValues(alpha: 0.6),
-                                  size: 20,
-                                ),
-                                style: context.textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                items: sortOptions.map((option) {
-                                  return DropdownMenuItem<String>(
-                                    value: option,
-                                    child: Text(option),
-                                  );
-                                }).toList(),
-                              ),
-                            ],
-                          ),
-                          Gap(24),
+                          // Row(
+                          //   children: [
+                          //     Text(
+                          //       'Sort by',
+                          //       style: context.textTheme.bodyMedium?.copyWith(
+                          //         fontSize: 13,
+                          //         color: Colors.white.withValues(alpha: 0.5),
+                          //       ),
+                          //     ),
+                          //     Gap(12),
+                          //     DropdownButton<String>(
+                          //       isDense: true,
+                          //       value: selectedSort,
+                          //       onChanged: (value) {
+                          //         if (value != null) {
+                          //           setState(() {
+                          //             selectedSort = value;
+                          //           });
+                          //         }
+                          //       },
+                          //       underline: const SizedBox.shrink(),
+                          //       dropdownColor: Color(0xFF0A0A0A),
+                          //       icon: Icon(
+                          //         Icons.keyboard_arrow_down_rounded,
+                          //         color: Colors.white.withValues(alpha: 0.6),
+                          //         size: 20,
+                          //       ),
+                          //       style: context.textTheme.bodyMedium?.copyWith(
+                          //         color: Colors.white,
+                          //         fontSize: 14,
+                          //         fontWeight: FontWeight.w500,
+                          //       ),
+                          //       items: sortOptions.map((option) {
+                          //         return DropdownMenuItem<String>(
+                          //           value: option,
+                          //           child: Text(option),
+                          //         );
+                          //       }).toList(),
+                          //     ),
+                          //   ],
+                          // ),
+                          // Gap(24),
+                          // Leaderboard List
                           ...List.generate(
-                            notifier.otherStats.length,
+                            leaderboardUsers.length > 3
+                                ? leaderboardUsers.length - 3
+                                : 0,
                             (i) {
-                              final userStat = notifier.otherStats[i];
-                              final user = userStat.user;
-                              return UserTile(
-                                user: user,
-                                rank: i + 4,
-                                xp: userStat.totalPoints,
+                              final user = leaderboardUsers[i + 3];
+                              return _LeaderboardUserTile(
+                                rank: user.rank,
+                                name: '${user.firstName} ${user.lastName}'
+                                    .trim(),
+                                xp: user.totalXp,
+                                profilePictureUrl: user.profilePictureUrl,
                                 onTap: () async {
                                   await context.push(
                                     UserProfileScreen.routeName,
-                                    extra: userStat.user?.id ?? '',
+                                    extra: user.user,
                                   );
                                 },
                               );
@@ -239,6 +215,123 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                     );
                   },
                 ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LeaderboardUserTile extends StatelessWidget {
+  const _LeaderboardUserTile({
+    required this.rank,
+    required this.name,
+    required this.xp,
+    this.profilePictureUrl,
+    this.onTap,
+  });
+
+  final int rank;
+  final String name;
+  final int xp;
+  final String? profilePictureUrl;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 16,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withValues(alpha: 0.06),
+                Colors.white.withValues(alpha: 0.02),
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.4),
+                blurRadius: 16,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // Rank Number
+              SizedBox(
+                width: 40,
+                child: Text(
+                  '$rank',
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.6),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              // Profile Picture
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 24,
+                  backgroundImage: profilePictureUrl != null
+                      ? FastCachedImageProvider(profilePictureUrl!)
+                            as ImageProvider
+                      : AssetImage('assets/images/user-placeholder.png')
+                            as ImageProvider,
+                ),
+              ),
+              Gap(16),
+              // User Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      name.isNotEmpty ? name : 'User',
+                      style: context.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w300,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const Gap(16),
+              // XP
+              Text(
+                '$xp XP',
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.7),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
       ),

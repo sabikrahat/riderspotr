@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:go_router/go_router.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:ridespotr/presentation/providers/leaderboard/user_rank_provider.dart';
 
 import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
@@ -12,14 +13,15 @@ import '../../../models/car/car_spot_model.dart';
 import '../../../models/map/map_marker_model.dart';
 import '../../pages/explore/explore_screen.dart';
 import '../../providers/car/map_provider.dart';
+import '../../providers/car/spot_stat_provider.dart';
 
-class HeroSection extends StatelessWidget {
+class HeroSection extends ConsumerWidget {
   const HeroSection({super.key, required this.user});
 
   final dynamic user;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final topPadding = MediaQuery.viewPaddingOf(context).top;
     final screenHeight = context.height;
 
@@ -83,24 +85,73 @@ class HeroSection extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.emoji_events,
-                        size: 14,
-                        color: Colors.white.withValues(alpha: 0.9),
-                      ),
-                      Gap(7),
-                      Text(
-                        '#142',
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.5,
+                  child: ref
+                      .watch(userRankProvider)
+                      .when(
+                        loading: () => Row(
+                          children: [
+                            Icon(
+                              Icons.emoji_events,
+                              size: 14,
+                              color: Colors.white.withValues(alpha: 0.9),
+                            ),
+                            Gap(7),
+                            SizedBox(
+                              width: 40,
+                              height: 14,
+                              child: Center(
+                                child: SizedBox(
+                                  width: 12,
+                                  height: 12,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white.withValues(alpha: 0.6),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        error: (_, __) => Row(
+                          children: [
+                            Icon(
+                              Icons.emoji_events,
+                              size: 14,
+                              color: Colors.white.withValues(alpha: 0.9),
+                            ),
+                            Gap(7),
+                            Text(
+                              'N/A',
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.5,
+                                color: Colors.white.withValues(alpha: 0.6),
+                              ),
+                            ),
+                          ],
+                        ),
+                        data: (rank) => Row(
+                          children: [
+                            Icon(
+                              Icons.emoji_events,
+                              size: 14,
+                              color: Colors.white.withValues(alpha: 0.9),
+                            ),
+                            Gap(7),
+                            Text(
+                              '#$rank',
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
                 ),
               ],
             ),
@@ -111,30 +162,93 @@ class HeroSection extends StatelessWidget {
             left: 20,
             right: 20,
             bottom: 86,
-            child: Row(
-              children: [
-                Expanded(
-                  child: _StatOverlay(
-                    value: '12.4K',
-                    label: 'Total Spots',
+            child: ref
+                .watch(spotStatProvider)
+                .when(
+                  loading: () => Row(
+                    children: [
+                      Expanded(
+                        child: _StatOverlay(
+                          value: '...',
+                          label: 'Total Spots',
+                        ),
+                      ),
+                      Gap(16),
+                      Expanded(
+                        child: _StatOverlay(
+                          value: '...',
+                          label: 'Today',
+                        ),
+                      ),
+                      Gap(16),
+                      Expanded(
+                        child: _StatOverlay(
+                          value: '...',
+                          label: 'Last Hour',
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                Gap(16),
-                Expanded(
-                  child: _StatOverlay(
-                    value: '1,847',
-                    label: 'Active Now',
+                  error: (_, __) => Row(
+                    children: [
+                      Expanded(
+                        child: _StatOverlay(
+                          value: 'N/A',
+                          label: 'Total Spots',
+                        ),
+                      ),
+                      Gap(16),
+                      Expanded(
+                        child: _StatOverlay(
+                          value: 'N/A',
+                          label: 'Today',
+                        ),
+                      ),
+                      Gap(16),
+                      Expanded(
+                        child: _StatOverlay(
+                          value: 'N/A',
+                          label: 'Last Hour',
+                        ),
+                      ),
+                    ],
                   ),
+                  data: (stats) {
+                    String formatValue(int value) {
+                      if (value >= 1000000) {
+                        return '${(value / 1000000).toStringAsFixed(1)}M';
+                      } else if (value >= 1000) {
+                        return '${(value / 1000).toStringAsFixed(1)}K';
+                      }
+                      return value.toString();
+                    }
+
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: _StatOverlay(
+                            value: formatValue(stats.totalSpots),
+                            label: 'Total Spots',
+                          ),
+                        ),
+                        Gap(16),
+                        Expanded(
+                          child: _StatOverlay(
+                            value: formatValue(stats.todaysSpots),
+                            label: 'Today',
+                          ),
+                        ),
+                        Gap(16),
+                        Expanded(
+                          child: _StatOverlay(
+                            value: '+${stats.lastHourSpots}',
+                            label: 'Last Hour',
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-                Gap(16),
-                Expanded(
-                  child: _StatOverlay(
-                    value: '+156',
-                    label: 'Last Hour',
-                  ),
-                ),
-              ],
-            ),
           ),
 
           // Explore Map Button - Bottom Center

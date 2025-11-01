@@ -50,7 +50,7 @@ final class ProfileNotifierProvider
   }
 }
 
-String _$profileNotifierHash() => r'7184f987d09b492a8d7b5c7ace1c8432b963957d';
+String _$profileNotifierHash() => r'e02d842b87c7fe526f44b1dc38f569ab4355e766';
 
 final class ProfileNotifierFamily extends $Family
     with
@@ -70,8 +70,8 @@ final class ProfileNotifierFamily extends $Family
         isAutoDispose: false,
       );
 
-  ProfileNotifierProvider call(String? arg) =>
-      ProfileNotifierProvider._(argument: arg, from: this);
+  ProfileNotifierProvider call(String? userId) =>
+      ProfileNotifierProvider._(argument: userId, from: this);
 
   @override
   String toString() => r'profileProvider';
@@ -79,9 +79,9 @@ final class ProfileNotifierFamily extends $Family
 
 abstract class _$ProfileNotifier extends $AsyncNotifier<UserModel?> {
   late final _$args = ref.$arg as String?;
-  String? get arg => _$args;
+  String? get userId => _$args;
 
-  FutureOr<UserModel?> build(String? arg);
+  FutureOr<UserModel?> build(String? userId);
   @$mustCallSuper
   @override
   void runBuild() {

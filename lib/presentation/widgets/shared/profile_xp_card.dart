@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
 import '../../../core/extensions.dart';
-import '../../../models/auth/user_model.dart';
+import '../../../models/user/user_model.dart';
 
 class ProfileXPCard extends StatelessWidget {
   const ProfileXPCard({

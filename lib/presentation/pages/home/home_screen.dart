@@ -49,7 +49,9 @@ class HomeScreen extends ConsumerWidget {
                         Gap(40),
 
                         // Stats Grid Section
-                        StatsGridSection(),
+                        StatsGridSection(
+                          stats: user?.stats,
+                        ),
 
                         Gap(40),
 

@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:ridespotr/models/user/user_stats_model.dart';
 
 import '../../../core/extensions.dart';
 import 'stat_card.dart';
 
 class StatsGridSection extends StatelessWidget {
-  const StatsGridSection({super.key});
+  final UserStatsModel? stats;
+  const StatsGridSection({
+    super.key,
+    required this.stats,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +33,8 @@ class StatsGridSection extends StatelessWidget {
               child: StatCard(
                 icon: Icons.directions_car,
                 title: 'SPOTTED',
-                value: '247',
-                subtitle: '+12 this week',
+                value: '${stats?.totalSpots ?? 0}',
+                subtitle: 'Total spots',
               ),
             ),
             Gap(16),
@@ -37,8 +42,8 @@ class StatsGridSection extends StatelessWidget {
               child: StatCard(
                 icon: Icons.emoji_events,
                 title: 'LEGENDARY',
-                value: '8',
-                subtitle: 'Top 3%',
+                value: '${stats?.legendarySpots ?? 0}',
+                subtitle: 'Legendary spots',
                 accentColor: Colors.amber,
               ),
             ),
@@ -49,10 +54,10 @@ class StatsGridSection extends StatelessWidget {
           children: [
             Expanded(
               child: StatCard(
-                icon: Icons.diamond_outlined,
-                title: 'RARITY SCORE',
-                value: '9.2k',
-                subtitle: 'Elite hunter',
+                icon: Icons.numbers,
+                title: 'UNIQUE',
+                value: '${stats?.uniqueSpots ?? 0}',
+                subtitle: 'Unique car spots',
                 accentColor: Colors.purple,
               ),
             ),
@@ -60,9 +65,9 @@ class StatsGridSection extends StatelessWidget {
             Expanded(
               child: StatCard(
                 icon: Icons.location_on,
-                title: 'LOCATIONS',
-                value: '34',
-                subtitle: '5 countries',
+                title: 'STREAK',
+                value: '${stats?.spottingStreak ?? 0}',
+                subtitle: 'Spotting streak',
               ),
             ),
           ],
@@ -71,4 +76,3 @@ class StatsGridSection extends StatelessWidget {
     );
   }
 }
-

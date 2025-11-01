@@ -8,6 +8,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/extensions.dart';
+import '../../providers/auth/profile_provider.dart';
 import '../../providers/auth/user_provider.dart';
 import '../../widgets/image_process/pick_photo.dart';
 import '../../widgets/profile/profile_stats_section.dart';
@@ -314,12 +315,30 @@ class _OwnProfileScreenState extends ConsumerState<OwnProfileScreen> {
                           ),
                           Gap(24),
                           // Stats Section
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0,
-                            ),
-                            child: ProfileStatsSection(user: user),
-                          ),
+                          ref
+                              .watch(profileProvider(null))
+                              .when(
+                                loading: () => Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                                error: (error, stackTrace) => Center(
+                                  child: Text(error.toString()),
+                                ),
+                                data: (_) {
+                                  final profileNotifier = ref.read(
+                                    profileProvider(null).notifier,
+                                  );
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0,
+                                    ),
+                                    child: ProfileStatsSection(
+                                      user: user,
+                                      carSpots: profileNotifier.carSpots,
+                                    ),
+                                  );
+                                },
+                              ),
                           Gap(100),
                         ],
                       ),

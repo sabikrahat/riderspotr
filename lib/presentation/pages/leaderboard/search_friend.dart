@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ridespotr/presentation/widgets/shared/search_text_field.dart';
 
 import '../../../core/extensions.dart';
@@ -9,6 +10,7 @@ import '../../widgets/shared/back.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/page_padding.dart';
 import '../../widgets/shared/user_tile.dart';
+import '../profile/user_profile_screen.dart';
 
 class SearchFriendScreen extends ConsumerStatefulWidget {
   const SearchFriendScreen({super.key});
@@ -150,8 +152,11 @@ class _SearchFriendScreenState extends ConsumerState<SearchFriendScreen> {
                               final user = notifier.users[i];
                               return UserTile(
                                 user: user,
-                                onTap: () {
-                                  // TODO: Navigate to user profile or add friend
+                                onTap: () async {
+                                  await context.push(
+                                    UserProfileScreen.routeName,
+                                    extra: user.id,
+                                  );
                                 },
                               );
                             },

@@ -26,7 +26,8 @@ class CarProductionModel {
     this.msrp,
   });
 
-  factory CarProductionModel.fromJson(Map<String, dynamic> json) => _$CarProductionModelFromJson(json);
+  factory CarProductionModel.fromJson(Map<String, dynamic> json) =>
+      _$CarProductionModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$CarProductionModelToJson(this);
 

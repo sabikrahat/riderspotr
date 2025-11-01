@@ -36,7 +36,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
   isGaragePrivate: json['is_garage_private'] as bool,
   stats: json['stats'] == null
       ? null
-      : UserXPStatsModel.fromJson(json['stats'] as Map<String, dynamic>),
+      : UserStatsModel.fromJson(json['stats'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{

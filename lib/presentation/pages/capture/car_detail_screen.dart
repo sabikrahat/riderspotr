@@ -8,7 +8,7 @@ import '../../widgets/capture/history_part.dart';
 import '../../widgets/capture/production_part.dart';
 import '../../widgets/capture/specs_part.dart';
 import '../../widgets/shared/back.dart';
-import '../../widgets/shared/rarity_chip.dart';
+import '../../widgets/shared/rarity_badge.dart';
 
 class CarDetailScreen extends StatefulWidget {
   static const String routeName = '/car-detail';
@@ -122,21 +122,29 @@ class _CarDetailScreenState extends State<CarDetailScreen>
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),
                         child: Column(
-                          // spacing: 12,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            RarityBadge(rarity: carSpot.car!.rarity),
+                            const Gap(16),
                             Text(
                               carSpot.car!.make!.name.toUpperCase(),
-                              style: context.textTheme.headlineMedium,
-                            ),
-                            Text(
-                              carSpot.car!.model!.toUpperCase(),
-                              style: context.textTheme.headlineMedium!.copyWith(
-                                fontWeight: FontWeight.w200,
+                              style: context.textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.w300,
+                                letterSpacing: 3,
+                                fontSize: 18,
+                                color: Colors.white.withValues(alpha: 0.7),
                               ),
                             ),
-                            const Gap(12),
-                            RarityChip(rarity: carSpot.car!.rarity),
+                            const Gap(2),
+                            Text(
+                              carSpot.car!.model!.toUpperCase(),
+                              style: context.textTheme.headlineLarge?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1,
+                                fontSize: 28,
+                                height: 1.1,
+                              ),
+                            ),
                           ],
                         ),
                       ),
