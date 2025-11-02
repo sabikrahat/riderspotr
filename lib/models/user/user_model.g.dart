@@ -30,6 +30,9 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
   location: json['location'] == null
       ? null
       : Location.fromJson(json['location'] as Map<String, dynamic>),
+  country: json['country'] as String?,
+  countryCode: json['country_code'] as String?,
+  state: json['state'] as String?,
   profilePictureUrl: json['profile_picture_url'] as String?,
   bannerUrl: json['banner_url'] as String?,
   createdAt: DateTime.parse(json['created_at'] as String),
@@ -51,6 +54,9 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
   'experience': instance.experience,
   'address': instance.address,
   'location': instance.location,
+  'country': instance.country,
+  'country_code': instance.countryCode,
+  'state': instance.state,
   'profile_picture_url': instance.profilePictureUrl,
   'banner_url': instance.bannerUrl,
   'created_at': instance.createdAt.toIso8601String(),

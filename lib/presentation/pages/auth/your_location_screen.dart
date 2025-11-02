@@ -152,6 +152,22 @@ class _YourLocationScreenState extends ConsumerState<YourLocationScreen> {
                                 setState(() {
                                   isLoading = true;
                                 });
+
+                                // Get location details (country, state, etc.)
+                                final locationDetails =
+                                    await GoogleMapsService()
+                                        .getLocationDetails(_selectedLatLng!);
+
+                                if (locationDetails == null) {
+                                  showErrorMessage(
+                                    'Unable to determine country and state. Please try again.',
+                                  );
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                  return;
+                                }
+
                                 await notifier.updateUser(
                                   user: notifier.user!.copyWith(
                                     address: _locationController.text.trim(),
@@ -159,6 +175,9 @@ class _YourLocationScreenState extends ConsumerState<YourLocationScreen> {
                                       latitude: _selectedLatLng!.latitude,
                                       longitude: _selectedLatLng!.longitude,
                                     ),
+                                    country: locationDetails.country,
+                                    countryCode: locationDetails.countryCode,
+                                    state: locationDetails.state,
                                   ),
                                 );
                                 if (widget.fromUpdateProfile) {

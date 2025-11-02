@@ -4,13 +4,44 @@ import 'package:gap/gap.dart';
 
 import '../../../core/extensions.dart';
 import '../../providers/auth/user_provider.dart';
-import '../../providers/leaderboard/user_rank_provider.dart';
+import '../../providers/leaderboard/user_current_rank_provider.dart';
 
 class LeaderboardSummaryCard extends ConsumerWidget {
-  const LeaderboardSummaryCard({super.key});
+  const LeaderboardSummaryCard({
+    super.key,
+    required this.selectedFilter,
+  });
+
+  final String selectedFilter;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Determine icon and title based on filter
+    IconData rankIcon;
+    String rankTitle;
+
+    switch (selectedFilter) {
+      case 'Country':
+        rankIcon = Icons.flag_rounded;
+        rankTitle = 'Country';
+        break;
+      case 'State':
+        rankIcon = Icons.location_city_rounded;
+        rankTitle = 'State';
+        break;
+      case 'Friends':
+        rankIcon = Icons.people_rounded;
+        rankTitle = 'Friends';
+        break;
+      case 'Global':
+      default:
+        rankIcon = Icons.language;
+        rankTitle = 'Global';
+        break;
+    }
+
+    // Watch the rank provider for the current filter
+    final rankAsync = ref.watch(userCurrentRankProvider(selectedFilter));
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
       decoration: BoxDecoration(
@@ -55,25 +86,23 @@ class LeaderboardSummaryCard extends ConsumerWidget {
                 ),
           ),
           Expanded(
-            child: ref
-                .watch(userRankProvider)
-                .when(
-                  loading: () => _Tile(
-                    icon: Icons.language,
-                    title: 'Global',
-                    value: '...',
-                  ),
-                  error: (_, __) => _Tile(
-                    icon: Icons.language,
-                    title: 'Global',
-                    value: 'N/A',
-                  ),
-                  data: (rank) => _Tile(
-                    icon: Icons.language,
-                    title: 'Global',
-                    value: '#$rank',
-                  ),
-                ),
+            child: rankAsync.when(
+              loading: () => _Tile(
+                icon: rankIcon,
+                title: rankTitle,
+                value: '...',
+              ),
+              error: (_, __) => _Tile(
+                icon: rankIcon,
+                title: rankTitle,
+                value: 'N/A',
+              ),
+              data: (rank) => _Tile(
+                icon: rankIcon,
+                title: rankTitle,
+                value: rank == null ? 'N/A' : '#$rank',
+              ),
+            ),
           ),
           Expanded(
             child: ref

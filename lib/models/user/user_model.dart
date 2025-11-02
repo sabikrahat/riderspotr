@@ -32,6 +32,9 @@ class UserModel {
   final String? experience;
   final String? address;
   final Location? location;
+  final String? country;
+  final String? countryCode;
+  final String? state;
   final String? profilePictureUrl;
   final String? bannerUrl;
   final DateTime createdAt;
@@ -51,6 +54,9 @@ class UserModel {
     this.experience,
     this.address,
     this.location,
+    this.country,
+    this.countryCode,
+    this.state,
     this.profilePictureUrl,
     this.bannerUrl,
     required this.createdAt,
@@ -66,7 +72,12 @@ class UserModel {
   bool get isProfileComplete =>
       firstName != null && lastName != null && username != null && dob != null;
   bool get isExperienceComplete => knowledgeLevel != null && experience != null;
-  bool get isLocationComplete => address != null && location != null;
+  bool get isLocationComplete =>
+      address != null &&
+      location != null &&
+      country != null &&
+      countryCode != null &&
+      state != null;
 
   // Create a copy with method
   UserModel copyWith({
@@ -79,6 +90,9 @@ class UserModel {
     String? experience,
     String? address,
     Location? location,
+    String? country,
+    String? countryCode,
+    String? state,
     String? profilePictureUrl,
     String? bannerUrl,
     DateTime? createdAt,
@@ -96,6 +110,9 @@ class UserModel {
     experience: experience ?? this.experience,
     location: location ?? this.location,
     address: address ?? this.address,
+    country: country ?? this.country,
+    countryCode: countryCode ?? this.countryCode,
+    state: state ?? this.state,
     profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
     bannerUrl: bannerUrl ?? this.bannerUrl,
     createdAt: createdAt ?? this.createdAt,

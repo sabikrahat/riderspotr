@@ -26,7 +26,7 @@ class LeaderboardScreen extends ConsumerStatefulWidget {
 
 class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
   String selectedFilter = 'Global';
-  final List<String> filters = ['Global', 'Country', 'City', 'Friends'];
+  final List<String> filters = ['Global', 'Country', 'State', 'Friends'];
   String selectedSort = 'Overall';
   final List<String> sortOptions = [
     'Overall',
@@ -34,6 +34,44 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
     'This Week',
     'Today',
   ];
+  bool isLoadingLeaderboard = false;
+
+  Future<void> _handleFilterChange(String value) async {
+    setState(() {
+      selectedFilter = value;
+      isLoadingLeaderboard = true;
+    });
+
+    try {
+      if (value == 'Global') {
+        // Call the global leaderboard method
+        await ref
+            .read(leaderboardProviderProvider.notifier)
+            .getWorldLeaderboard();
+      } else if (value == 'Country') {
+        // Call the country leaderboard method
+        await ref
+            .read(leaderboardProviderProvider.notifier)
+            .getCountryLeaderboard();
+      } else if (value == 'State') {
+        // Call the state leaderboard method
+        await ref
+            .read(leaderboardProviderProvider.notifier)
+            .getStateLeaderboard();
+      } else if (value == 'Friends') {
+        // Call the friends leaderboard method
+        await ref
+            .read(leaderboardProviderProvider.notifier)
+            .getFriendsLeaderboard();
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoadingLeaderboard = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,177 +82,202 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
         heightPercent: 0.3,
         child: SafeArea(
           child: PagePadding(
-            child: ref
-                .watch(leaderboardProviderProvider)
-                .when(
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (error, stack) => Center(child: Text('Error: $error')),
-                  data: (leaderboardUsers) {
-                    return SingleChildScrollView(
-                      child: Column(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Clean Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Clean Header
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'LEADERBOARD',
-                                    style: context.textTheme.headlineMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w300,
-                                          // letterSpacing: -0.5,
-                                        ),
-                                  ),
-                                  Gap(4),
-                                  Text(
-                                    'Global Rankings',
-                                    style: context.textTheme.bodySmall
-                                        ?.copyWith(
-                                          color: Colors.white.withValues(
-                                            alpha: 0.4,
-                                          ),
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w300,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                              GestureDetector(
-                                onTap: () async => await context.push(
-                                  SearchFriendScreen.routeName,
-                                ),
-                                child: Container(
-                                  padding: EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        Colors.white.withValues(alpha: 0.08),
-                                        Colors.white.withValues(alpha: 0.03),
-                                      ],
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(
-                                          alpha: 0.3,
-                                        ),
-                                        blurRadius: 10,
-                                        offset: Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Icon(
-                                    Icons.person_add_alt_1_rounded,
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    size: 20,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Gap(32),
-
-                          // Clean Filter Chips
-                          FilterChips(
-                            options: filters,
-                            selectedValue: selectedFilter,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedFilter = value;
-                              });
-                            },
-                          ),
-                          Gap(24),
-
-                          // Summary Card
-                          LeaderboardSummaryCard(),
-                          Gap(16),
-
-                          // Leaderboard Bar
-                          if (leaderboardUsers.length >= 3)
-                            LeaderboardComparisonBar(
-                              firstPlace: leaderboardUsers[0],
-                              secondPlace: leaderboardUsers[1],
-                              thirdPlace: leaderboardUsers[2],
+                          Text(
+                            'LEADERBOARD',
+                            style: context.textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.w300,
+                              // letterSpacing: -0.5,
                             ),
-                          Gap(16),
-
-                          // Sort Section
-                          // Row(
-                          //   children: [
-                          //     Text(
-                          //       'Sort by',
-                          //       style: context.textTheme.bodyMedium?.copyWith(
-                          //         fontSize: 13,
-                          //         color: Colors.white.withValues(alpha: 0.5),
-                          //       ),
-                          //     ),
-                          //     Gap(12),
-                          //     DropdownButton<String>(
-                          //       isDense: true,
-                          //       value: selectedSort,
-                          //       onChanged: (value) {
-                          //         if (value != null) {
-                          //           setState(() {
-                          //             selectedSort = value;
-                          //           });
-                          //         }
-                          //       },
-                          //       underline: const SizedBox.shrink(),
-                          //       dropdownColor: Color(0xFF0A0A0A),
-                          //       icon: Icon(
-                          //         Icons.keyboard_arrow_down_rounded,
-                          //         color: Colors.white.withValues(alpha: 0.6),
-                          //         size: 20,
-                          //       ),
-                          //       style: context.textTheme.bodyMedium?.copyWith(
-                          //         color: Colors.white,
-                          //         fontSize: 14,
-                          //         fontWeight: FontWeight.w500,
-                          //       ),
-                          //       items: sortOptions.map((option) {
-                          //         return DropdownMenuItem<String>(
-                          //           value: option,
-                          //           child: Text(option),
-                          //         );
-                          //       }).toList(),
-                          //     ),
-                          //   ],
-                          // ),
-                          // Gap(24),
-                          // Leaderboard List
-                          ...List.generate(
-                            leaderboardUsers.length > 3
-                                ? leaderboardUsers.length - 3
-                                : 0,
-                            (i) {
-                              final user = leaderboardUsers[i + 3];
-                              return _LeaderboardUserTile(
-                                rank: user.rank,
-                                name: '${user.firstName} ${user.lastName}'
-                                    .trim(),
-                                xp: user.totalXp,
-                                profilePictureUrl: user.profilePictureUrl,
-                                onTap: () async {
-                                  await context.push(
-                                    UserProfileScreen.routeName,
-                                    extra: user.user,
-                                  );
-                                },
-                              );
-                            },
+                          ),
+                          Gap(4),
+                          Text(
+                            'Global Rankings',
+                            style: context.textTheme.bodySmall?.copyWith(
+                              color: Colors.white.withValues(
+                                alpha: 0.4,
+                              ),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                            ),
                           ),
                         ],
                       ),
-                    );
-                  },
-                ),
+                      GestureDetector(
+                        onTap: () async => await context.push(
+                          SearchFriendScreen.routeName,
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.white.withValues(alpha: 0.08),
+                                Colors.white.withValues(alpha: 0.03),
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(
+                                  alpha: 0.3,
+                                ),
+                                blurRadius: 10,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            Icons.person_add_alt_1_rounded,
+                            color: Colors.white.withValues(alpha: 0.9),
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Gap(32),
+
+                  // Clean Filter Chips
+                  FilterChips(
+                    options: filters,
+                    selectedValue: selectedFilter,
+                    onChanged: _handleFilterChange,
+                  ),
+                  Gap(24),
+
+                  // Summary Card
+                  LeaderboardSummaryCard(
+                    selectedFilter: selectedFilter,
+                  ),
+                  Gap(16),
+
+                  // Leaderboard content with separate loading
+                  ref
+                      .watch(leaderboardProviderProvider)
+                      .when(
+                        loading: () => const SizedBox.shrink(),
+                        error: (_, __) => const SizedBox.shrink(),
+                        data: (_) => const SizedBox.shrink(),
+                      ),
+
+                  // Loading or Leaderboard List
+                  if (isLoadingLeaderboard)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(40.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  else
+                    ref
+                        .watch(leaderboardProviderProvider)
+                        .when(
+                          loading: () => const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(40.0),
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                          error: (error, stack) => Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(40.0),
+                              child: Text('Error: $error'),
+                            ),
+                          ),
+                          data: (leaderboardUsers) => Column(
+                            children: [
+                              // Leaderboard Bar
+                              if (leaderboardUsers.length >= 3)
+                                LeaderboardComparisonBar(
+                                  firstPlace: leaderboardUsers[0],
+                                  secondPlace: leaderboardUsers[1],
+                                  thirdPlace: leaderboardUsers[2],
+                                ),
+                              if (leaderboardUsers.length >= 3) const Gap(16),
+
+                              // Sort Section
+                              // Row(
+                              //   children: [
+                              //     Text(
+                              //       'Sort by',
+                              //       style: context.textTheme.bodyMedium?.copyWith(
+                              //         fontSize: 13,
+                              //         color: Colors.white.withValues(alpha: 0.5),
+                              //       ),
+                              //     ),
+                              //     Gap(12),
+                              //     DropdownButton<String>(
+                              //       isDense: true,
+                              //       value: selectedSort,
+                              //       onChanged: (value) {
+                              //         if (value != null) {
+                              //           setState(() {
+                              //             selectedSort = value;
+                              //           });
+                              //         }
+                              //       },
+                              //       underline: const SizedBox.shrink(),
+                              //       dropdownColor: Color(0xFF0A0A0A),
+                              //       icon: Icon(
+                              //         Icons.keyboard_arrow_down_rounded,
+                              //         color: Colors.white.withValues(alpha: 0.6),
+                              //         size: 20,
+                              //       ),
+                              //       style: context.textTheme.bodyMedium?.copyWith(
+                              //         color: Colors.white,
+                              //         fontSize: 14,
+                              //         fontWeight: FontWeight.w500,
+                              //       ),
+                              //       items: sortOptions.map((option) {
+                              //         return DropdownMenuItem<String>(
+                              //           value: option,
+                              //           child: Text(option),
+                              //         );
+                              //       }).toList(),
+                              //     ),
+                              //   ],
+                              // ),
+                              // Gap(24),
+                              // Leaderboard List
+                              ...List.generate(
+                                leaderboardUsers.length > 3
+                                    ? leaderboardUsers.length - 3
+                                    : 0,
+                                (i) {
+                                  final user = leaderboardUsers[i + 3];
+                                  return _LeaderboardUserTile(
+                                    rank: user.rank,
+                                    name: '${user.firstName} ${user.lastName}'
+                                        .trim(),
+                                    xp: user.totalXp,
+                                    profilePictureUrl: user.profilePictureUrl,
+                                    onTap: () async {
+                                      await context.push(
+                                        UserProfileScreen.routeName,
+                                        extra: user.user,
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
