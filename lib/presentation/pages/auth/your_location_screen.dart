@@ -185,7 +185,10 @@ class _YourLocationScreenState extends ConsumerState<YourLocationScreen> {
                                   return;
                                 }
                                 if (context.mounted) {
+                                  // Replace with home screen first (can't go back to registration)
                                   context.pushReplacement(HomeScreen.routeName);
+                                  // Then show payment screen on top
+                                  context.push('/payment');
                                 }
                               } on KException catch (e) {
                                 showErrorMessage(e.message);

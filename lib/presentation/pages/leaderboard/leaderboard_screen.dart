@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridespotr/presentation/providers/leaderboard/leaderboard_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/extensions.dart';
 import '../../widgets/leaderboard/comparison_bar.dart';
@@ -75,6 +76,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: CarbonBackground(
@@ -257,12 +260,16 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                     : 0,
                                 (i) {
                                   final user = leaderboardUsers[i + 3];
+                                  final isCurrentUser =
+                                      currentUserId != null &&
+                                      user.user == currentUserId;
                                   return _LeaderboardUserTile(
                                     rank: user.rank,
                                     name: '${user.firstName} ${user.lastName}'
                                         .trim(),
                                     xp: user.totalXp,
                                     profilePictureUrl: user.profilePictureUrl,
+                                    isCurrentUser: isCurrentUser,
                                     onTap: () async {
                                       await context.push(
                                         UserProfileScreen.routeName,
@@ -291,6 +298,7 @@ class _LeaderboardUserTile extends StatelessWidget {
     required this.name,
     required this.xp,
     this.profilePictureUrl,
+    this.isCurrentUser = false,
     this.onTap,
   });
 
@@ -298,6 +306,7 @@ class _LeaderboardUserTile extends StatelessWidget {
   final String name;
   final int xp;
   final String? profilePictureUrl;
+  final bool isCurrentUser;
   final VoidCallback? onTap;
 
   @override
@@ -316,15 +325,28 @@ class _LeaderboardUserTile extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.06),
-                Colors.white.withValues(alpha: 0.02),
-              ],
+              colors: isCurrentUser
+                  ? [
+                      Colors.white.withValues(alpha: 0.12),
+                      Colors.white.withValues(alpha: 0.06),
+                    ]
+                  : [
+                      Colors.white.withValues(alpha: 0.06),
+                      Colors.white.withValues(alpha: 0.02),
+                    ],
             ),
+            border: isCurrentUser
+                ? Border.all(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    width: 1,
+                  )
+                : null,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.4),
-                blurRadius: 16,
+                color: Colors.black.withValues(
+                  alpha: isCurrentUser ? 0.5 : 0.4,
+                ),
+                blurRadius: isCurrentUser ? 20 : 16,
                 offset: Offset(0, 4),
               ),
             ],
