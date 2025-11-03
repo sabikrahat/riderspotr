@@ -213,6 +213,8 @@ class CarService {
 
       debugPrint('Car spot fetched: ${res.toString()}');
       return CarSpotModel.fromJson(res);
+    } on FunctionException catch (e) {
+      throw EdgeFunctionException.fromFunctionException(e, 'Failed to scan car');
     } catch (e) {
       throw Exception('Error scanning car: $e');
     }

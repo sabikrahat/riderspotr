@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/exception.dart';
 import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
 import '../../providers/car/garage_provider.dart';
@@ -185,9 +186,10 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                               ScanDeatilScreen.routeName,
                               extra: carSpotModel,
                             );
+                          } on EdgeFunctionException catch (e) {
+                            showAlertMessage(e.message);
                           } catch (e) {
-                            debugPrint('Error capturing image: $e');
-                            showAlertMessage('Error capturing image: $e');
+                            showAlertMessage('Error: $e');
                           } finally {
                             setState(() {
                               _isUploading = false;

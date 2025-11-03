@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/enums.dart';
+import '../../../core/exception.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../../services/car/car_service.dart';
 
@@ -40,6 +41,9 @@ class GarageNotifier extends _$GarageNotifier {
       final carSpotModel = await CarService().scanCar(imagePath);
 
       return carSpotModel;
+    } on EdgeFunctionException {
+      // Re-throw EdgeFunctionException as-is
+      rethrow;
     } catch (e) {
       throw Exception('Error scanning car: $e');
     }
