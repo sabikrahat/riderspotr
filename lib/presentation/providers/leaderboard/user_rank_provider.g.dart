@@ -20,7 +20,7 @@ final class UserRankNotifierProvider
         argument: null,
         retry: null,
         name: r'userRankProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -33,7 +33,7 @@ final class UserRankNotifierProvider
   UserRankNotifier create() => UserRankNotifier();
 }
 
-String _$userRankNotifierHash() => r'75f2dd577e705d49154ede17b71f57c44729e424';
+String _$userRankNotifierHash() => r'7413157c6b3850934266c1d7d4a541220567ff66';
 
 abstract class _$UserRankNotifier extends $AsyncNotifier<int> {
   FutureOr<int> build();

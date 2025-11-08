@@ -5,7 +5,7 @@ import '../../../services/car/car_service.dart';
 
 part 'spot_stat_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class SpotStat extends _$SpotStat {
   @override
   Future<SpotStatModel> build() async {

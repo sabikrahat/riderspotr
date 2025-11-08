@@ -20,7 +20,7 @@ final class ProfileNotifierProvider
   }) : super(
          retry: null,
          name: r'profileProvider',
-         isAutoDispose: false,
+         isAutoDispose: true,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
@@ -50,7 +50,7 @@ final class ProfileNotifierProvider
   }
 }
 
-String _$profileNotifierHash() => r'e02d842b87c7fe526f44b1dc38f569ab4355e766';
+String _$profileNotifierHash() => r'61d290b8650597bc7a0091d6167d78f1bd024b9c';
 
 final class ProfileNotifierFamily extends $Family
     with
@@ -67,7 +67,7 @@ final class ProfileNotifierFamily extends $Family
         name: r'profileProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: false,
+        isAutoDispose: true,
       );
 
   ProfileNotifierProvider call(String? userId) =>

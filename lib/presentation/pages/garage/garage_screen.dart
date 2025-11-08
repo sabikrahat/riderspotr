@@ -15,6 +15,7 @@ import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/filter_chips.dart';
 import '../../widgets/shared/page_padding.dart';
 import '../../widgets/shared/search_text_field.dart';
+import '../capture/camera_screen.dart';
 
 class GarageScreen extends ConsumerStatefulWidget {
   const GarageScreen({super.key});
@@ -304,12 +305,15 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
   }
 
   Widget _buildEmptyState(List<CarSpotModel> allCars) {
+    final isEmptyGarage =
+        allCars.isEmpty && _searchQuery.isEmpty && _selectedRarity == null;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.search_off,
+            isEmptyGarage ? Icons.directions_car_outlined : Icons.search_off,
             size: 64,
             color: Colors.white.withValues(alpha: 0.5),
           ),
@@ -318,7 +322,7 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
             _searchQuery.isNotEmpty || _selectedRarity != null
                 ? 'No cars found'
                 : allCars.isEmpty
-                ? 'No cars in your garage. Pull down to refresh.'
+                ? 'Scan your first car to get started'
                 : 'No cars match your filters',
             style: context.textTheme.bodyMedium?.copyWith(
               color: Colors.white,
@@ -326,8 +330,35 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
             ),
             textAlign: TextAlign.center,
           ),
+          const Gap(20),
+          if (isEmptyGarage) ...[
+            FilledButton.icon(
+              onPressed: () => context.push(CameraScreen.routeName),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
+                // shape: const RoundedRectangleBorder(),
+              ),
+              icon: const Icon(
+                Icons.camera_alt,
+                size: 18,
+              ),
+              label: Text(
+                'SCAN CAR',
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                  letterSpacing: 2,
+                ),
+              ),
+            ),
+          ],
           if (_searchQuery.isNotEmpty || _selectedRarity != null) ...[
-            const Gap(8),
             TextButton(
               onPressed: () {
                 _clearSearch();

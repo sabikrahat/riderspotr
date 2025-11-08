@@ -20,7 +20,7 @@ final class SpotStatProvider
         argument: null,
         retry: null,
         name: r'spotStatProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -33,7 +33,7 @@ final class SpotStatProvider
   SpotStat create() => SpotStat();
 }
 
-String _$spotStatHash() => r'49c8388611c4c476d7bebb5d8957e6c8d312fa52';
+String _$spotStatHash() => r'7199dbbe049006942a70913cc237ff6328b3c5d5';
 
 abstract class _$SpotStat extends $AsyncNotifier<SpotStatModel> {
   FutureOr<SpotStatModel> build();

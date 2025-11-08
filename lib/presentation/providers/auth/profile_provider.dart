@@ -8,7 +8,7 @@ import '../../../services/following/following.dart';
 
 part 'profile_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class ProfileNotifier extends _$ProfileNotifier {
   List<CarSpotModel> _carSpots = [];
   UserModel? _user;

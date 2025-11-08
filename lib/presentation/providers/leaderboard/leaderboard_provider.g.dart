@@ -24,7 +24,7 @@ final class LeaderboardProviderProvider
         argument: null,
         retry: null,
         name: r'leaderboardProviderProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -38,7 +38,7 @@ final class LeaderboardProviderProvider
 }
 
 String _$leaderboardProviderHash() =>
-    r'aa2e07ae3d78665e597d63a6ab7fe1c61ca17870';
+    r'35bf2c005cbd76b95e7bdcbcd9844558554d668c';
 
 abstract class _$LeaderboardProvider
     extends $AsyncNotifier<List<UserLeaderboardModel>> {

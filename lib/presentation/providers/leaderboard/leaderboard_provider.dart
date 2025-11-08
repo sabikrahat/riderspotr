@@ -8,7 +8,7 @@ import '../../../config/constants.dart';
 
 part 'leaderboard_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class LeaderboardProvider extends _$LeaderboardProvider {
   final SupabaseClient _client = Supabase.instance.client;
 

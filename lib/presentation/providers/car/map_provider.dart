@@ -8,7 +8,7 @@ import '../../../services/car/car_service.dart';
 
 part 'map_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class MapNotifier extends _$MapNotifier {
   List<CarSpotModel> _carSpots = [];
 
