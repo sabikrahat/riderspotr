@@ -5,9 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as path;
 
 import '../../../core/exception.dart';
 import '../../../core/extensions.dart';
@@ -70,72 +67,6 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
     }
   }
 
-  /// Compresses an image to ensure it's under 3MB
-  Future<XFile> _compressImage(XFile imageFile) async {
-    final file = File(imageFile.path);
-    final fileSize = await file.length();
-
-    // If already under 3MB, return as is
-    const maxSize = 3 * 1024 * 1024; // 3MB in bytes
-    if (fileSize < maxSize) {
-      debugPrint(
-        'Image size: ${fileSize / 1024 / 1024}MB - No compression needed',
-      );
-      return imageFile;
-    }
-
-    debugPrint('Image size: ${fileSize / 1024 / 1024}MB - Compressing...');
-
-    try {
-      final dir = await getTemporaryDirectory();
-      final targetPath = path.join(
-        dir.path,
-        '${DateTime.now().millisecondsSinceEpoch}_compressed${path.extension(imageFile.path)}',
-      );
-
-      // Start with quality 85 and reduce if needed
-      int quality = 85;
-      XFile? compressedFile;
-
-      while (quality > 20) {
-        final result = await FlutterImageCompress.compressAndGetFile(
-          file.absolute.path,
-          targetPath,
-          quality: quality,
-          minWidth: 1920,
-          minHeight: 1080,
-        );
-
-        if (result != null) {
-          final compressedSize = await File(result.path).length();
-          debugPrint(
-            'Compressed to ${compressedSize / 1024 / 1024}MB at quality $quality',
-          );
-
-          if (compressedSize < maxSize) {
-            compressedFile = result;
-            break;
-          }
-        }
-
-        quality -= 10;
-      }
-
-      if (compressedFile == null) {
-        debugPrint('Warning: Could not compress below 3MB, using best attempt');
-        return imageFile;
-      }
-
-      final finalSize = await File(compressedFile.path).length();
-      debugPrint('Final compressed size: ${finalSize / 1024 / 1024}MB');
-
-      return compressedFile;
-    } catch (e) {
-      debugPrint('Error compressing image: $e');
-      return imageFile; // Return original on error
-    }
-  }
-
   // TODO: Remove - Temporary method for testing with gallery images
   Future<void> _pickFromGallery() async {
     try {
@@ -144,18 +75,18 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
 
       if (image == null) return;
 
+      // Immediately show loading indicator
       setState(() {
         _capturedImage = image;
         _isUploading = true;
       });
 
-      // Compress image before uploading
-      final compressedImage = await _compressImage(image);
-
-      // Use garage provider's scanCar method
+      // Provider handles compression, blurring, and scanning
       final carSpotModel = await ref
           .read(garageProvider(null).notifier)
-          .scanCar(compressedImage);
+          .scanCar(image);
+
+      if (!mounted) return;
 
       setState(() {
         _isUploading = false;
@@ -172,10 +103,12 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
     } catch (e) {
       showAlertMessage('Error: $e');
     } finally {
-      setState(() {
-        _isUploading = false;
-        _capturedImage = null;
-      });
+      if (mounted) {
+        setState(() {
+          _isUploading = false;
+          _capturedImage = null;
+        });
+      }
     }
   }
 
@@ -327,25 +260,24 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                                   return;
                                 }
 
+                                // Immediately show loading indicator
                                 setState(() {
                                   _capturedImage = file;
                                   _isUploading = true;
                                 });
 
-                                // Compress image before uploading
-                                final compressedImage = await _compressImage(
-                                  file,
-                                );
-
-                                // Use garage provider's scanCar method
+                                // Provider handles compression, blurring, and scanning
                                 final carSpotModel = await ref
                                     .read(garageProvider(null).notifier)
-                                    .scanCar(compressedImage);
+                                    .scanCar(file);
+
+                                if (!mounted) return;
 
                                 setState(() {
                                   _isUploading = false;
                                   _capturedImage = null;
                                 });
+
                                 if (!context.mounted) return;
                                 await context.push(
                                   ScanDeatilScreen.routeName,
@@ -356,10 +288,12 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                               } catch (e) {
                                 showAlertMessage('Error: $e');
                               } finally {
-                                setState(() {
-                                  _isUploading = false;
-                                  _capturedImage = null;
-                                });
+                                if (mounted) {
+                                  setState(() {
+                                    _isUploading = false;
+                                    _capturedImage = null;
+                                  });
+                                }
                               }
                             },
                             child: Container(

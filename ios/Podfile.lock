@@ -18,11 +18,48 @@ PODS:
     - Flutter
     - Google-Maps-iOS-Utils (< 7.0, >= 5.0)
     - GoogleMaps (< 10.0, >= 8.4)
+  - google_mlkit_commons (0.11.0):
+    - Flutter
+    - MLKitVision
+  - google_mlkit_face_detection (0.13.1):
+    - Flutter
+    - google_mlkit_commons
+    - GoogleMLKit/FaceDetection (~> 7.0.0)
+  - google_mlkit_text_recognition (0.15.0):
+    - Flutter
+    - google_mlkit_commons
+    - GoogleMLKit/TextRecognition (~> 7.0.0)
+  - GoogleDataTransport (10.1.0):
+    - nanopb (~> 3.30910.0)
+    - PromisesObjC (~> 2.4)
   - GoogleMaps (8.4.0):
     - GoogleMaps/Maps (= 8.4.0)
   - GoogleMaps/Base (8.4.0)
   - GoogleMaps/Maps (8.4.0):
     - GoogleMaps/Base
+  - GoogleMLKit/FaceDetection (7.0.0):
+    - GoogleMLKit/MLKitCore
+    - MLKitFaceDetection (~> 6.0.0)
+  - GoogleMLKit/MLKitCore (7.0.0):
+    - MLKitCommon (~> 12.0.0)
+  - GoogleMLKit/TextRecognition (7.0.0):
+    - GoogleMLKit/MLKitCore
+    - MLKitTextRecognition (~> 5.0.0)
+  - GoogleToolboxForMac/Defines (4.2.1)
+  - GoogleToolboxForMac/Logger (4.2.1):
+    - GoogleToolboxForMac/Defines (= 4.2.1)
+  - "GoogleToolboxForMac/NSData+zlib (4.2.1)":
+    - GoogleToolboxForMac/Defines (= 4.2.1)
+  - GoogleUtilities/Environment (8.1.0):
+    - GoogleUtilities/Privacy
+  - GoogleUtilities/Logger (8.1.0):
+    - GoogleUtilities/Environment
+    - GoogleUtilities/Privacy
+  - GoogleUtilities/Privacy (8.1.0)
+  - GoogleUtilities/UserDefaults (8.1.0):
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Privacy
+  - GTMSessionFetcher/Core (3.5.0)
   - image_cropper (0.0.4):
     - Flutter
     - TOCropViewController (~> 2.8.0)
@@ -55,11 +92,41 @@ PODS:
     - MapboxCommon (= 24.16.0-rc.1)
     - MapboxCoreMaps (= 11.16.0-rc.1)
     - Turf (= 4.0.0)
+  - MLImage (1.0.0-beta6)
+  - MLKitCommon (12.0.0):
+    - GoogleDataTransport (~> 10.0)
+    - GoogleToolboxForMac/Logger (< 5.0, >= 4.2.1)
+    - "GoogleToolboxForMac/NSData+zlib (< 5.0, >= 4.2.1)"
+    - GoogleUtilities/Logger (~> 8.0)
+    - GoogleUtilities/UserDefaults (~> 8.0)
+    - GTMSessionFetcher/Core (< 4.0, >= 3.3.2)
+  - MLKitFaceDetection (6.0.0):
+    - MLKitCommon (~> 12.0)
+    - MLKitVision (~> 8.0)
+  - MLKitTextRecognition (5.0.0):
+    - MLKitCommon (~> 12.0)
+    - MLKitTextRecognitionCommon (= 4.0.0)
+    - MLKitVision (~> 8.0)
+  - MLKitTextRecognitionCommon (4.0.0):
+    - MLKitCommon (~> 12.0)
+    - MLKitVision (~> 8.0)
+  - MLKitVision (8.0.0):
+    - GoogleToolboxForMac/Logger (< 5.0, >= 4.2.1)
+    - "GoogleToolboxForMac/NSData+zlib (< 5.0, >= 4.2.1)"
+    - GTMSessionFetcher/Core (< 4.0, >= 3.3.2)
+    - MLImage (= 1.0.0-beta6)
+    - MLKitCommon (~> 12.0)
+  - nanopb (3.30910.0):
+    - nanopb/decode (= 3.30910.0)
+    - nanopb/encode (= 3.30910.0)
+  - nanopb/decode (3.30910.0)
+  - nanopb/encode (3.30910.0)
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
   - permission_handler_apple (9.3.0):
     - Flutter
+  - PromisesObjC (2.4.0)
   - purchases_flutter (9.9.1):
     - Flutter
     - PurchasesHybridCommon (= 17.12.0)
@@ -98,6 +165,9 @@ DEPENDENCIES:
   - flutter_image_compress_common (from `.symlinks/plugins/flutter_image_compress_common/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
   - google_maps_flutter_ios (from `.symlinks/plugins/google_maps_flutter_ios/ios`)
+  - google_mlkit_commons (from `.symlinks/plugins/google_mlkit_commons/ios`)
+  - google_mlkit_face_detection (from `.symlinks/plugins/google_mlkit_face_detection/ios`)
+  - google_mlkit_text_recognition (from `.symlinks/plugins/google_mlkit_text_recognition/ios`)
   - image_cropper (from `.symlinks/plugins/image_cropper/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - mapbox_maps_flutter (from `.symlinks/plugins/mapbox_maps_flutter/ios`)
@@ -112,12 +182,25 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - Google-Maps-iOS-Utils
+    - GoogleDataTransport
     - GoogleMaps
+    - GoogleMLKit
+    - GoogleToolboxForMac
+    - GoogleUtilities
+    - GTMSessionFetcher
     - libwebp
     - Mantle
     - MapboxCommon
     - MapboxCoreMaps
     - MapboxMaps
+    - MLImage
+    - MLKitCommon
+    - MLKitFaceDetection
+    - MLKitTextRecognition
+    - MLKitTextRecognitionCommon
+    - MLKitVision
+    - nanopb
+    - PromisesObjC
     - PurchasesHybridCommon
     - PurchasesHybridCommonUI
     - RevenueCat
@@ -140,6 +223,12 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/geolocator_apple/darwin"
   google_maps_flutter_ios:
     :path: ".symlinks/plugins/google_maps_flutter_ios/ios"
+  google_mlkit_commons:
+    :path: ".symlinks/plugins/google_mlkit_commons/ios"
+  google_mlkit_face_detection:
+    :path: ".symlinks/plugins/google_mlkit_face_detection/ios"
+  google_mlkit_text_recognition:
+    :path: ".symlinks/plugins/google_mlkit_text_recognition/ios"
   image_cropper:
     :path: ".symlinks/plugins/image_cropper/ios"
   image_picker_ios:
@@ -169,7 +258,15 @@ SPEC CHECKSUMS:
   geolocator_apple: ab36aa0e8b7d7a2d7639b3b4e48308394e8cef5e
   Google-Maps-iOS-Utils: 66d6de12be1ce6d3742a54661e7a79cb317a9321
   google_maps_flutter_ios: 0291eb2aa252298a769b04d075e4a9d747ff7264
+  google_mlkit_commons: 2abe6a70e1824e431d16a51085cb475b672c8aab
+  google_mlkit_face_detection: 754da2113a1952f063c7c5dc347ac6ae8934fb77
+  google_mlkit_text_recognition: ec2122ec89bfe0d7200763336a6e4ef44810674c
+  GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleMaps: 8939898920281c649150e0af74aa291c60f2e77d
+  GoogleMLKit: eff9e23ec1d90ea4157a1ee2e32a4f610c5b3318
+  GoogleToolboxForMac: d1a2cbf009c453f4d6ded37c105e2f67a32206d8
+  GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
+  GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   image_cropper: 64567491beea6cd1bc4b11948e2babb590de5826
   image_picker_ios: e0ece4aa2a75771a7de3fa735d26d90817041326
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
@@ -178,8 +275,16 @@ SPEC CHECKSUMS:
   MapboxCommon: da94d0473ede78c1a1f43c468fafcf8ac9190b0c
   MapboxCoreMaps: 0aff67a7fd64d84737c03bf6b81a274be2a62825
   MapboxMaps: cfa3aabb6e9521daec72a1585f94eeeeeeaa731d
+  MLImage: 0ad1c5f50edd027672d8b26b0fee78a8b4a0fc56
+  MLKitCommon: 07c2c33ae5640e5380beaaa6e4b9c249a205542d
+  MLKitFaceDetection: 2a593db4837db503ad3426b565e7aab045cefea5
+  MLKitTextRecognition: 3b41f3ff084a79afb214408d25d2068d77ab322c
+  MLKitTextRecognitionCommon: cd44577a8c506fc6bba065096de03bec0d01a213
+  MLKitVision: 45e79d68845a2de77e2dd4d7f07947f0ed157b0e
+  nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
+  PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   purchases_flutter: ee06a21a33d5a56ba5267732f36b7472455fb353
   purchases_ui_flutter: 085e0049cb450238da14337d6d703230017136ff
   PurchasesHybridCommon: c8f805e0f6d3a557a6d63300d0402b8ae5219a48
@@ -194,6 +299,6 @@ SPEC CHECKSUMS:
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
   video_player_avfoundation: 2cef49524dd1f16c5300b9cd6efd9611ce03639b
 
-PODFILE CHECKSUM: fe37b0047e6a468a47ddd7c52a99d644c578e27d
+PODFILE CHECKSUM: 455e3481c5a7aa785ac69d8404bd6f7f51355f6b
 
 COCOAPODS: 1.16.2
