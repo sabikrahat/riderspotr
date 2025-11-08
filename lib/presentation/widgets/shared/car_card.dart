@@ -1,18 +1,26 @@
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridespotr/core/enums.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/extensions.dart';
+import '../../../core/toastification.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../pages/capture/car_detail_screen.dart';
+import '../../providers/car/garage_provider.dart';
 
-class CarCard extends StatelessWidget {
+class CarCard extends ConsumerWidget {
   final CarSpotModel carSpot;
   const CarCard({required this.carSpot, super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+    final isOwnCar = currentUserId == carSpot.user;
+
     return GestureDetector(
       onTap: () {
         context.push(
@@ -20,6 +28,11 @@ class CarCard extends StatelessWidget {
           extra: carSpot,
         );
       },
+      onLongPress: isOwnCar
+          ? () {
+              _showDeleteDialog(context, ref);
+            }
+          : null,
       child: Container(
         height: context.height * 0.28,
         decoration: BoxDecoration(
@@ -99,14 +112,34 @@ class CarCard extends StatelessWidget {
               ),
               // Content
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Rarity Badge (Top Right)
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // 3 Dots Menu - Only for owned cars
+                        if (isOwnCar)
+                          GestureDetector(
+                            onTap: () => _showDeleteDialog(context, ref),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black.withValues(alpha: 0.6),
+                              ),
+                              child: Icon(
+                                Icons.more_vert,
+                                color: Colors.white.withValues(alpha: 0.8),
+                                size: 16,
+                              ),
+                            ),
+                          )
+                        else
+                          const SizedBox.shrink(),
+                        // Rarity Badge
                         Container(
                           padding: EdgeInsets.symmetric(
                             horizontal: 12,
@@ -122,7 +155,7 @@ class CarCard extends StatelessWidget {
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 1,
-                              color: _getRarityColor(carSpot.car?.rarity.name),
+                              color: carSpot.car?.rarity.color,
                             ),
                           ),
                         ),
@@ -193,19 +226,101 @@ class CarCard extends StatelessWidget {
     );
   }
 
-  Color _getRarityColor(String? rarity) {
-    switch (rarity?.toLowerCase()) {
-      case 'legendary':
-        return Color(0xFFFFD700);
-      case 'epic':
-        return Color(0xFFAB47BC);
-      case 'rare':
-        return Color(0xFF42A5F5);
-      case 'uncommon':
-        return Color(0xFF66BB6A);
-      default:
-        return Colors.white.withValues(alpha: 0.7);
-    }
+  void _showDeleteDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.8),
+      builder: (dialogContext) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: Color(0xFF1A1A1A),
+            borderRadius: BorderRadius.circular(0),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'DELETE CAR',
+                style: context.textTheme.titleLarge?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w300,
+                  letterSpacing: 3,
+                ),
+              ),
+              const Gap(16),
+              Text(
+                '${carSpot.car?.make?.name ?? 'This car'} ${carSpot.car?.model ?? ''}',
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.7),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const Gap(8),
+              Text(
+                'This action cannot be undone.',
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.5),
+                  fontSize: 12,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const Gap(32),
+              // Delete Button
+              GestureDetector(
+                onTap: () async {
+                  dialogContext.pop();
+                  try {
+                    await ref
+                        .read(garageProvider(null).notifier)
+                        .deleteCar(carSpot.id);
+                  } catch (e) {
+                    showErrorMessage('Failed to delete car. Please try again.');
+                  }
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  color: Colors.white,
+                  child: Center(
+                    child: Text(
+                      'DELETE',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 2,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const Gap(12),
+              // Cancel Button
+              GestureDetector(
+                onTap: () => dialogContext.pop(),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Center(
+                    child: Text(
+                      'CANCEL',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.5),
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 2,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

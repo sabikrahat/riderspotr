@@ -20,6 +20,7 @@ import '../presentation/pages/leaderboard/leaderboard_screen.dart';
 import '../presentation/pages/leaderboard/search_friend.dart';
 import '../presentation/pages/nav_screen.dart';
 import '../presentation/pages/payment/payment_screen.dart';
+import '../presentation/pages/payment/upgrade_required_screen.dart';
 import '../presentation/pages/profile/own_profile_screen.dart';
 import '../presentation/pages/profile/user_profile_screen.dart';
 import '../presentation/pages/settings/settings_screen.dart';
@@ -71,7 +72,8 @@ final router = GoRouter(
     GoRoute(
       path: AboutYouScreen.routeName,
       // redirect: authHandler,
-      builder: (_, state) => AboutYouScreen(fromUpdateProfile: state.extra as bool? ?? false),
+      builder: (_, state) =>
+          AboutYouScreen(fromUpdateProfile: state.extra as bool? ?? false),
     ),
     GoRoute(
       path: YourExperienceScreen.routeName,
@@ -83,7 +85,8 @@ final router = GoRouter(
     GoRoute(
       path: YourLocationScreen.routeName,
       // redirect: authHandler,
-      builder: (_, state) => YourLocationScreen(fromUpdateProfile: state.extra as bool? ?? false),
+      builder: (_, state) =>
+          YourLocationScreen(fromUpdateProfile: state.extra as bool? ?? false),
     ),
     GoRoute(
       path: ExploreScreen.routeName,
@@ -138,17 +141,24 @@ final router = GoRouter(
     GoRoute(
       path: ScanDeatilScreen.routeName,
       redirect: authHandler,
-      builder: (_, state) => ScanDeatilScreen(carSpot: state.extra as CarSpotModel?),
+      builder: (_, state) =>
+          ScanDeatilScreen(carSpot: state.extra as CarSpotModel?),
     ),
     GoRoute(
       path: CarDetailScreen.routeName,
       redirect: authHandler,
-      builder: (_, state) => CarDetailScreen(carSpot: state.extra as CarSpotModel?),
+      builder: (_, state) =>
+          CarDetailScreen(carSpot: state.extra as CarSpotModel?),
     ),
     GoRoute(
       path: PaymentScreen.routeName,
       redirect: authHandler,
       builder: (_, _) => PaymentScreen(),
+    ),
+    GoRoute(
+      path: UpgradeRequiredScreen.routeName,
+      redirect: authHandler,
+      builder: (_, _) => UpgradeRequiredScreen(),
     ),
   ],
 );

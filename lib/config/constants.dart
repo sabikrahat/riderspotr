@@ -4,10 +4,6 @@ const supabaseKey =
 const supabaseStorageUrl =
     'https://gjzqghorxbptsjtjobsx.supabase.co/storage/v1/object/public';
 
-// TODO: Implement
-const revenueCatApiKeyAndroid = '';
-const revenueCatApiKeyIos = 'appl_SOidpcBPdnvUDXDENYuEpytIIte';
-
 const usersTbl = 'users';
 
 const googleMapKey = 'AIzaSyBVLKzXc8b-kYbfpIYjHOV4cNbJmTP89_c';

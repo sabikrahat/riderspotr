@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ridespotr/presentation/pages/payment/payment_screen.dart';
 // import 'package:go_router/go_router.dart';
 // import 'package:ridespotr/presentation/pages/payment/payment_screen.dart';
 
@@ -33,7 +35,10 @@ class HomeScreen extends ConsumerWidget {
                   // Hero Section with Carbon Fiber
                   HeroSection(user: user),
 
-                  // IconButton(onPressed: () => context.push(PaymentScreen.routeName), icon: Icon(Icons.payment)),
+                  IconButton(
+                    onPressed: () => context.push(PaymentScreen.routeName),
+                    icon: Icon(Icons.payment),
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(

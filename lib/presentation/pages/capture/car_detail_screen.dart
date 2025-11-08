@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
+import '../../providers/subscription/subscription_provider.dart';
 import '../../widgets/capture/car_detail_tab_bar.dart';
 import '../../widgets/capture/history_part.dart';
 import '../../widgets/capture/production_part.dart';
 import '../../widgets/capture/specs_part.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/rarity_badge.dart';
+import '../../widgets/shared/locked_content.dart';
 
-class CarDetailScreen extends StatefulWidget {
+class CarDetailScreen extends ConsumerStatefulWidget {
   static const String routeName = '/car-detail';
   const CarDetailScreen({super.key, required this.carSpot});
 
   final CarSpotModel? carSpot;
 
   @override
-  State<CarDetailScreen> createState() => _CarDetailScreenState();
+  ConsumerState<CarDetailScreen> createState() => _CarDetailScreenState();
 }
 
-class _CarDetailScreenState extends State<CarDetailScreen>
+class _CarDetailScreenState extends ConsumerState<CarDetailScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   int selectedIndex = 0;
@@ -52,6 +55,8 @@ class _CarDetailScreenState extends State<CarDetailScreen>
   @override
   Widget build(BuildContext context) {
     final carSpot = widget.carSpot;
+    final subscription = ref.watch(subscriptionProvider.notifier);
+    final hasStatsAccess = subscription.hasStatsAccess;
     if (carSpot == null) {
       return Scaffold(
         appBar: AppBar(
@@ -168,11 +173,17 @@ class _CarDetailScreenState extends State<CarDetailScreen>
               ],
             ),
             // Tab Views
-            selectedIndex == 0
-                ? ProductionPart(car: widget.carSpot!.car!)
-                : selectedIndex == 1
-                ? SpecsPart(specs: widget.carSpot!.car!.specs)
-                : HistoryPart(history: widget.carSpot!.car!.history),
+            hasStatsAccess
+                ? (selectedIndex == 0
+                      ? ProductionPart(car: widget.carSpot!.car!)
+                      : selectedIndex == 1
+                      ? SpecsPart(specs: widget.carSpot!.car!.specs)
+                      : HistoryPart(history: widget.carSpot!.car!.history))
+                : const LockedContent(
+                    title: 'CAR DETAILS\nLOCKED',
+                    description:
+                        'Upgrade to unlock full car details,\nspecifications, and history.',
+                  ),
           ],
         ),
       ),

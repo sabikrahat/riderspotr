@@ -7,6 +7,8 @@ import 'package:ridespotr/presentation/providers/leaderboard/leaderboard_provide
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/extensions.dart';
+import '../../providers/subscription/subscription_provider.dart';
+import '../../widgets/shared/locked_content.dart';
 import '../../widgets/leaderboard/comparison_bar.dart';
 import '../../widgets/leaderboard/summary_card.dart';
 import '../../widgets/shared/carbon_background.dart';
@@ -77,6 +79,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
   @override
   Widget build(BuildContext context) {
     final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+    final subscription = ref.watch(subscriptionProvider.notifier);
+    final hasLeaderboardAccess = subscription.hasLeaderboardAccess;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -199,88 +203,60 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                               child: Text('Error: $error'),
                             ),
                           ),
-                          data: (leaderboardUsers) => Column(
-                            children: [
-                              // Leaderboard Bar
-                              if (leaderboardUsers.length >= 3)
-                                LeaderboardComparisonBar(
-                                  firstPlace: leaderboardUsers[0],
-                                  secondPlace: leaderboardUsers[1],
-                                  thirdPlace: leaderboardUsers[2],
-                                ),
-                              if (leaderboardUsers.length >= 3) const Gap(16),
+                          data: (leaderboardUsers) {
+                            if (!hasLeaderboardAccess) {
+                              return Column(
+                                children: [
+                                  const LockedContent(
+                                    title: 'LEADERBOARD\nLOCKED',
+                                    description:
+                                        'Upgrade to view full leaderboard\nand compete with other players.',
+                                  ),
+                                ],
+                              );
+                            }
 
-                              // Sort Section
-                              // Row(
-                              //   children: [
-                              //     Text(
-                              //       'Sort by',
-                              //       style: context.textTheme.bodyMedium?.copyWith(
-                              //         fontSize: 13,
-                              //         color: Colors.white.withValues(alpha: 0.5),
-                              //       ),
-                              //     ),
-                              //     Gap(12),
-                              //     DropdownButton<String>(
-                              //       isDense: true,
-                              //       value: selectedSort,
-                              //       onChanged: (value) {
-                              //         if (value != null) {
-                              //           setState(() {
-                              //             selectedSort = value;
-                              //           });
-                              //         }
-                              //       },
-                              //       underline: const SizedBox.shrink(),
-                              //       dropdownColor: Color(0xFF0A0A0A),
-                              //       icon: Icon(
-                              //         Icons.keyboard_arrow_down_rounded,
-                              //         color: Colors.white.withValues(alpha: 0.6),
-                              //         size: 20,
-                              //       ),
-                              //       style: context.textTheme.bodyMedium?.copyWith(
-                              //         color: Colors.white,
-                              //         fontSize: 14,
-                              //         fontWeight: FontWeight.w500,
-                              //       ),
-                              //       items: sortOptions.map((option) {
-                              //         return DropdownMenuItem<String>(
-                              //           value: option,
-                              //           child: Text(option),
-                              //         );
-                              //       }).toList(),
-                              //     ),
-                              //   ],
-                              // ),
-                              // Gap(24),
-                              // Leaderboard List
-                              ...List.generate(
-                                leaderboardUsers.length > 3
-                                    ? leaderboardUsers.length - 3
-                                    : 0,
-                                (i) {
-                                  final user = leaderboardUsers[i + 3];
-                                  final isCurrentUser =
-                                      currentUserId != null &&
-                                      user.user == currentUserId;
-                                  return _LeaderboardUserTile(
-                                    rank: user.rank,
-                                    name: '${user.firstName} ${user.lastName}'
-                                        .trim(),
-                                    xp: user.totalXp,
-                                    profilePictureUrl: user.profilePictureUrl,
-                                    isCurrentUser: isCurrentUser,
-                                    onTap: () async {
-                                      await context.push(
-                                        UserProfileScreen.routeName,
-                                        extra: user.user,
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
+                            // Full leaderboard for paid users
+                            return Column(
+                              children: [
+                                // Leaderboard Bar
+                                if (leaderboardUsers.length >= 3)
+                                  LeaderboardComparisonBar(
+                                    firstPlace: leaderboardUsers[0],
+                                    secondPlace: leaderboardUsers[1],
+                                    thirdPlace: leaderboardUsers[2],
+                                  ),
+                                if (leaderboardUsers.length >= 3) const Gap(16),
+
+                                // Leaderboard List
+                                ...List.generate(
+                                  leaderboardUsers.length > 3
+                                      ? leaderboardUsers.length - 3
+                                      : 0,
+                                  (i) {
+                                    final user = leaderboardUsers[i + 3];
+                                    final isCurrentUser =
+                                        currentUserId != null &&
+                                        user.user == currentUserId;
+                                    return _LeaderboardUserTile(
+                                      rank: user.rank,
+                                      name: '${user.firstName} ${user.lastName}'
+                                          .trim(),
+                                      xp: user.totalXp,
+                                      profilePictureUrl: user.profilePictureUrl,
+                                      isCurrentUser: isCurrentUser,
+                                      onTap: () async {
+                                        await context.push(
+                                          UserProfileScreen.routeName,
+                                          extra: user.user,
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ],
+                            );
+                          },
                         ),
                 ],
               ),

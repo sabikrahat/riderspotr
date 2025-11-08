@@ -128,3 +128,46 @@ extension SortOptionsExtension on SortOptions {
     }
   }
 }
+
+enum SubscriptionTier {
+  free,
+  basic,
+  premium,
+}
+
+extension SubscriptionTierExtension on SubscriptionTier {
+  int get maxCarSpots {
+    switch (this) {
+      case SubscriptionTier.free:
+        return 5;
+      case SubscriptionTier.basic:
+        return 50;
+      case SubscriptionTier.premium:
+        return -1;
+    }
+  }
+
+  bool get hasStatsAccess {
+    switch (this) {
+      case SubscriptionTier.free:
+        return false;
+      case SubscriptionTier.basic:
+      case SubscriptionTier.premium:
+        return true;
+    }
+  }
+
+  bool get hasLeaderboardAccess {
+    switch (this) {
+      case SubscriptionTier.free:
+        return false;
+      case SubscriptionTier.basic:
+      case SubscriptionTier.premium:
+        return true;
+    }
+  }
+
+  bool get isUnlimited {
+    return this == SubscriptionTier.premium;
+  }
+}

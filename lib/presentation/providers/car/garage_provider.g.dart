@@ -50,7 +50,7 @@ final class GarageNotifierProvider
   }
 }
 
-String _$garageNotifierHash() => r'b0ae6231b5b84ff4e73acd300ce723c53ea3d86a';
+String _$garageNotifierHash() => r'511c136fa42d059608b3c0ff5f5968c99cf73911';
 
 final class GarageNotifierFamily extends $Family
     with

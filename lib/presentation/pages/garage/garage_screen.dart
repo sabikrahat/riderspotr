@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ridespotr/presentation/pages/payment/payment_screen.dart';
 import 'package:ridespotr/presentation/providers/auth/user_provider.dart';
 
 import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../providers/car/garage_provider.dart';
+import '../../providers/subscription/subscription_provider.dart';
 import '../../widgets/shared/car_card.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/filter_chips.dart';
@@ -118,6 +121,13 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                     sortBy: _selectedSort,
                   );
 
+                  final subscription = ref.watch(subscriptionProvider.notifier);
+                  final currentCarCount = data.length;
+                  final maxSpots = subscription.maxCarSpots;
+                  final canAddMore = subscription.canAddMoreCars(
+                    currentCarCount,
+                  );
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -125,11 +135,33 @@ class _GarageScreenState extends ConsumerState<GarageScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'GARAGE',
-                            style: context.textTheme.headlineMedium!.copyWith(
-                              fontWeight: FontWeight.w300,
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'GARAGE',
+                                style: context.textTheme.headlineMedium!
+                                    .copyWith(
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                              ),
+                              const Gap(4),
+                              GestureDetector(
+                                onTap: () =>
+                                    context.push(PaymentScreen.routeName),
+                                child: Text(
+                                  maxSpots == -1
+                                      ? '$currentCarCount cars (Unlimited)'
+                                      : '$currentCarCount / $maxSpots cars${!canAddMore ? ' • Upgrade!' : ''}',
+                                  style: context.textTheme.bodySmall?.copyWith(
+                                    color: !canAddMore
+                                        ? Colors.orange
+                                        : Colors.white.withValues(alpha: 0.6),
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           // Visibility Toggle Button with Optimistic Updates
                           Consumer(

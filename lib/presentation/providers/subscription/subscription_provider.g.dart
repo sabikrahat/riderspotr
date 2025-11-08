@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user_provider.dart';
+part of 'subscription_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,44 +9,45 @@ part of 'user_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(UserNotifier)
-const userProvider = UserNotifierProvider._();
+@ProviderFor(Subscription)
+const subscriptionProvider = SubscriptionProvider._();
 
-final class UserNotifierProvider
-    extends $AsyncNotifierProvider<UserNotifier, UserModel?> {
-  const UserNotifierProvider._()
+final class SubscriptionProvider
+    extends $AsyncNotifierProvider<Subscription, SubscriptionTier> {
+  const SubscriptionProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'userProvider',
+        name: r'subscriptionProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$userNotifierHash();
+  String debugGetCreateSourceHash() => _$subscriptionHash();
 
   @$internal
   @override
-  UserNotifier create() => UserNotifier();
+  Subscription create() => Subscription();
 }
 
-String _$userNotifierHash() => r'e330f84ae6101ccfbf5818bc989776a9ce3b10c5';
+String _$subscriptionHash() => r'b66bf4dc4b59e8ced631d14acb489800a134e375';
 
-abstract class _$UserNotifier extends $AsyncNotifier<UserModel?> {
-  FutureOr<UserModel?> build();
+abstract class _$Subscription extends $AsyncNotifier<SubscriptionTier> {
+  FutureOr<SubscriptionTier> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<UserModel?>, UserModel?>;
+    final ref =
+        this.ref as $Ref<AsyncValue<SubscriptionTier>, SubscriptionTier>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<UserModel?>, UserModel?>,
-              AsyncValue<UserModel?>,
+              AnyNotifier<AsyncValue<SubscriptionTier>, SubscriptionTier>,
+              AsyncValue<SubscriptionTier>,
               Object?,
               Object?
             >;

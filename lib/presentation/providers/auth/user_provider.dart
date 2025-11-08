@@ -1,10 +1,12 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../models/user/user_model.dart';
 import '../../../services/auth/auth_service.dart';
 import '../../../services/auth/user_service.dart';
+import '../../../services/subscription/subscription_service.dart';
 
 part 'user_provider.g.dart';
 
@@ -41,6 +43,7 @@ class UserNotifier extends _$UserNotifier {
 
   Future<void> signOut({required BuildContext context}) async {
     await AuthService().signout();
+    await SubscriptionService().logout();
     await refreshUser();
   }
 
@@ -54,6 +57,12 @@ class UserNotifier extends _$UserNotifier {
       email: email,
       token: token,
     );
+
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId != null) {
+      await SubscriptionService().login(userId);
+    }
+
     if (shouldCreateUser) {
       await UserService().createUser();
     }

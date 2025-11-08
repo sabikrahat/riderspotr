@@ -64,6 +64,7 @@ class GarageNotifier extends _$GarageNotifier {
   Future<void> deleteCar(String carSpotId) async {
     try {
       await CarService().delete(carSpotId);
+      await refresh();
     } catch (e) {
       throw Exception('Error deleting car: $e');
     }
@@ -75,10 +76,14 @@ class GarageNotifier extends _$GarageNotifier {
 
     final lowercaseQuery = query.toLowerCase();
     return cars.where((car) {
-      final modelMatch = car.car?.model?.toLowerCase().contains(lowercaseQuery) ?? false;
+      final modelMatch =
+          car.car?.model?.toLowerCase().contains(lowercaseQuery) ?? false;
       final makeName = car.car?.make?.name;
-      final makeMatch = makeName?.toLowerCase().contains(lowercaseQuery) ?? false;
-      final carName = '${makeName ?? ''} ${car.car?.model ?? ''}'.toLowerCase().trim();
+      final makeMatch =
+          makeName?.toLowerCase().contains(lowercaseQuery) ?? false;
+      final carName = '${makeName ?? ''} ${car.car?.model ?? ''}'
+          .toLowerCase()
+          .trim();
       final nameMatch = carName.contains(lowercaseQuery);
 
       return modelMatch || makeMatch || nameMatch;

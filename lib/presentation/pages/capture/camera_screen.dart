@@ -4,13 +4,19 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 
 import '../../../core/exception.dart';
 import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
 import '../../providers/car/garage_provider.dart';
+import '../../providers/subscription/subscription_provider.dart';
 import '../../widgets/capture/scanner.dart';
 import '../../widgets/shared/back.dart';
+import '../payment/upgrade_required_screen.dart';
 import 'scan_detail_screen.dart';
 
 class CameraScreen extends ConsumerStatefulWidget {
@@ -61,6 +67,115 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
       if (mounted) {
         setState(() => _isLoading = false);
       }
+    }
+  }
+
+  /// Compresses an image to ensure it's under 3MB
+  Future<XFile> _compressImage(XFile imageFile) async {
+    final file = File(imageFile.path);
+    final fileSize = await file.length();
+
+    // If already under 3MB, return as is
+    const maxSize = 3 * 1024 * 1024; // 3MB in bytes
+    if (fileSize < maxSize) {
+      debugPrint(
+        'Image size: ${fileSize / 1024 / 1024}MB - No compression needed',
+      );
+      return imageFile;
+    }
+
+    debugPrint('Image size: ${fileSize / 1024 / 1024}MB - Compressing...');
+
+    try {
+      final dir = await getTemporaryDirectory();
+      final targetPath = path.join(
+        dir.path,
+        '${DateTime.now().millisecondsSinceEpoch}_compressed${path.extension(imageFile.path)}',
+      );
+
+      // Start with quality 85 and reduce if needed
+      int quality = 85;
+      XFile? compressedFile;
+
+      while (quality > 20) {
+        final result = await FlutterImageCompress.compressAndGetFile(
+          file.absolute.path,
+          targetPath,
+          quality: quality,
+          minWidth: 1920,
+          minHeight: 1080,
+        );
+
+        if (result != null) {
+          final compressedSize = await File(result.path).length();
+          debugPrint(
+            'Compressed to ${compressedSize / 1024 / 1024}MB at quality $quality',
+          );
+
+          if (compressedSize < maxSize) {
+            compressedFile = result;
+            break;
+          }
+        }
+
+        quality -= 10;
+      }
+
+      if (compressedFile == null) {
+        debugPrint('Warning: Could not compress below 3MB, using best attempt');
+        return imageFile;
+      }
+
+      final finalSize = await File(compressedFile.path).length();
+      debugPrint('Final compressed size: ${finalSize / 1024 / 1024}MB');
+
+      return compressedFile;
+    } catch (e) {
+      debugPrint('Error compressing image: $e');
+      return imageFile; // Return original on error
+    }
+  }
+
+  // TODO: Remove - Temporary method for testing with gallery images
+  Future<void> _pickFromGallery() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+      if (image == null) return;
+
+      setState(() {
+        _capturedImage = image;
+        _isUploading = true;
+      });
+
+      // Compress image before uploading
+      final compressedImage = await _compressImage(image);
+
+      // Use garage provider's scanCar method
+      final carSpotModel = await ref
+          .read(garageProvider(null).notifier)
+          .scanCar(compressedImage);
+
+      setState(() {
+        _isUploading = false;
+        _capturedImage = null;
+      });
+
+      if (!context.mounted) return;
+      await context.push(
+        ScanDeatilScreen.routeName,
+        extra: carSpotModel,
+      );
+    } on EdgeFunctionException catch (e) {
+      showAlertMessage(e.message);
+    } catch (e) {
+      showAlertMessage('Error: $e');
+    } finally {
+      setState(() {
+        _isUploading = false;
+        _capturedImage = null;
+      });
     }
   }
 
@@ -154,68 +269,120 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      GestureDetector(
-                        onTap: () async {
-                          // capture image
-                          try {
-                            final XFile? file = await _controller
-                                ?.takePicture();
-                            if (file == null) {
-                              showAlertMessage(
-                                'Failed to capture image. Please try again.',
-                              );
-                              return;
-                            }
-
-                            setState(() {
-                              _capturedImage = file;
-                              _isUploading = true;
-                            });
-
-                            // Use garage provider's scanCar method
-                            final carSpotModel = await ref
-                                .read(garageProvider(null).notifier)
-                                .scanCar(file);
-
-                            setState(() {
-                              _isUploading = false;
-                              _capturedImage = null;
-                            });
-                            if (!context.mounted) return;
-                            await context.push(
-                              ScanDeatilScreen.routeName,
-                              extra: carSpotModel,
-                            );
-                          } on EdgeFunctionException catch (e) {
-                            showAlertMessage(e.message);
-                          } catch (e) {
-                            showAlertMessage('Error: $e');
-                          } finally {
-                            setState(() {
-                              _isUploading = false;
-                              _capturedImage = null;
-                            });
-                          }
-                        },
-                        child: Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // TODO: Remove - Temporary gallery button for testing
+                          GestureDetector(
+                            onTap: _pickFromGallery,
+                            child: Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.3),
-                                blurRadius: 30,
-                                offset: const Offset(0, 10),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
                               ),
-                            ],
+                              child: const Icon(
+                                Icons.photo_library,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                            ),
                           ),
-                          child: const Icon(
-                            Icons.camera_alt,
-                            color: Colors.black,
+                          const SizedBox(width: 40),
+                          GestureDetector(
+                            onTap: () async {
+                              // Check subscription limit
+                              final subscription = ref.read(
+                                subscriptionProvider.notifier,
+                              );
+                              final garageNotifier = ref.read(
+                                garageProvider(null).notifier,
+                              );
+                              final currentCarCount =
+                                  garageNotifier.carSpots.length;
+
+                              if (!subscription.canAddMoreCars(
+                                currentCarCount,
+                              )) {
+                                if (!context.mounted) return;
+                                await context.push(
+                                  UpgradeRequiredScreen.routeName,
+                                );
+                                return;
+                              }
+
+                              // capture image
+                              try {
+                                final XFile? file = await _controller
+                                    ?.takePicture();
+                                if (file == null) {
+                                  showAlertMessage(
+                                    'Failed to capture image. Please try again.',
+                                  );
+                                  return;
+                                }
+
+                                setState(() {
+                                  _capturedImage = file;
+                                  _isUploading = true;
+                                });
+
+                                // Compress image before uploading
+                                final compressedImage = await _compressImage(
+                                  file,
+                                );
+
+                                // Use garage provider's scanCar method
+                                final carSpotModel = await ref
+                                    .read(garageProvider(null).notifier)
+                                    .scanCar(compressedImage);
+
+                                setState(() {
+                                  _isUploading = false;
+                                  _capturedImage = null;
+                                });
+                                if (!context.mounted) return;
+                                await context.push(
+                                  ScanDeatilScreen.routeName,
+                                  extra: carSpotModel,
+                                );
+                              } on EdgeFunctionException catch (e) {
+                                showAlertMessage(e.message);
+                              } catch (e) {
+                                showAlertMessage('Error: $e');
+                              } finally {
+                                setState(() {
+                                  _isUploading = false;
+                                  _capturedImage = null;
+                                });
+                              }
+                            },
+                            child: Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                    blurRadius: 30,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.camera_alt,
+                                color: Colors.black,
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                       const SizedBox(height: 12),
                       Text(
