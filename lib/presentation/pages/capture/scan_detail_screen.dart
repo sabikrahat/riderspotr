@@ -7,25 +7,99 @@ import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
 import '../../../models/car/car_spot_model.dart';
+import '../../../models/user/xp_level_model.dart';
 import '../../providers/car/garage_provider.dart';
 import '../../providers/auth/user_provider.dart';
+import '../../providers/auth/xp_level_provider.dart';
+import '../../widgets/capture/xp_progression_card.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/rarity_badge.dart';
 import 'car_detail_screen.dart';
 
-class ScanDeatilScreen extends ConsumerWidget {
+class ScanDeatilScreen extends ConsumerStatefulWidget {
   static const String routeName = '/scan-detail';
   const ScanDeatilScreen({super.key, required this.carSpot});
 
   final CarSpotModel? carSpot;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final car = carSpot?.car;
+  ConsumerState<ScanDeatilScreen> createState() => _ScanDeatilScreenState();
+}
+
+class _ScanDeatilScreenState extends ConsumerState<ScanDeatilScreen> {
+  // Calculate XP and level progression using actual level data
+  Map<String, dynamic> _calculateXPProgression(
+    int currentTotalXP,
+    int currentLevel,
+    int xpToAdd,
+    List<XpLevelModel> xpLevels,
+  ) {
+    if (xpLevels.isEmpty) {
+      return {
+        'newLevel': currentLevel,
+        'newProgress': 0.0,
+        'levelsGained': 0,
+        'xpInCurrentLevel': 0,
+      };
+    }
+
+    int newTotalXP = currentTotalXP + xpToAdd;
+    int newLevel = 0;
+
+    // Find the new level based on cumulative XP
+    for (var level in xpLevels) {
+      if (newTotalXP >= level.xpCumulative) {
+        newLevel = level.level;
+      } else {
+        break;
+      }
+    }
+
+    int levelsGained = newLevel - currentLevel;
+
+    // Calculate progress to next level
+    double newProgress = 0.0;
+    int xpInCurrentLevel = 0;
+    int xpRequiredForNextLevel = 0;
+
+    // Get cumulative XP at current level (0 if level 0)
+    int xpAtLevelStart = 0;
+    if (newLevel > 0) {
+      final currentLevelData = xpLevels.firstWhere(
+        (l) => l.level == newLevel,
+        orElse: () => xpLevels.first,
+      );
+      xpAtLevelStart = currentLevelData.xpCumulative;
+    }
+
+    // XP progress within current level
+    xpInCurrentLevel = newTotalXP - xpAtLevelStart;
+
+    // Find next level's required XP
+    final nextLevelIndex = xpLevels.indexWhere((l) => l.level == newLevel + 1);
+    if (nextLevelIndex != -1) {
+      xpRequiredForNextLevel = xpLevels[nextLevelIndex].xpRequired;
+      if (xpRequiredForNextLevel > 0) {
+        newProgress = xpInCurrentLevel / xpRequiredForNextLevel;
+      }
+    }
+
+    return {
+      'newLevel': newLevel,
+      'newProgress': newProgress.clamp(0.0, 1.0),
+      'levelsGained': levelsGained,
+      'xpInCurrentLevel': xpInCurrentLevel,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final car = widget.carSpot?.car;
     final rarity = car?.rarity;
     final rarityColor = rarity?.color ?? Colors.grey;
     final points = car?.points ?? 0;
     final userAsync = ref.watch(userProvider);
+    final xpLevelsAsync = ref.watch(xpLevelsProvider);
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -42,7 +116,7 @@ class ScanDeatilScreen extends ConsumerWidget {
             child: Stack(
               children: [
                 Image.network(
-                  carSpot!.imageUrl,
+                  widget.carSpot!.imageUrl,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
@@ -160,7 +234,7 @@ class ScanDeatilScreen extends ConsumerWidget {
                             ),
                           ],
                         ),
-                        child: userAsync.when(
+                        child: xpLevelsAsync.when(
                           loading: () => SizedBox(
                             height: 60,
                             child: Center(
@@ -170,25 +244,71 @@ class ScanDeatilScreen extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          error: (_, __) => _buildXPContent(
-                            context,
-                            rarityColor,
-                            points,
-                            1,
-                            0.0,
+                          error: (_, __) => SizedBox(
+                            height: 60,
+                            child: Center(
+                              child: Text(
+                                'Unable to load XP data',
+                                style: context.textTheme.bodySmall?.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.5),
+                                ),
+                              ),
+                            ),
                           ),
-                          data: (user) {
-                            final stats = user?.stats;
-                            final progress =
-                                stats?.xpToNextLevelProgress ?? 0.0;
-                            final level = stats?.level ?? 1;
+                          data: (xpLevels) {
+                            return userAsync.when(
+                              loading: () => SizedBox(
+                                height: 60,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: rarityColor,
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              ),
+                              error: (_, __) => SizedBox(
+                                height: 60,
+                                child: Center(
+                                  child: Text(
+                                    'Unable to load user data',
+                                    style: context.textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.5,
+                                          ),
+                                        ),
+                                  ),
+                                ),
+                              ),
+                              data: (user) {
+                                final stats = user?.stats;
+                                final currentProgress =
+                                    stats?.xpToNextLevelProgress ?? 0.0;
+                                final currentLevel = stats?.level ?? 0;
+                                final currentTotalXP = stats?.totalXp ?? 0;
 
-                            return _buildXPContent(
-                              context,
-                              rarityColor,
-                              points,
-                              level,
-                              progress,
+                                // Calculate projected progression using real XP levels
+                                final progression = _calculateXPProgression(
+                                  currentTotalXP,
+                                  currentLevel,
+                                  points,
+                                  xpLevels,
+                                );
+
+                                final newLevel = progression['newLevel'] as int;
+                                final newProgress =
+                                    progression['newProgress'] as double;
+
+                                return XpProgressionCard(
+                                  rarityColor: rarityColor,
+                                  points: points,
+                                  currentLevel: currentLevel,
+                                  currentProgress: currentProgress,
+                                  newLevel: newLevel,
+                                  newProgress: newProgress,
+                                  xpLevels: xpLevels,
+                                );
+                              },
                             );
                           },
                         ),
@@ -222,7 +342,7 @@ class ScanDeatilScreen extends ConsumerWidget {
                                         garageProvider(null).notifier,
                                       );
                                       await garageNotifier.deleteCar(
-                                        carSpot!.id,
+                                        widget.carSpot!.id,
                                       );
                                       if (!context.mounted) return;
                                       context.pop();
@@ -294,7 +414,7 @@ class ScanDeatilScreen extends ConsumerWidget {
                                         garageProvider(null).notifier,
                                       );
                                       await garageNotifier.claimCar(
-                                        carSpot!.id,
+                                        widget.carSpot!.id,
                                       );
                                       // Refresh user stats
                                       await ref
@@ -356,7 +476,7 @@ class ScanDeatilScreen extends ConsumerWidget {
                           child: InkWell(
                             onTap: () => context.push(
                               CarDetailScreen.routeName,
-                              extra: carSpot,
+                              extra: widget.carSpot,
                             ),
                             borderRadius: BorderRadius.circular(16),
                             child: Center(
@@ -381,104 +501,6 @@ class ScanDeatilScreen extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildXPContent(
-    BuildContext context,
-    Color rarityColor,
-    int points,
-    int level,
-    double progress,
-  ) {
-    return Column(
-      children: [
-        // XP Gain
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.electric_bolt_rounded,
-              color: rarityColor,
-              size: 20,
-            ),
-            Gap(6),
-            Text(
-              '+$points XP',
-              style: context.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: rarityColor,
-                letterSpacing: 1,
-                fontSize: 22,
-              ),
-            ),
-          ],
-        ),
-        Gap(12),
-        // Progress Bar
-        Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'LEVEL $level',
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 1,
-                    fontSize: 10,
-                  ),
-                ),
-                Text(
-                  'LEVEL ${level + 1}',
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 1,
-                    fontSize: 10,
-                  ),
-                ),
-              ],
-            ),
-            Gap(8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Container(
-                height: 6,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Stack(
-                  children: [
-                    FractionallySizedBox(
-                      alignment: Alignment.centerLeft,
-                      widthFactor: progress.clamp(0.0, 1.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              rarityColor,
-                              rarityColor.withValues(alpha: 0.6),
-                            ],
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: rarityColor.withValues(alpha: 0.5),
-                              blurRadius: 8,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }

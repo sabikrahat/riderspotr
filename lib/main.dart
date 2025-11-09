@@ -6,6 +6,8 @@ import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toastification/toastification.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 import 'config/constants.dart';
 import 'config/router.dart';
@@ -30,6 +32,10 @@ Future<void> main() async {
   );
 
   MapboxOptions.setAccessToken(mapBoxAccessToken);
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
     ProviderScope(

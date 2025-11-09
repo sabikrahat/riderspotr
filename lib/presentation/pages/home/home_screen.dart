@@ -4,7 +4,7 @@ import 'package:gap/gap.dart';
 
 import '../../providers/auth/profile_provider.dart';
 import '../../widgets/home/achievements_section.dart';
-import '../../widgets/home/daily_tasks_section.dart';
+// import '../../widgets/home/daily_tasks_section.dart';
 import '../../widgets/home/hero_section.dart';
 import '../../widgets/home/stats_grid_section.dart';
 import '../../widgets/home/upgrade_promo_section.dart';
@@ -45,11 +45,10 @@ class HomeScreen extends ConsumerWidget {
                         // XP Progress Section
                         if (user != null) XPProgressSection(user: user),
 
-                        Gap(40),
+                        // Gap(40),
 
-                        // Daily Tasks Section
-                        DailyTasksSection(),
-
+                        // // Daily Tasks Section
+                        // DailyTasksSection(),
                         Gap(40),
 
                         // Stats Grid Section
@@ -60,7 +59,7 @@ class HomeScreen extends ConsumerWidget {
                         Gap(40),
 
                         // Achievements Section
-                        AchievementsSection(),
+                        AchievementsSection(user: user),
 
                         Gap(100),
                       ],

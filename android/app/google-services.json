@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "88295616673",
+    "project_id": "ridespotr-app",
+    "storage_bucket": "ridespotr-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:88295616673:android:4da2359edf2de97a1980e0",
+        "android_client_info": {
+          "package_name": "com.ridespotr.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEByNLh2dbvs6V38blDy0VZNso-DJ1YJU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user_provider.dart';
+part of 'xp_level_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,44 +9,45 @@ part of 'user_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(UserNotifier)
-const userProvider = UserNotifierProvider._();
+@ProviderFor(XpLevels)
+const xpLevelsProvider = XpLevelsProvider._();
 
-final class UserNotifierProvider
-    extends $AsyncNotifierProvider<UserNotifier, UserModel?> {
-  const UserNotifierProvider._()
+final class XpLevelsProvider
+    extends $AsyncNotifierProvider<XpLevels, List<XpLevelModel>> {
+  const XpLevelsProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'userProvider',
+        name: r'xpLevelsProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$userNotifierHash();
+  String debugGetCreateSourceHash() => _$xpLevelsHash();
 
   @$internal
   @override
-  UserNotifier create() => UserNotifier();
+  XpLevels create() => XpLevels();
 }
 
-String _$userNotifierHash() => r'0e0e5da099a61c4cdd14c25dff511163fc87896b';
+String _$xpLevelsHash() => r'b12e11266cfc8513291b44d95dae0239676f650a';
 
-abstract class _$UserNotifier extends $AsyncNotifier<UserModel?> {
-  FutureOr<UserModel?> build();
+abstract class _$XpLevels extends $AsyncNotifier<List<XpLevelModel>> {
+  FutureOr<List<XpLevelModel>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<UserModel?>, UserModel?>;
+    final ref =
+        this.ref as $Ref<AsyncValue<List<XpLevelModel>>, List<XpLevelModel>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<UserModel?>, UserModel?>,
-              AsyncValue<UserModel?>,
+              AnyNotifier<AsyncValue<List<XpLevelModel>>, List<XpLevelModel>>,
+              AsyncValue<List<XpLevelModel>>,
               Object?,
               Object?
             >;

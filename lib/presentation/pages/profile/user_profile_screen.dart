@@ -8,6 +8,7 @@ import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../providers/auth/profile_provider.dart';
+import '../../widgets/home/achievements_section.dart';
 import '../../widgets/profile/profile_stats_section.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/car_card.dart';
@@ -347,9 +348,21 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 16.0,
                                     ),
-                                    child: ProfileStatsSection(
-                                      user: notifier.user,
-                                      carSpots: notifier.carSpots,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ProfileStatsSection(
+                                          user: notifier.user,
+                                          carSpots: notifier.carSpots,
+                                        ),
+                                        Gap(40),
+                                        // Achievements Section
+                                        AchievementsSection(
+                                          user: notifier.user,
+                                          showAll: true,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ]
@@ -358,9 +371,21 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 16.0,
                                     ),
-                                    child: ProfileStatsSection(
-                                      user: notifier.user,
-                                      carSpots: notifier.carSpots,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ProfileStatsSection(
+                                          user: notifier.user,
+                                          carSpots: notifier.carSpots,
+                                        ),
+                                        Gap(40),
+                                        // Achievements Section
+                                        AchievementsSection(
+                                          user: notifier.user,
+                                          showAll: true,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   _Garages(widget.id),

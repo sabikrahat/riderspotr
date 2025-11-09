@@ -82,75 +82,117 @@ class UserService {
   Future<void> update({required UserModel user}) async {
     try {
       debugPrint("Updating user: ${user.toJson()}");
-      // Check if username is used
-      final username = await _client
-          .from('usernames')
-          .select()
-          .eq('username', user.username!)
-          .neq('id', user.id)
-          .maybeSingle();
 
-      if (username != null) {
-        throw KException(
-          'Username already used. Please use a different username.',
-        );
+      // Check if username is used (only if username is provided)
+      if (user.username != null && user.username!.isNotEmpty) {
+        final username = await _client
+            .from('usernames')
+            .select()
+            .eq('username', user.username!)
+            .neq('id', user.id)
+            .maybeSingle();
+
+        if (username != null) {
+          throw KException(
+            'Username already used. Please use a different username.',
+          );
+        }
       }
 
-      await _client
-          .from(usersTbl)
-          .update({
-            ...user.toJson(),
-            'lat_lng': user.location != null
-                ? 'POINT(${user.location!.longitude} ${user.location!.latitude})'
-                : null,
-          })
-          .eq('id', user.id);
+      final updateData = {
+        ...user.toJson(),
+        'lat_lng': user.location != null
+            ? 'POINT(${user.location!.longitude} ${user.location!.latitude})'
+            : null,
+      };
+
+      debugPrint("Update data being sent: $updateData");
+
+      await _client.from(usersTbl).update(updateData).eq('id', user.id);
+
+      debugPrint("User updated successfully in database");
     } on SocketException catch (e) {
+      debugPrint("SocketException: ${e.message}");
       throw KException('No internet connection. ${e.message}');
     } on AuthException catch (e) {
+      debugPrint("AuthException: ${e.message}");
       throw KException(e.message);
-    } on KException catch (_) {
+    } on KException catch (e) {
+      debugPrint("KException: ${e.toString()}");
       rethrow;
     } catch (e) {
+      debugPrint("Unknown error: ${e.toString()}");
       throw KException(e.toString());
     }
   }
 
-  /// Upload a profile picture to storage
-  Future<String?> uploadProfilePictureToStorage(XFile file) async {
+  /// Update profile picture - uploads and saves to database
+  Future<String> updateProfilePicture(XFile file) async {
     try {
+      final userId = _client.auth.currentUser?.id;
+      if (userId == null) throw Exception('User not authenticated');
+
+      // Upload to storage
       final path = '${const Uuid().v4()}.jpg';
-      // upload to supabase storage bucket 'banner-picture'
-      final res = await _client.storage
+      await _client.storage
           .from('profile-picture')
           .upload(
             path,
             File(file.path),
             fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
           );
-      debugPrint('Supabase photo upload in <$res>');
-      return '$supabaseStorageUrl/profile-picture/$path';
+
+      final imageUrl = '$supabaseStorageUrl/profile-picture/$path';
+      debugPrint('Profile picture uploaded to: $imageUrl');
+
+      // Update database
+      await _client
+          .from(usersTbl)
+          .update({'profile_picture_url': imageUrl})
+          .eq('id', userId);
+
+      debugPrint('Profile picture URL saved to database');
+      return imageUrl;
+    } on SocketException catch (e) {
+      throw KException('No internet connection. ${e.message}');
     } catch (e) {
-      throw Exception('Error uploading file: $e');
+      debugPrint('Error updating profile picture: $e');
+      throw KException('Error updating profile picture: $e');
     }
   }
 
-  /// Upload a banner picture to storage
-  Future<String?> uploadBannerPictureToStorage(XFile file) async {
+  /// Update banner picture - uploads and saves to database
+  Future<String> updateBannerPicture(XFile file) async {
     try {
+      final userId = _client.auth.currentUser?.id;
+      if (userId == null) throw Exception('User not authenticated');
+
+      // Upload to storage
       final path = '${const Uuid().v4()}.jpg';
-      // upload to supabase storage bucket 'banner-picture'
-      final res = await _client.storage
+      await _client.storage
           .from('banner-picture')
           .upload(
             path,
             File(file.path),
             fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
           );
-      debugPrint('Supabase photo upload in <$res>');
-      return '$supabaseStorageUrl/banner-picture/$path';
+
+      final imageUrl = '$supabaseStorageUrl/banner-picture/$path';
+      debugPrint('Banner picture uploaded to: $imageUrl');
+
+      // Update database
+      await _client
+          .from(usersTbl)
+          .update({'banner_url': imageUrl})
+          .eq('id', userId);
+
+      debugPrint('Banner picture URL saved to database');
+      return imageUrl;
+    } on SocketException catch (e) {
+      throw KException('No internet connection. ${e.message}');
     } catch (e) {
-      throw Exception('Error uploading file: $e');
+      debugPrint('Error updating banner picture: $e');
+      throw KException('Error updating banner picture: $e');
     }
   }
 
@@ -165,6 +207,26 @@ class UserService {
       return res['rank'];
     } catch (e) {
       throw Exception('Failed to get leaderboard rank');
+    }
+  }
+
+  Future<void> saveFcmToken(String token) async {
+    try {
+      final userId = _client.auth.currentUser?.id;
+      if (userId == null) return;
+
+      await _client
+          .from(usersTbl)
+          .update({'fcm_token': token})
+          .eq('id', userId);
+
+      debugPrint('FCM token saved: $token');
+    } on SocketException catch (e) {
+      throw KException('No internet connection. ${e.message}');
+    } on AuthException catch (e) {
+      throw KException(e.message);
+    } catch (e) {
+      throw KException(e.toString());
     }
   }
 }

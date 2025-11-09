@@ -87,65 +87,19 @@ class UserNotifier extends _$UserNotifier {
     await refreshUser();
   }
 
-  Future<void> updateProfilePicture({
-    required XFile profilePicture,
-  }) async {
-    if (_user == null) return;
-
-    final profileImagePath = await UserService().uploadProfilePictureToStorage(
-      profilePicture,
-    );
-
-    await updateUser(
-      user: _user!.copyWith(
-        profilePictureUrl: profileImagePath,
-      ),
-    );
+  Future<void> updateProfilePicture(XFile profilePicture) async {
+    final imageUrl = await UserService().updateProfilePicture(profilePicture);
+    debugPrint('Profile picture updated: $imageUrl');
+    await refreshUser();
   }
 
-  Future<void> updateBannerPicture({
-    required XFile bannerPicture,
-  }) async {
-    if (_user == null) return;
-
-    final bannerImagePath = await UserService().uploadBannerPictureToStorage(
-      bannerPicture,
-    );
-
-    await updateUser(
-      user: _user!.copyWith(
-        bannerUrl: bannerImagePath,
-      ),
-    );
+  Future<void> updateBannerPicture(XFile bannerPicture) async {
+    final imageUrl = await UserService().updateBannerPicture(bannerPicture);
+    debugPrint('Banner picture updated: $imageUrl');
+    await refreshUser();
   }
 
-  Future<void> updateProfileAndBannerPictures({
-    XFile? profilePicture,
-    XFile? bannerPicture,
-  }) async {
-    if (_user == null) return;
-    if (profilePicture == null && bannerPicture == null) return;
-
-    String? profileImagePath;
-    String? bannerImagePath;
-
-    if (profilePicture != null) {
-      profileImagePath = await UserService().uploadProfilePictureToStorage(
-        profilePicture,
-      );
-    }
-
-    if (bannerPicture != null) {
-      bannerImagePath = await UserService().uploadBannerPictureToStorage(
-        bannerPicture,
-      );
-    }
-
-    await updateUser(
-      user: _user!.copyWith(
-        profilePictureUrl: profileImagePath ?? _user!.profilePictureUrl,
-        bannerUrl: bannerImagePath ?? _user!.bannerUrl,
-      ),
-    );
+  Future<void> saveFcmToken(String token) async {
+    await UserService().saveFcmToken(token);
   }
 }

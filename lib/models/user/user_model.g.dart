@@ -40,6 +40,9 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
   stats: json['stats'] == null
       ? null
       : UserStatsModel.fromJson(json['stats'] as Map<String, dynamic>),
+  achievements: (json['achievements'] as List<dynamic>?)
+      ?.map((e) => AchievementModel.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{

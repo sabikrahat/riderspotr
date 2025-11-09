@@ -1,6 +1,7 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridespotr/presentation/pages/fcm_wrapper.dart';
 
 import '../../core/enums.dart';
 import 'capture/camera_screen.dart';
@@ -33,8 +34,10 @@ class NavScreen extends StatelessWidget {
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
-      body: body,
-      bottomNavigationBar: KBottomNavbar(selectedNavItem: _getSelectedNavItem(path)),
+      body: FcmWrapper(child: body),
+      bottomNavigationBar: KBottomNavbar(
+        selectedNavItem: _getSelectedNavItem(path),
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.grey.shade900,
         shape: const CircleBorder(),

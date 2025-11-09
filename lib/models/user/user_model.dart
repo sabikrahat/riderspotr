@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:ridespotr/models/user/user_stats_model.dart';
+import 'package:ridespotr/models/user/achievement_model.dart';
 
 part 'user_model.g.dart';
 
@@ -41,6 +42,8 @@ class UserModel {
   final bool isGaragePrivate;
   @JsonKey(includeToJson: false)
   final UserStatsModel? stats;
+  @JsonKey(includeToJson: false)
+  final List<AchievementModel>? achievements;
 
   UserModel({
     required this.id,
@@ -62,6 +65,7 @@ class UserModel {
     required this.createdAt,
     required this.isGaragePrivate,
     required this.stats,
+    this.achievements,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
@@ -98,6 +102,7 @@ class UserModel {
     DateTime? createdAt,
     bool? isGaragePrivate,
     UserStatsModel? stats,
+    List<AchievementModel>? achievements,
   }) => UserModel(
     id: id,
     email: email,
@@ -118,9 +123,10 @@ class UserModel {
     createdAt: createdAt ?? this.createdAt,
     isGaragePrivate: isGaragePrivate ?? this.isGaragePrivate,
     stats: stats ?? this.stats,
+    achievements: achievements ?? this.achievements,
   );
 
   String get fullName => "$firstName$lastName";
 
-  static const query = '*, stats: user_stats(*)';
+  static const query = '*, stats: user_stats(*), achievements: achievements(*)';
 }

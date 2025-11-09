@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +6,10 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/extensions.dart';
+import '../../../core/toastification.dart';
 import '../../providers/auth/profile_provider.dart';
 import '../../providers/auth/user_provider.dart';
+import '../../widgets/home/achievements_section.dart';
 import '../../widgets/image_process/pick_photo.dart';
 import '../../widgets/profile/profile_stats_section.dart';
 import '../../widgets/shared/loading_overlay.dart';
@@ -26,25 +26,40 @@ class OwnProfileScreen extends ConsumerStatefulWidget {
 
 class _OwnProfileScreenState extends ConsumerState<OwnProfileScreen> {
   bool _isLoading = false;
-  XFile? _pickedProfilePicture;
-  XFile? _pickedBannerPicture;
 
-  Future<void> _updateImages(UserNotifier notifier) async {
+  Future<void> _updateProfilePicture(XFile file) async {
     setState(() {
       _isLoading = true;
     });
     try {
-      await notifier.updateProfileAndBannerPictures(
-        profilePicture: _pickedProfilePicture,
-        bannerPicture: _pickedBannerPicture,
-      );
+      final notifier = ref.read(userProvider.notifier);
+      await notifier.updateProfilePicture(file);
+
+      showSuccessMessage('Profile picture updated successfully!');
     } catch (e) {
-      // Handle error - maybe show a snackbar
+      debugPrint('Error updating profile picture: $e');
+      showErrorMessage('Failed to update profile picture. Please try again.');
+    } finally {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating images: $e')),
-        );
+        setState(() {
+          _isLoading = false;
+        });
       }
+    }
+  }
+
+  Future<void> _updateBannerPicture(XFile file) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final notifier = ref.read(userProvider.notifier);
+      await notifier.updateBannerPicture(file);
+
+      showSuccessMessage('Banner updated successfully!');
+    } catch (e) {
+      debugPrint('Error updating banner: $e');
+      showErrorMessage('Failed to update banner. Please try again.');
     } finally {
       if (mounted) {
         setState(() {
@@ -59,25 +74,6 @@ class _OwnProfileScreenState extends ConsumerState<OwnProfileScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
-      floatingActionButton:
-          _pickedProfilePicture == null && _pickedBannerPicture == null
-          ? null
-          : FloatingActionButton.extended(
-              backgroundColor: Colors.white,
-              onPressed: () async {
-                final notifier = ref.read(userProvider.notifier);
-                await _updateImages(notifier);
-                setState(() {
-                  _pickedProfilePicture = null;
-                  _pickedBannerPicture = null;
-                });
-              },
-              icon: Icon(Icons.upload, color: Colors.black),
-              label: Text(
-                'Update',
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
       body: ref
           .watch(userProvider)
           .when(
@@ -88,9 +84,7 @@ class _OwnProfileScreenState extends ConsumerState<OwnProfileScreen> {
               final user = notifier.user;
 
               // Determine which banner to show
-              final bannerImage = _pickedBannerPicture != null
-                  ? FileImage(File(_pickedBannerPicture!.path))
-                  : user?.bannerUrl != null
+              final bannerImage = user?.bannerUrl != null
                   ? FastCachedImageProvider(user!.bannerUrl!) as ImageProvider
                   : AssetImage('assets/carbon/leaderboard-bg.jpg')
                         as ImageProvider;
@@ -148,14 +142,10 @@ class _OwnProfileScreenState extends ConsumerState<OwnProfileScreen> {
                                       GestureDetector(
                                         onTap: () async {
                                           if (user == null) return;
-                                          await pickPhoto(context).then((
-                                            pk,
-                                          ) async {
-                                            if (pk == null) return;
-                                            setState(() {
-                                              _pickedBannerPicture = pk;
-                                            });
-                                          });
+                                          final pk = await pickPhoto(context);
+                                          if (pk != null) {
+                                            await _updateBannerPicture(pk);
+                                          }
                                         },
                                         child: Container(
                                           padding: EdgeInsets.all(10),
@@ -237,13 +227,7 @@ class _OwnProfileScreenState extends ConsumerState<OwnProfileScreen> {
                                         child: CircleAvatar(
                                           radius: 50,
                                           backgroundImage:
-                                              _pickedProfilePicture != null
-                                              ? FileImage(
-                                                  File(
-                                                    _pickedProfilePicture!.path,
-                                                  ),
-                                                )
-                                              : user?.profilePictureUrl == null
+                                              user?.profilePictureUrl == null
                                               ? AssetImage(
                                                   'assets/images/user-placeholder.png',
                                                 )
@@ -259,14 +243,10 @@ class _OwnProfileScreenState extends ConsumerState<OwnProfileScreen> {
                                         child: GestureDetector(
                                           onTap: () async {
                                             if (user == null) return;
-                                            await pickPhoto(context).then((
-                                              pk,
-                                            ) async {
-                                              if (pk == null) return;
-                                              setState(() {
-                                                _pickedProfilePicture = pk;
-                                              });
-                                            });
+                                            final pk = await pickPhoto(context);
+                                            if (pk != null) {
+                                              await _updateProfilePicture(pk);
+                                            }
                                           },
                                           child: Container(
                                             padding: EdgeInsets.all(6),
@@ -332,9 +312,21 @@ class _OwnProfileScreenState extends ConsumerState<OwnProfileScreen> {
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 16.0,
                                     ),
-                                    child: ProfileStatsSection(
-                                      user: user,
-                                      carSpots: profileNotifier.carSpots,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ProfileStatsSection(
+                                          user: user,
+                                          carSpots: profileNotifier.carSpots,
+                                        ),
+                                        Gap(40),
+                                        // Achievements Section
+                                        AchievementsSection(
+                                          user: user,
+                                          showAll: true,
+                                        ),
+                                      ],
                                     ),
                                   );
                                 },

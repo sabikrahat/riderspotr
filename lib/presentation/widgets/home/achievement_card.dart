@@ -8,13 +8,11 @@ class AchievementCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.description,
-    required this.progress,
     required this.icon,
   });
 
   final String title;
   final String description;
-  final double progress;
   final IconData icon;
 
   @override
@@ -90,50 +88,7 @@ class AchievementCard extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.35),
                   ),
                 ),
-                Gap(12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: FractionallySizedBox(
-                      widthFactor: progress,
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.white.withValues(alpha: 0.9),
-                              Colors.white.withValues(alpha: 0.7),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              blurRadius: 6,
-                              offset: Offset(0, 0),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
               ],
-            ),
-          ),
-          Gap(12),
-          Text(
-            '${(progress * 100).toInt()}%',
-            style: context.textTheme.bodyMedium?.copyWith(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              letterSpacing: 0.3,
-              color: Colors.white.withValues(alpha: 0.6),
             ),
           ),
         ],
