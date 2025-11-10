@@ -8,6 +8,7 @@ import 'package:ridespotr/core/extensions.dart';
 import '../../../core/toastification.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/loading_overlay.dart';
+import '../home/home_screen.dart';
 
 class PaymentScreen extends ConsumerStatefulWidget {
   static const routeName = '/payment';
@@ -32,7 +33,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       });
       if (info.activeSubscriptions.isNotEmpty) {
         if (mounted) {
-          context.go('/');
+          context.go(HomeScreen.routeName);
         }
       }
       setState(() {

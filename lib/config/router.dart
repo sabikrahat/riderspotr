@@ -50,6 +50,17 @@ final router = GoRouter(
   initialLocation: HomeScreen.routeName,
   routes: [
     GoRoute(
+      path: '/',
+      redirect: (context, state) {
+        final loggedIn = Supabase.instance.client.auth.currentUser != null;
+
+        if (loggedIn) {
+          return HomeScreen.routeName;
+        }
+        return LoginScreen.routeName;
+      },
+    ),
+    GoRoute(
       path: WelcomeScreen.routeName,
       builder: (_, _) => WelcomeScreen(),
     ),
