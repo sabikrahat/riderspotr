@@ -31,11 +31,13 @@ class Subscription extends _$Subscription {
 
     final entitlements = _customerInfo!.entitlements.active;
 
-    if (entitlements.containsKey('premium')) {
+    final entitlementKeys = entitlements.keys.map((key) => key.toLowerCase());
+
+    if (entitlementKeys.contains('premium')) {
       return SubscriptionTier.premium;
     }
 
-    if (entitlements.containsKey('basic')) {
+    if (entitlementKeys.contains('basic')) {
       return SubscriptionTier.basic;
     }
 

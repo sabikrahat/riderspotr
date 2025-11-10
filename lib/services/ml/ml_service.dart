@@ -8,6 +8,32 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
+/// Helper class to store a text region with its license plate likelihood score
+class _ScoredTextRegion {
+  final String text;
+  final Rect boundingBox;
+  final double score;
+
+  _ScoredTextRegion({
+    required this.text,
+    required this.boundingBox,
+    required this.score,
+  });
+}
+
+/// Result from ML detection containing the blurred image and detection metadata
+class MLDetectionResult {
+  final XFile blurredImage;
+  final String? numberPlate;
+  final bool faceDetected;
+
+  MLDetectionResult({
+    required this.blurredImage,
+    this.numberPlate,
+    required this.faceDetected,
+  });
+}
+
 class MLService {
   final TextRecognizer _textRecognizer = TextRecognizer(
     script: TextRecognitionScript.latin,
@@ -23,8 +49,10 @@ class MLService {
   );
 
   /// Detects and blurs text (license plates) and faces in an image
-  /// Returns a new XFile with the blurred image
-  Future<XFile> detectAndBlurSensitiveContent(XFile imageFile) async {
+  /// Returns MLDetectionResult with blurred image and detection metadata
+  Future<MLDetectionResult> detectAndBlurSensitiveContent(
+    XFile imageFile,
+  ) async {
     try {
       debugPrint('Starting ML detection and blur process...');
 
@@ -38,14 +66,21 @@ class MLService {
 
       if (originalImage == null) {
         debugPrint('Failed to decode image');
-        return imageFile;
+        return MLDetectionResult(
+          blurredImage: imageFile,
+          numberPlate: null,
+          faceDetected: false,
+        );
       }
 
       // Create a copy of the image to work with
       img.Image processedImage = img.Image.from(originalImage);
 
       // Step 1: Detect and blur text (license plates)
-      final textRegions = await _detectText(inputImage);
+      final textDetectionResult = await _detectText(inputImage);
+      final textRegions = textDetectionResult['regions'] as List<Rect>;
+      final detectedPlate = textDetectionResult['plate_text'] as String?;
+
       processedImage = _blurRegions(
         processedImage,
         originalImage,
@@ -55,6 +90,8 @@ class MLService {
 
       // Step 2: Detect and blur faces
       final faceRegions = await _detectFaces(inputImage);
+      final faceDetected = faceRegions.isNotEmpty;
+
       processedImage = _blurRegions(
         processedImage,
         originalImage,
@@ -75,18 +112,30 @@ class MLService {
       await tempFile.writeAsBytes(encodedImage);
 
       debugPrint('Saved blurred image to: $tempPath');
+      debugPrint(
+        'Detected plate: $detectedPlate | Face detected: $faceDetected',
+      );
 
-      return XFile(tempPath);
+      return MLDetectionResult(
+        blurredImage: XFile(tempPath),
+        numberPlate: detectedPlate,
+        faceDetected: faceDetected,
+      );
     } catch (e, stackTrace) {
       debugPrint('Error in ML detection and blur: $e');
       debugPrint('Stack trace: $stackTrace');
-      // Return original image on error
-      return imageFile;
+      // Return original image on error with no detections
+      return MLDetectionResult(
+        blurredImage: imageFile,
+        numberPlate: null,
+        faceDetected: false,
+      );
     }
   }
 
-  /// Detects text in the image and returns bounding boxes
-  Future<List<Rect>> _detectText(InputImage inputImage) async {
+  /// Detects text in the image and returns bounding boxes and detected plate text
+  /// Uses scoring to identify the most likely license plate region
+  Future<Map<String, dynamic>> _detectText(InputImage inputImage) async {
     try {
       final RecognizedText recognizedText = await _textRecognizer.processImage(
         inputImage,
@@ -94,11 +143,128 @@ class MLService {
 
       debugPrint('Detected ${recognizedText.blocks.length} text blocks');
 
-      return recognizedText.blocks.map((block) => block.boundingBox).toList();
+      // Collect all text lines with their scores
+      List<_ScoredTextRegion> scoredRegions = [];
+
+      for (final block in recognizedText.blocks) {
+        for (final line in block.lines) {
+          final score = _scoreLicensePlateLikelihood(line, inputImage);
+          scoredRegions.add(
+            _ScoredTextRegion(
+              text: line.text,
+              boundingBox: line.boundingBox,
+              score: score,
+            ),
+          );
+
+          debugPrint(
+            'Text: "${line.text}" | Score: ${score.toStringAsFixed(2)}',
+          );
+        }
+      }
+
+      if (scoredRegions.isEmpty) {
+        debugPrint('No text regions found');
+        return {'regions': <Rect>[], 'plate_text': null};
+      }
+
+      // Sort by score (highest first)
+      scoredRegions.sort((a, b) => b.score.compareTo(a.score));
+
+      // Get the highest scoring region
+      final bestCandidate = scoredRegions.first;
+
+      debugPrint(
+        '🎯 Selected license plate: "${bestCandidate.text}" with score ${bestCandidate.score.toStringAsFixed(2)}',
+      );
+
+      // Only return the best candidate if it has a reasonable score
+      if (bestCandidate.score > 0.3) {
+        return {
+          'regions': [bestCandidate.boundingBox],
+          'plate_text': bestCandidate.text,
+        };
+      } else {
+        debugPrint(
+          '⚠️ Best score too low (${bestCandidate.score.toStringAsFixed(2)}), skipping blur',
+        );
+        return {'regions': <Rect>[], 'plate_text': null};
+      }
     } catch (e) {
       debugPrint('Error detecting text: $e');
-      return [];
+      return {'regions': <Rect>[], 'plate_text': null};
     }
+  }
+
+  /// Scores how likely a text line is to be a license plate (0.0 to 1.0)
+  double _scoreLicensePlateLikelihood(TextLine line, InputImage inputImage) {
+    final text = line.text.replaceAll(' ', ''); // Remove spaces
+    final box = line.boundingBox;
+    double score = 0.0;
+
+    // Factor 1: Character count (4-9 is ideal)
+    if (text.length >= 4 && text.length <= 9) {
+      // Perfect range
+      score += 0.25;
+      if (text.length >= 5 && text.length <= 8) {
+        // Most common range, extra bonus
+        score += 0.05;
+      }
+    } else if (text.length >= 3 && text.length <= 11) {
+      // Acceptable but not ideal
+      score += 0.10;
+    }
+    // else: no points for very short or very long text
+
+    // Factor 2: Aspect ratio (license plates are wide and rectangular)
+    final aspectRatio = box.width / box.height;
+    if (aspectRatio >= 2.0 && aspectRatio <= 5.0) {
+      // Ideal aspect ratio for plates
+      score += 0.25;
+    } else if (aspectRatio >= 1.5 && aspectRatio <= 6.0) {
+      // Acceptable aspect ratio
+      score += 0.15;
+    }
+
+    // Factor 3: Has both letters AND numbers (strong indicator)
+    final hasLetters = RegExp(r'[A-Z]', caseSensitive: false).hasMatch(text);
+    final hasNumbers = RegExp(r'[0-9]').hasMatch(text);
+    if (hasLetters && hasNumbers) {
+      score += 0.20;
+    } else if (hasLetters || hasNumbers) {
+      // At least has some alphanumeric
+      score += 0.05;
+    }
+
+    // Factor 4: Position in image (plates usually in lower 2/3 of image)
+    final imageHeight = inputImage.metadata?.size.height ?? 1000;
+    final centerY = box.top + (box.height / 2);
+    final relativePosition = centerY / imageHeight;
+
+    if (relativePosition >= 0.4 && relativePosition <= 0.9) {
+      // Lower portion of image - where plates usually are
+      score += 0.10;
+    } else if (relativePosition >= 0.3) {
+      // Still acceptable
+      score += 0.05;
+    }
+
+    // Factor 5: Character density (plates pack characters closely)
+    final characterDensity = text.length / box.width;
+    if (characterDensity >= 0.015 && characterDensity <= 0.1) {
+      score += 0.10;
+    } else if (characterDensity >= 0.01) {
+      score += 0.05;
+    }
+
+    // Factor 6: Minimum size (plates shouldn't be tiny)
+    if (box.width >= 80 && box.height >= 20) {
+      score += 0.10;
+    } else if (box.width >= 50 && box.height >= 15) {
+      score += 0.05;
+    }
+
+    return score.clamp(0.0, 1.0);
   }
 
   /// Detects faces in the image and returns bounding boxes

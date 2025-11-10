@@ -6,6 +6,7 @@ import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:ridespotr/core/extensions.dart';
 
 import '../../../core/toastification.dart';
+import '../../providers/subscription/subscription_provider.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/loading_overlay.dart';
 import '../home/home_screen.dart';
@@ -22,25 +23,67 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   bool _isLoading = false;
   late Future<Offerings> _getOfferings;
   late void Function(CustomerInfo) _customerInfoUpdateListener;
+  Set<String>? _initialEntitlements;
 
   @override
   void initState() {
     super.initState();
+
+    // Save initial entitlements when screen opens
+    _initializeEntitlements();
+
     _getOfferings = Purchases.getOfferings();
     _customerInfoUpdateListener = (info) {
-      setState(() {
-        _isLoading = true;
-      });
-      if (info.activeSubscriptions.isNotEmpty) {
-        if (mounted) {
-          context.go(HomeScreen.routeName);
-        }
+      // Get current entitlements
+      final currentEntitlements = info.entitlements.active.keys.toSet();
+
+      // Only trigger if entitlements have changed from initial state
+      if (_initialEntitlements != null &&
+          !_areEntitlementsEqual(_initialEntitlements!, currentEntitlements) &&
+          info.activeSubscriptions.isNotEmpty) {
+        // Delay the provider modification until after the widget tree is done building
+        Future(() async {
+          setState(() {
+            _isLoading = true;
+          });
+
+          // Refresh the subscription provider to get latest status
+          await ref.read(subscriptionProvider.notifier).refresh();
+
+          if (mounted) {
+            // Show success message
+            showSuccessMessage('Thanks for subscribing!');
+
+            // Navigate to home screen
+            context.go(HomeScreen.routeName);
+          }
+
+          setState(() {
+            _isLoading = false;
+          });
+        });
       }
-      setState(() {
-        _isLoading = false;
-      });
     };
     Purchases.addCustomerInfoUpdateListener(_customerInfoUpdateListener);
+  }
+
+  Future<void> _initializeEntitlements() async {
+    try {
+      final customerInfo = await Purchases.getCustomerInfo();
+      setState(() {
+        _initialEntitlements = customerInfo.entitlements.active.keys.toSet();
+      });
+    } catch (e) {
+      // If we can't get customer info, assume no entitlements
+      setState(() {
+        _initialEntitlements = {};
+      });
+    }
+  }
+
+  bool _areEntitlementsEqual(Set<String> set1, Set<String> set2) {
+    if (set1.length != set2.length) return false;
+    return set1.every((element) => set2.contains(element));
   }
 
   @override

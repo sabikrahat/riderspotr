@@ -110,20 +110,26 @@ class GarageNotifier extends _$GarageNotifier {
 
       // Step 2: Detect and blur sensitive content (license plates and faces)
       debugPrint('Step 2: Detecting and blurring sensitive content...');
-      final blurredImage = await _mlService.detectAndBlurSensitiveContent(
+      final detectionResult = await _mlService.detectAndBlurSensitiveContent(
         compressedImage,
       );
 
       // Step 3: Upload image to storage
       debugPrint('Step 3: Uploading image to storage...');
-      final imagePath = await CarService().uploadFileToStorage(blurredImage);
+      final imagePath = await CarService().uploadFileToStorage(
+        detectionResult.blurredImage,
+      );
       if (imagePath == null) {
         throw Exception('Failed to upload image');
       }
 
       // Step 4: Scan the car and get the full CarSpotModel from the database
       debugPrint('Step 4: Scanning car...');
-      final carSpotModel = await CarService().scanCar(imagePath);
+      final carSpotModel = await CarService().scanCar(
+        imagePath,
+        numberPlate: detectionResult.numberPlate,
+        faceDetected: detectionResult.faceDetected,
+      );
 
       debugPrint('Car scan completed successfully!');
       return carSpotModel;

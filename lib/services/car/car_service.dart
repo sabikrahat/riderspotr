@@ -185,13 +185,19 @@ class CarService {
   }
 
   /// Scan a car by calling the edge function and return the full CarSpotModel
-  Future<CarSpotModel> scanCar(String imagePath) async {
+  Future<CarSpotModel> scanCar(
+    String imagePath, {
+    String? numberPlate,
+    required bool faceDetected,
+  }) async {
     try {
       // Take currentLocation latitude and longitude with proper permissions
       // will return latitude and longitude and address string
       final data = await _getLocation();
       final requestBody = {
         'image_path': imagePath,
+        'number_plate': numberPlate,
+        'face_detected': faceDetected,
         ...data,
       };
       debugPrint('Scanning car with data: $requestBody');
@@ -214,7 +220,10 @@ class CarService {
       debugPrint('Car spot fetched: ${res.toString()}');
       return CarSpotModel.fromJson(res);
     } on FunctionException catch (e) {
-      throw EdgeFunctionException.fromFunctionException(e, 'Failed to scan car');
+      throw EdgeFunctionException.fromFunctionException(
+        e,
+        'Failed to scan car',
+      );
     } catch (e) {
       throw Exception('Error scanning car: $e');
     }
