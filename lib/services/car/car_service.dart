@@ -189,16 +189,32 @@ class CarService {
     String imagePath, {
     String? numberPlate,
     required bool faceDetected,
+    bool isManual = false,
+    String? manualAddress,
+    double? manualLat,
+    double? manualLng,
   }) async {
     try {
-      // Take currentLocation latitude and longitude with proper permissions
-      // will return latitude and longitude and address string
-      final data = await _getLocation();
+      // For manual uploads, use provided address and coordinates
+      // For automatic scans, get the current location
+      Map<String, dynamic> locationData;
+
+      if (isManual) {
+        locationData = {
+          'address': manualAddress ?? 'Manual upload',
+          'lat': manualLat ?? 0.0,
+          'lng': manualLng ?? 0.0,
+        };
+      } else {
+        locationData = await _getLocation();
+      }
+
       final requestBody = {
         'image_path': imagePath,
         'number_plate': numberPlate,
         'face_detected': faceDetected,
-        ...data,
+        'is_manual': isManual,
+        ...locationData,
       };
       debugPrint('Scanning car with data: $requestBody');
       final response = await _client.functions.invoke(

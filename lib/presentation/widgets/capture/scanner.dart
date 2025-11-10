@@ -27,8 +27,8 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
     super.didChangeDependencies();
     _scannerAnimation =
         Tween<double>(
-            begin: context.height * 0.225,
-            end: context.height * 0.775,
+            begin: context.height * 0.25,
+            end: context.height * 0.75,
           ).animate(_scannerController)
           ..addListener(() {
             setState(() {});
@@ -95,7 +95,7 @@ class CameraOverlayPainter extends CustomPainter {
 
     // Frame dimensions
     final frameWidth = size.width * 0.85;
-    final frameHeight = size.height * 0.55;
+    final frameHeight = size.height * 0.50;
     final frameLeft = (size.width - frameWidth) / 2;
     final frameTop = (size.height - frameHeight) / 2;
 

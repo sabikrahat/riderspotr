@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
-import '../../../models/car/car_spot_model.dart';
+import '../../../models/car/scan_detail_params.dart';
 import '../../../models/user/xp_level_model.dart';
 import '../../providers/car/garage_provider.dart';
 import '../../providers/auth/user_provider.dart';
@@ -14,13 +14,17 @@ import '../../providers/auth/xp_level_provider.dart';
 import '../../widgets/capture/xp_progression_card.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/rarity_badge.dart';
+import '../garage/garage_screen.dart';
 import 'car_detail_screen.dart';
 
 class ScanDeatilScreen extends ConsumerStatefulWidget {
   static const String routeName = '/scan-detail';
-  const ScanDeatilScreen({super.key, required this.carSpot});
+  const ScanDeatilScreen({
+    super.key,
+    required this.params,
+  });
 
-  final CarSpotModel? carSpot;
+  final ScanDetailParams params;
 
   @override
   ConsumerState<ScanDeatilScreen> createState() => _ScanDeatilScreenState();
@@ -94,10 +98,11 @@ class _ScanDeatilScreenState extends ConsumerState<ScanDeatilScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final car = widget.carSpot?.car;
+    final car = widget.params.carSpot?.car;
     final rarity = car?.rarity;
     final rarityColor = rarity?.color ?? Colors.grey;
-    final points = car?.points ?? 0;
+    // If manual upload, XP is 0, otherwise use car's actual points
+    final points = widget.params.isManual ? 0 : (car?.points ?? 0);
     final userAsync = ref.watch(userProvider);
     final xpLevelsAsync = ref.watch(xpLevelsProvider);
 
@@ -116,7 +121,7 @@ class _ScanDeatilScreenState extends ConsumerState<ScanDeatilScreen> {
             child: Stack(
               children: [
                 Image.network(
-                  widget.carSpot!.imageUrl,
+                  widget.params.carSpot!.imageUrl,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
@@ -342,7 +347,7 @@ class _ScanDeatilScreenState extends ConsumerState<ScanDeatilScreen> {
                                         garageProvider(null).notifier,
                                       );
                                       await garageNotifier.deleteCar(
-                                        widget.carSpot!.id,
+                                        widget.params.carSpot!.id,
                                       );
                                       if (!context.mounted) return;
                                       context.pop();
@@ -414,7 +419,7 @@ class _ScanDeatilScreenState extends ConsumerState<ScanDeatilScreen> {
                                         garageProvider(null).notifier,
                                       );
                                       await garageNotifier.claimCar(
-                                        widget.carSpot!.id,
+                                        widget.params.carSpot!.id,
                                       );
                                       // Refresh user stats
                                       await ref
@@ -424,7 +429,8 @@ class _ScanDeatilScreenState extends ConsumerState<ScanDeatilScreen> {
                                         'Car spot claimed successfully!',
                                       );
                                       if (!context.mounted) return;
-                                      context.pop();
+                                      // Pop all screens and navigate to garage
+                                      context.go(GarageScreen.routeName);
                                     } catch (e) {
                                       showErrorMessage(
                                         'Error claiming car spot: $e',
@@ -476,7 +482,7 @@ class _ScanDeatilScreenState extends ConsumerState<ScanDeatilScreen> {
                           child: InkWell(
                             onTap: () => context.push(
                               CarDetailScreen.routeName,
-                              extra: widget.carSpot,
+                              extra: widget.params.carSpot,
                             ),
                             borderRadius: BorderRadius.circular(16),
                             child: Center(

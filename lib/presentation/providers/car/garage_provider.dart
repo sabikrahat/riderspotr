@@ -102,23 +102,41 @@ class GarageNotifier extends _$GarageNotifier {
   /// Scans a car by uploading the image and calling the edge function
   /// Returns a CarSpotModel with is_claimed = false
   /// This method handles compression, blurring, uploading, and scanning
-  Future<CarSpotModel> scanCar(XFile file) async {
+  ///
+  /// If [isManual] is true, skips ML detection and uses provided address
+  /// Manual uploads don't earn XP points
+  Future<CarSpotModel> scanCar(
+    XFile file, {
+    bool isManual = false,
+    String? manualAddress,
+    double? manualLat,
+    double? manualLng,
+  }) async {
     try {
       // Step 1: Compress image
       debugPrint('Step 1: Compressing image...');
       final compressedImage = await _compressImage(file);
 
-      // Step 2: Detect and blur sensitive content (license plates and faces)
-      debugPrint('Step 2: Detecting and blurring sensitive content...');
-      final detectionResult = await _mlService.detectAndBlurSensitiveContent(
-        compressedImage,
-      );
+      String? numberPlate;
+      bool faceDetected = false;
+      XFile imageToUpload = compressedImage;
+
+      // Step 2: Detect and blur sensitive content (only for automatic scans)
+      if (!isManual) {
+        debugPrint('Step 2: Detecting and blurring sensitive content...');
+        final detectionResult = await _mlService.detectAndBlurSensitiveContent(
+          compressedImage,
+        );
+        numberPlate = detectionResult.numberPlate;
+        faceDetected = detectionResult.faceDetected;
+        imageToUpload = detectionResult.blurredImage;
+      } else {
+        debugPrint('Step 2: Skipping ML detection for manual upload...');
+      }
 
       // Step 3: Upload image to storage
       debugPrint('Step 3: Uploading image to storage...');
-      final imagePath = await CarService().uploadFileToStorage(
-        detectionResult.blurredImage,
-      );
+      final imagePath = await CarService().uploadFileToStorage(imageToUpload);
       if (imagePath == null) {
         throw Exception('Failed to upload image');
       }
@@ -127,8 +145,12 @@ class GarageNotifier extends _$GarageNotifier {
       debugPrint('Step 4: Scanning car...');
       final carSpotModel = await CarService().scanCar(
         imagePath,
-        numberPlate: detectionResult.numberPlate,
-        faceDetected: detectionResult.faceDetected,
+        numberPlate: numberPlate,
+        faceDetected: faceDetected,
+        isManual: isManual,
+        manualAddress: manualAddress,
+        manualLat: manualLat,
+        manualLng: manualLng,
       );
 
       debugPrint('Car scan completed successfully!');

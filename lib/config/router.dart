@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/car/car_spot_model.dart';
+import '../models/car/scan_detail_params.dart';
 import '../presentation/pages/auth/about_you_screen.dart';
 import '../presentation/pages/auth/login_screen.dart';
 import '../presentation/pages/auth/otp_screen.dart';
@@ -12,6 +13,7 @@ import '../presentation/pages/auth/your_experience_screen.dart';
 import '../presentation/pages/auth/your_location_screen.dart';
 import '../presentation/pages/capture/camera_screen.dart';
 import '../presentation/pages/capture/car_detail_screen.dart';
+import '../presentation/pages/capture/manual_upload_screen.dart';
 import '../presentation/pages/capture/scan_detail_screen.dart';
 import '../presentation/pages/explore/explore_screen.dart';
 import '../presentation/pages/garage/garage_screen.dart';
@@ -150,10 +152,26 @@ final router = GoRouter(
       builder: (_, _) => CameraScreen(),
     ),
     GoRoute(
+      path: ManualUploadScreen.routeName,
+      redirect: authHandler,
+      builder: (_, _) => ManualUploadScreen(),
+    ),
+    GoRoute(
       path: ScanDeatilScreen.routeName,
       redirect: authHandler,
-      builder: (_, state) =>
-          ScanDeatilScreen(carSpot: state.extra as CarSpotModel?),
+      builder: (_, state) {
+        final extra = state.extra;
+        if (extra is ScanDetailParams) {
+          return ScanDeatilScreen(params: extra);
+        }
+        // Fallback for backward compatibility
+        return ScanDeatilScreen(
+          params: ScanDetailParams(
+            carSpot: extra as CarSpotModel?,
+            isManual: false,
+          ),
+        );
+      },
     ),
     GoRoute(
       path: CarDetailScreen.routeName,
