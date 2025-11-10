@@ -120,7 +120,11 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: HomeScreen.routeName,
-          pageBuilder: (_, __) => NoTransitionPage(child: HomeScreen()),
+          pageBuilder: (_, state) => NoTransitionPage(
+            child: HomeScreen(
+              isFinishRegister: state.extra as bool? ?? false,
+            ),
+          ),
         ),
         GoRoute(
           path: GarageScreen.routeName,
@@ -130,10 +134,11 @@ final router = GoRouter(
           path: LeaderboardScreen.routeName,
           pageBuilder: (_, __) => NoTransitionPage(child: LeaderboardScreen()),
         ),
-        // TODO: Wrap in NoTransitionPage
         GoRoute(
           path: OwnProfileScreen.routeName,
-          builder: (_, state) => OwnProfileScreen(),
+          pageBuilder: (_, __) => NoTransitionPage(
+            child: OwnProfileScreen(),
+          ),
         ),
       ],
     ),

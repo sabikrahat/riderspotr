@@ -8,11 +8,11 @@ import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
 import '../../providers/auth/user_provider.dart';
 import '../../widgets/shared/back.dart';
+import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/dropdown_textfield.dart';
 import '../../widgets/shared/loading_overlay.dart';
 import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
-import 'login_screen.dart' show LoginScreen;
 import 'your_location_screen.dart';
 
 class YourExperienceScreen extends ConsumerStatefulWidget {
@@ -22,7 +22,8 @@ class YourExperienceScreen extends ConsumerStatefulWidget {
   final bool fromUpdateProfile;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _YourExperienceScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _YourExperienceScreenState();
 }
 
 class _YourExperienceScreenState extends ConsumerState<YourExperienceScreen> {
@@ -54,116 +55,100 @@ class _YourExperienceScreenState extends ConsumerState<YourExperienceScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          leading: Back(
-            onPressed: () async {
-              if (widget.fromUpdateProfile) {
-                if (context.mounted) context.pop();
-                return;
-              }
-              await notifier.signOut(context: context);
-              if (context.mounted) {
-                context.pushReplacement(LoginScreen.routeName);
-              }
-            },
-          ),
+          leading: Back(),
         ),
         extendBodyBehindAppBar: true,
-        body: Stack(
-          children: [
-            Image.asset(
-              'assets/onboarding/experience.png',
-              // fit: BoxFit.cover,
-              width: double.infinity,
-              height: context.height * 0.36,
-            ),
-            PagePadding(
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'YOUR EXPERIENCE',
-                        style: context.textTheme.headlineSmall,
-                      ),
-                      Gap(4),
-                      Text('How experienced are you with car spotting?'),
-                      Gap(24),
-                      DropdownTextfield(
-                        initialValue: _carKnowledge,
-                        labelText: 'Car Knowledge',
-                        items: [
-                          'Newbie',
-                          'Casual Driver',
-                          'Car Enthusiast',
-                          'Gearhead',
-                          'Car Guru',
-                        ],
-                        onChanged: (val) => setState(() => _carKnowledge = val),
-                      ),
-                      Gap(8),
-                      DropdownTextfield(
-                        initialValue: _spottingExperience,
-                        labelText: 'Spotting Experience',
-                        items: [
-                          'First Timer',
-                          'Casual Spotter',
-                          'Weekend Hunter',
-                          'Street Scout',
-                          'Pro Spotter',
-                        ],
-                        onChanged: (val) => setState(() => _spottingExperience = val),
-                      ),
-                      Gap(24),
-                      LongButton(
-                        text: 'Continue',
-                        onPressed: () async {
-                          if (_carKnowledge == null) {
-                            showErrorMessage(
-                              'Please select your car knowledge',
-                            );
+        body: CarbonBackground(
+          imgPath: 'assets/carbon/49.jpg',
+          heightPercent: 0.36,
+          child: PagePadding(
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'YOUR EXPERIENCE',
+                      style: context.textTheme.headlineSmall,
+                    ),
+                    Gap(4),
+                    Text('How experienced are you with car spotting?'),
+                    Gap(24),
+                    DropdownTextfield(
+                      initialValue: _carKnowledge,
+                      labelText: 'Car Knowledge',
+                      items: [
+                        'Newbie',
+                        'Casual Driver',
+                        'Car Enthusiast',
+                        'Gearhead',
+                        'Car Guru',
+                      ],
+                      onChanged: (val) => setState(() => _carKnowledge = val),
+                    ),
+                    Gap(8),
+                    DropdownTextfield(
+                      initialValue: _spottingExperience,
+                      labelText: 'Spotting Experience',
+                      items: [
+                        'First Timer',
+                        'Casual Spotter',
+                        'Weekend Hunter',
+                        'Street Scout',
+                        'Pro Spotter',
+                      ],
+                      onChanged: (val) =>
+                          setState(() => _spottingExperience = val),
+                    ),
+                    Gap(24),
+                    LongButton(
+                      text: 'Continue',
+                      onPressed: () async {
+                        if (_carKnowledge == null) {
+                          showErrorMessage(
+                            'Please select your car knowledge',
+                          );
+                          return;
+                        }
+                        if (_spottingExperience == null) {
+                          showErrorMessage(
+                            'Please select your spotting experience',
+                          );
+                          return;
+                        }
+                        try {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          await notifier.updateUser(
+                            user: notifier.user!.copyWith(
+                              knowledgeLevel: _carKnowledge!,
+                              experience: _spottingExperience!,
+                            ),
+                          );
+                          if (widget.fromUpdateProfile) {
+                            if (context.mounted) context.pop();
                             return;
                           }
-                          if (_spottingExperience == null) {
-                            showErrorMessage(
-                              'Please select your spotting experience',
-                            );
-                            return;
+                          if (context.mounted) {
+                            context.push(YourLocationScreen.routeName);
                           }
-                          try {
-                            setState(() {
-                              isLoading = true;
-                            });
-                            await notifier.updateUser(
-                              user: notifier.user!.copyWith(
-                                knowledgeLevel: _carKnowledge!,
-                                experience: _spottingExperience!,
-                              ),
-                            );
-                            if (widget.fromUpdateProfile) {
-                              if (context.mounted) context.pop();
-                              return;
-                            }
-                            if (context.mounted) {
-                              context.push(YourLocationScreen.routeName);
-                            }
-                          } on KException catch (e) {
-                            showErrorMessage(e.message);
-                          } catch (e) {
-                            showErrorMessage(e.toString());
-                          } finally {
-                            setState(() {
-                              isLoading = false;
-                            });
-                          }
-                        },
-                      ),
-                    ],
-                  ),
+                        } on KException catch (e) {
+                          showErrorMessage(e.message);
+                        } catch (e) {
+                          showErrorMessage(e.toString());
+                        } finally {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

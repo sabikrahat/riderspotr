@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../providers/auth/profile_provider.dart';
 import '../../widgets/home/achievements_section.dart';
@@ -9,14 +10,34 @@ import '../../widgets/home/hero_section.dart';
 import '../../widgets/home/stats_grid_section.dart';
 import '../../widgets/home/upgrade_promo_section.dart';
 import '../../widgets/home/xp_progress_section.dart';
+import '../payment/payment_screen.dart';
 
-class HomeScreen extends ConsumerWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends ConsumerStatefulWidget {
+  const HomeScreen({super.key, this.isFinishRegister = false});
 
   static const String routeName = '/home';
+  final bool isFinishRegister;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isFinishRegister) {
+      // Show payment screen after the widget is built
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.push(PaymentScreen.routeName);
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ref
         .watch(profileProvider(null))
         .when(

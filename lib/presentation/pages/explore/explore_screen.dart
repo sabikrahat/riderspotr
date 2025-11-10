@@ -6,6 +6,7 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
+import '../../../core/location_utils.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../../models/map/map_marker_model.dart';
 import '../../providers/car/map_provider.dart';
@@ -114,6 +115,24 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     debugPrint('Map created with ${spots.length} spots');
     this.mapboxMap = mapboxMap;
     await _addCircleMarkers(spots);
+
+    // Focus on first car's location if available
+    if (spots.isNotEmpty &&
+        spots.first.latitude != null &&
+        spots.first.longitude != null) {
+      await mapboxMap.flyTo(
+        CameraOptions(
+          center: Point(
+            coordinates: Position(
+              spots.first.longitude!,
+              spots.first.latitude!,
+            ),
+          ),
+          zoom: 13.0,
+        ),
+        MapAnimationOptions(duration: 1500, startDelay: 300),
+      );
+    }
   }
 
   Future<void> _addCircleMarkers(List<CarSpotModel> spots) async {
@@ -136,10 +155,17 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             // Calculate radius based on rarity for glowing orbs
             final baseRadius = _getRadiusForRarity(spot.car!.rarity);
 
-            return MapMarkerModel(
-              id: spot.id,
+            // Randomize coordinates for privacy (within ~100m radius)
+            final randomizedCoords = LocationUtils.randomizeCoordinates(
               latitude: spot.latitude!,
               longitude: spot.longitude!,
+              radiusInMeters: 100.0,
+            );
+
+            return MapMarkerModel(
+              id: spot.id,
+              latitude: randomizedCoords['latitude']!,
+              longitude: randomizedCoords['longitude']!,
               borderColor: spot.car!.rarity.color,
               radius: baseRadius,
               carName: spot.car?.model,
@@ -175,36 +201,22 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       },
     );
 
-    // Add glowing orbs for each marker
+    // Add simple, minimalistic circles for each marker
     for (var marker in markers) {
-      // Outer glow ring
-      final outerRingOptions = CircleAnnotationOptions(
+      // Simple circle with clean border - all same size
+      final circleOptions = CircleAnnotationOptions(
         geometry: Point(
           coordinates: Position(marker.longitude, marker.latitude),
         ),
-        circleRadius: marker.radius * 1.5,
+        circleRadius: 25.0, // Fixed size for all markers
         circleColor: marker.colorToInt(marker.borderColor),
-        circleBlur: 1.5,
-        circleOpacity: 0.15,
-        circleStrokeWidth: 0,
-      );
-
-      // Inner glowing core
-      final coreOptions = CircleAnnotationOptions(
-        geometry: Point(
-          coordinates: Position(marker.longitude, marker.latitude),
-        ),
-        circleRadius: marker.radius,
-        circleColor: marker.colorToInt(marker.borderColor),
-        circleBlur: 1.0,
-        circleOpacity: 0.6,
-        circleStrokeWidth: 6.0,
+        circleOpacity: 0.25,
+        circleStrokeWidth: 2.0,
         circleStrokeColor: marker.colorToInt(marker.borderColor),
-        circleStrokeOpacity: 0.25,
+        circleStrokeOpacity: 0.7,
       );
 
-      await circleAnnotationManager!.create(outerRingOptions);
-      await circleAnnotationManager!.create(coreOptions);
+      await circleAnnotationManager!.create(circleOptions);
     }
   }
 
@@ -324,8 +336,14 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     cameraOptions: CameraOptions(
                       center: Point(
                         coordinates: Position(
-                          notifier.centeredLatLng.longitude,
-                          notifier.centeredLatLng.latitude,
+                          _sortedCarSpots.isNotEmpty &&
+                                  _sortedCarSpots.first.longitude != null
+                              ? _sortedCarSpots.first.longitude!
+                              : notifier.centeredLatLng.longitude,
+                          _sortedCarSpots.isNotEmpty &&
+                                  _sortedCarSpots.first.latitude != null
+                              ? _sortedCarSpots.first.latitude!
+                              : notifier.centeredLatLng.latitude,
                         ),
                       ),
                       zoom: 13.0,

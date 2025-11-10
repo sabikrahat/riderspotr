@@ -9,6 +9,7 @@ import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
 import '../../providers/auth/user_provider.dart';
 import '../../widgets/shared/back.dart';
+import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/custom_text_field.dart';
 import '../../widgets/shared/dropdown_textfield.dart';
 import '../../widgets/shared/loading_overlay.dart';
@@ -51,7 +52,9 @@ class _AboutYouScreenState extends ConsumerState<AboutYouScreen> {
       _dobController.text = _dateOfBirth == null
           ? ''
           : '${_dateOfBirth?.year}-${_dateOfBirth?.month.toString().padLeft(2, '0')}-${_dateOfBirth?.day.toString().padLeft(2, '0')}';
-      _measurement = notifier.user?.measurement?.toMeasurement?.name ?? Measurement.metric.name;
+      _measurement =
+          notifier.user?.measurement?.toMeasurement?.name ??
+          Measurement.metric.name;
     });
   }
 
@@ -88,151 +91,148 @@ class _AboutYouScreenState extends ConsumerState<AboutYouScreen> {
           ),
         ),
         extendBodyBehindAppBar: true,
-        body: Stack(
-          children: [
-            Image.asset(
-              'assets/onboarding/about.png',
-              width: double.infinity,
-              height: context.height * 0.36,
-            ),
-            PagePadding(
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'ABOUT YOU',
-                          style: context.textTheme.headlineSmall,
+        body: CarbonBackground(
+          imgPath: 'assets/carbon/47.jpg',
+          heightPercent: 0.36,
+          child: PagePadding(
+            child: Center(
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'ABOUT YOU',
+                        style: context.textTheme.headlineSmall,
+                      ),
+                      Gap(4),
+                      Text('Tell us about yourself'),
+                      Gap(24),
+                      ValidatedTextField(
+                        labelText: 'First Name',
+                        controller: _firstNameController,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        required: true,
+                        firstNameValidation: true,
+                      ),
+                      Gap(8),
+                      ValidatedTextField(
+                        labelText: 'Last Name',
+                        controller: _lastNameController,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        required: true,
+                        lastNameValidation: true,
+                      ),
+                      Gap(8),
+                      ValidatedTextField(
+                        labelText: 'Username',
+                        controller: _usernameController,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        required: true,
+                        usernameValidation: true,
+                      ),
+                      Gap(8),
+                      CustomTextField(
+                        controller: _dobController,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          labelText: 'Date of Birth',
                         ),
-                        Gap(4),
-                        Text('Tell us about yourself'),
-                        Gap(24),
-                        ValidatedTextField(
-                          labelText: 'First Name',
-                          controller: _firstNameController,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.next,
-                          required: true,
-                          firstNameValidation: true,
-                        ),
-                        Gap(8),
-                        ValidatedTextField(
-                          labelText: 'Last Name',
-                          controller: _lastNameController,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.next,
-                          required: true,
-                          lastNameValidation: true,
-                        ),
-                        Gap(8),
-                        ValidatedTextField(
-                          labelText: 'Username',
-                          controller: _usernameController,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.next,
-                          required: true,
-                          usernameValidation: true,
-                        ),
-                        Gap(8),
-                        CustomTextField(
-                          controller: _dobController,
-                          readOnly: true,
-                          decoration: InputDecoration(
-                            labelText: 'Date of Birth',
-                          ),
-                          onTap: () async {
-                            final DateTime? picked = await showDatePicker(
-                              initialEntryMode: DatePickerEntryMode.input,
-                              context: context,
-                              initialDate: DateTime.now().subtract(
-                                Duration(days: 365 * 18),
-                              ),
-                              firstDate: DateTime(1900),
-                              lastDate: DateTime.now().subtract(
-                                Duration(days: 365),
-                              ),
-                            );
-                            if (picked != null && picked != _dateOfBirth) {
-                              setState(() {
-                                _dateOfBirth = picked;
-                                _dobController.text =
-                                    '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
-                              });
-                            }
-                          },
-                          textInputAction: TextInputAction.done,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please select your date of birth';
-                            }
-                            return null;
-                          },
-                        ),
-                        Gap(8),
-                        DropdownTextfield(
-                          labelText: 'Measurement',
-                          items: Measurement.values.map((e) => e.title).toList(),
-                          initialValue: _measurement != null
-                              ? Measurement.values
-                                    .firstWhere(
-                                      (element) => element.name == _measurement,
-                                    )
-                                    .title
-                              : null,
-                          onChanged: (val) => setState(() {
-                            final idx = Measurement.values.indexWhere(
-                              (element) => element.title == val,
-                            );
-                            _measurement = idx != -1 ? Measurement.values[idx].name : null;
-                          }),
-                        ),
-                        Gap(24),
-                        LongButton(
-                          text: 'Continue',
-                          onPressed: () async {
-                            try {
-                              setState(() {
-                                isLoading = true;
-                              });
-                              if (_formKey.currentState!.validate()) {
-                                await notifier.updateUser(
-                                  user: notifier.user!.copyWith(
-                                    firstName: _firstNameController.text.trim(),
-                                    lastName: _lastNameController.text.trim(),
-                                    username: _usernameController.text.trim(),
-                                    dob: _dateOfBirth!,
-                                    measurement: _measurement!,
-                                  ),
-                                );
-                                if (widget.fromUpdateProfile) {
-                                  if (context.mounted) context.pop();
-                                  return;
-                                }
-                                if (context.mounted) {
-                                  context.push(YourExperienceScreen.routeName);
-                                }
+                        onTap: () async {
+                          final DateTime? picked = await showDatePicker(
+                            initialEntryMode: DatePickerEntryMode.input,
+                            context: context,
+                            initialDate: DateTime.now().subtract(
+                              Duration(days: 365 * 18),
+                            ),
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime.now().subtract(
+                              Duration(days: 365),
+                            ),
+                          );
+                          if (picked != null && picked != _dateOfBirth) {
+                            setState(() {
+                              _dateOfBirth = picked;
+                              _dobController.text =
+                                  '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+                            });
+                          }
+                        },
+                        textInputAction: TextInputAction.done,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select your date of birth';
+                          }
+                          return null;
+                        },
+                      ),
+                      Gap(8),
+                      DropdownTextfield(
+                        labelText: 'Measurement',
+                        items: Measurement.values.map((e) => e.title).toList(),
+                        initialValue: _measurement != null
+                            ? Measurement.values
+                                  .firstWhere(
+                                    (element) => element.name == _measurement,
+                                  )
+                                  .title
+                            : null,
+                        onChanged: (val) => setState(() {
+                          final idx = Measurement.values.indexWhere(
+                            (element) => element.title == val,
+                          );
+                          _measurement = idx != -1
+                              ? Measurement.values[idx].name
+                              : null;
+                        }),
+                      ),
+                      Gap(24),
+                      LongButton(
+                        text: 'Continue',
+                        onPressed: () async {
+                          try {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            if (_formKey.currentState!.validate()) {
+                              await notifier.updateUser(
+                                user: notifier.user!.copyWith(
+                                  firstName: _firstNameController.text.trim(),
+                                  lastName: _lastNameController.text.trim(),
+                                  username: _usernameController.text.trim(),
+                                  dob: _dateOfBirth!,
+                                  measurement: _measurement!,
+                                ),
+                              );
+                              if (widget.fromUpdateProfile) {
+                                if (context.mounted) context.pop();
+                                return;
                               }
-                            } on KException catch (e) {
-                              showErrorMessage(e.message);
-                            } catch (e) {
-                              showErrorMessage(e.toString());
-                            } finally {
-                              setState(() {
-                                isLoading = false;
-                              });
+                              if (context.mounted) {
+                                context.push(YourExperienceScreen.routeName);
+                              }
                             }
-                          },
-                        ),
-                      ],
-                    ),
+                          } on KException catch (e) {
+                            showErrorMessage(e.message);
+                          } catch (e) {
+                            showErrorMessage(e.toString());
+                          } finally {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          }
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

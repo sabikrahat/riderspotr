@@ -9,6 +9,7 @@ import 'package:ridespotr/presentation/providers/leaderboard/user_rank_provider.
 
 import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
+import '../../../core/location_utils.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../../models/map/map_marker_model.dart';
 import '../../pages/explore/explore_screen.dart';
@@ -399,7 +400,7 @@ class _MapPreviewState extends ConsumerState<_MapPreview> {
     circleAnnotationManager ??= await mapboxMap!.annotations
         .createCircleAnnotationManager();
 
-    // Convert car spots to map markers
+    // Convert car spots to map markers with randomized coordinates for privacy
     List<MapMarkerModel> markers = carSpots
         .where(
           (spot) =>
@@ -410,10 +411,18 @@ class _MapPreviewState extends ConsumerState<_MapPreview> {
         .map((spot) {
           // Safe to use ! here because we filtered out nulls above
           final rarity = spot.car!.rarity;
-          return MapMarkerModel(
-            id: spot.id,
+
+          // Randomize coordinates for privacy (within ~100m radius)
+          final randomizedCoords = LocationUtils.randomizeCoordinates(
             latitude: spot.latitude!,
             longitude: spot.longitude!,
+            radiusInMeters: 100.0,
+          );
+
+          return MapMarkerModel(
+            id: spot.id,
+            latitude: randomizedCoords['latitude']!,
+            longitude: randomizedCoords['longitude']!,
             borderColor: _getBorderColorForRarity(rarity),
             radius: _getRadiusForRarity(rarity),
             carName: spot.car?.model ?? 'Unknown',
@@ -421,36 +430,22 @@ class _MapPreviewState extends ConsumerState<_MapPreview> {
         })
         .toList();
 
-    // Add glowing orbs for each marker
+    // Add simple, minimalistic circles for each marker
     for (var marker in markers) {
-      // Outer glow ring
-      final outerRingOptions = CircleAnnotationOptions(
+      // Simple circle with clean border - all same size
+      final circleOptions = CircleAnnotationOptions(
         geometry: Point(
           coordinates: Position(marker.longitude, marker.latitude),
         ),
-        circleRadius: marker.radius * 1.5,
+        circleRadius: 25.0, // Fixed size for all markers
         circleColor: marker.colorToInt(marker.borderColor),
-        circleBlur: 1.5,
-        circleOpacity: 0.15,
-        circleStrokeWidth: 0,
-      );
-
-      // Inner glowing core
-      final coreOptions = CircleAnnotationOptions(
-        geometry: Point(
-          coordinates: Position(marker.longitude, marker.latitude),
-        ),
-        circleRadius: marker.radius,
-        circleColor: marker.colorToInt(marker.borderColor),
-        circleBlur: 1.0,
-        circleOpacity: 0.6,
-        circleStrokeWidth: 6.0,
+        circleOpacity: 0.25,
+        circleStrokeWidth: 2.0,
         circleStrokeColor: marker.colorToInt(marker.borderColor),
-        circleStrokeOpacity: 0.25,
+        circleStrokeOpacity: 0.7,
       );
 
-      await circleAnnotationManager!.create(outerRingOptions);
-      await circleAnnotationManager!.create(coreOptions);
+      await circleAnnotationManager!.create(circleOptions);
     }
   }
 

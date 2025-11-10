@@ -75,6 +75,11 @@ class _DropdownTextfieldState extends State<DropdownTextfield>
 
     final position = renderBox.localToGlobal(Offset.zero);
     final size = renderBox.size;
+    
+    // Calculate dynamic height based on number of items (max 5 items visible)
+    final itemHeight = 48.0;
+    final maxVisibleItems = 5;
+    final calculatedHeight = (widget.items.length * itemHeight).clamp(0.0, maxVisibleItems * itemHeight);
 
     _overlayEntry = OverlayEntry(
       builder: (context) => Theme(
@@ -107,43 +112,48 @@ class _DropdownTextfieldState extends State<DropdownTextfield>
                               opacity: _fadeAnimation.value,
                               child: Container(
                                 width: size.width,
-                                height: 200,
+                                constraints: BoxConstraints(
+                                  maxHeight: calculatedHeight,
+                                ),
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.grey.shade900,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.2),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: Colors.black,
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.1),
+                                    width: 1,
+                                  ),
                                 ),
                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: ListView(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: ListView.separated(
+                                    shrinkWrap: true,
                                     padding: EdgeInsets.zero,
-                                    children: List.generate(
-                                      widget.items.length,
-                                      (index) {
-                                        final item = widget.items[index];
-                                        return ListTile(
-                                          title: Text(
-                                            item,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          onTap: () {
-                                            setState(() {
-                                              _selectedValue = item;
-                                            });
-                                            widget.onChanged?.call(item);
-                                            _closeDropdown();
-                                          },
-                                        );
-                                      },
+                                    itemCount: widget.items.length,
+                                    separatorBuilder: (context, index) => Divider(
+                                      height: 1,
+                                      color: Colors.white.withValues(alpha: 0.1),
                                     ),
+                                    itemBuilder: (context, index) {
+                                      final item = widget.items[index];
+                                      return ListTile(
+                                        dense: true,
+                                        title: Text(
+                                          item,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedValue = item;
+                                          });
+                                          widget.onChanged?.call(item);
+                                          _closeDropdown();
+                                        },
+                                      );
+                                    },
                                   ),
                                 ),
                               ),

@@ -6,7 +6,6 @@ import '../../../core/extensions.dart';
 import '../../widgets/shared/logo.dart';
 import '../../widgets/shared/long_button.dart';
 import '../../widgets/shared/page_padding.dart';
-import '../../widgets/shared/video_player.dart';
 import 'register_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -19,7 +18,14 @@ class WelcomeScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          ShowVideo(videoPath: 'assets/welcome-video.mp4'),
+          // Carbon fiber background
+          Positioned.fill(
+            child: Image.asset(
+              'assets/carbon/47.jpg',
+              fit: BoxFit.cover,
+              opacity: AlwaysStoppedAnimation(0.3),
+            ),
+          ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -43,7 +49,10 @@ class WelcomeScreen extends StatelessWidget {
                     Logo(),
                     Gap(16),
                     Text(
-                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                      "Discover, capture and collect rare cars.\nJoin the ultimate car spotting community.",
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        height: 1.5,
+                      ),
                     ),
                     Gap(16),
                     LongButton(
