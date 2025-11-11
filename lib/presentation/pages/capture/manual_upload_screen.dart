@@ -15,6 +15,7 @@ import '../../../models/google_maps/map_prediction_model.dart';
 import '../../../services/google_maps/google_maps_service.dart';
 import '../../providers/car/garage_provider.dart';
 import '../../widgets/shared/back.dart';
+import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/scanning_overlay.dart';
 import 'scan_detail_screen.dart';
 
@@ -240,359 +241,352 @@ class _ManualUploadScreenState extends ConsumerState<ManualUploadScreen> {
         elevation: 0,
         leading: Back(),
       ),
-      body: Stack(
-        children: [
-          // Background gradient
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.grey.shade900,
-                  Colors.black,
-                  Colors.black,
-                ],
-              ),
-            ),
-          ),
-
-          // Content
-          SafeArea(
-            child: SingleChildScrollView(
-              physics: BouncingScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Gap(20),
-                  // Title
-                  Text(
-                    'MANUAL UPLOAD',
-                    style: context.textTheme.headlineLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 4,
+      body: CarbonBackground(
+        imgPath: 'assets/carbon/49.jpg',
+        heightPercent: 0.36,
+        child: Stack(
+          children: [
+            // Content
+            SafeArea(
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    Text(
+                      'MANUAL UPLOAD',
+                      style: context.textTheme.headlineMedium,
                     ),
-                  ),
-                  Gap(8),
-                  Text(
-                    'Add a car to your collection manually',
-                    style: context.textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.6),
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-
-                  Gap(40),
-
-                  // Image Picker Section
-                  GestureDetector(
-                    onTap: _isUploading ? null : _pickImage,
-                    child: Container(
-                      width: double.infinity,
-                      height: context.height * 0.35,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(24),
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.white.withValues(alpha: 0.08),
-                            Colors.white.withValues(alpha: 0.03),
-                          ],
-                        ),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.1),
-                          width: 1,
-                        ),
+                    Gap(8),
+                    Text(
+                      'Add a car to your collection manually',
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontWeight: FontWeight.w300,
                       ),
-                      child: _selectedImage != null
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(24),
-                              child: Stack(
-                                children: [
-                                  Image.file(
-                                    File(_selectedImage!.path),
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                  ),
-                                  // Change image overlay
-                                  Positioned(
-                                    top: 12,
-                                    right: 12,
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 8,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withValues(
-                                          alpha: 0.7,
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            Icons.edit,
-                                            color: Colors.white,
-                                            size: 16,
-                                          ),
-                                          Gap(6),
-                                          Text(
-                                            'CHANGE',
-                                            style: context.textTheme.bodySmall
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.w600,
-                                                  letterSpacing: 1,
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.all(24),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.white.withValues(alpha: 0.15),
-                                        Colors.white.withValues(alpha: 0.05),
-                                      ],
-                                    ),
-                                  ),
-                                  child: Icon(
-                                    Icons.add_photo_alternate_outlined,
-                                    size: 48,
-                                    color: Colors.white.withValues(alpha: 0.8),
-                                  ),
-                                ),
-                                Gap(20),
-                                Text(
-                                  'SELECT CAR IMAGE',
-                                  style: context.textTheme.bodyLarge?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 2,
-                                  ),
-                                ),
-                                Gap(8),
-                                Text(
-                                  'Tap to choose from gallery',
-                                  style: context.textTheme.bodySmall?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.5),
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                ),
-                              ],
-                            ),
                     ),
-                  ),
 
-                  Gap(32),
+                    Gap(24),
 
-                  Text(
-                    "ADDRESS",
-                    style: context.textTheme.headlineSmall!.copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-
-                  // Address Input Section
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextField(
-                        controller: _addressController,
-                        enabled: !_isUploading,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Where did you spot this car?',
-                          hintStyle: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.4),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w300,
+                    // Image Picker Section
+                    GestureDetector(
+                      onTap: _isUploading ? null : _pickImage,
+                      child: Container(
+                        width: double.infinity,
+                        height: context.height * 0.35,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.white.withValues(alpha: 0.08),
+                              Colors.white.withValues(alpha: 0.03),
+                            ],
                           ),
-                          suffixIcon: _isLoadingPredictions
-                              ? Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white.withValues(
-                                        alpha: 0.6,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : null,
-                        ),
-                        textCapitalization: TextCapitalization.words,
-                      ),
-
-                      // Address Suggestions
-                      if (_predictions.isNotEmpty)
-                        Container(
-                          margin: EdgeInsets.only(top: 8),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Colors.black,
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.1),
-                              width: 1,
-                            ),
-                          ),
-                          constraints: BoxConstraints(maxHeight: 250),
-                          child: ListView.separated(
-                            shrinkWrap: true,
-                            padding: EdgeInsets.zero,
-                            itemCount: _predictions.length,
-                            separatorBuilder: (context, index) => Divider(
-                              height: 1,
-                              color: Colors.white.withValues(alpha: 0.1),
-                            ),
-                            itemBuilder: (context, index) {
-                              final prediction = _predictions[index];
-                              return ListTile(
-                                dense: true,
-                                onTap: () => _selectPrediction(prediction),
-                                leading: Icon(
-                                  Icons.location_on_outlined,
-                                  color: Colors.white.withValues(alpha: 0.6),
-                                  size: 20,
-                                ),
-                                title: Text(
-                                  prediction.description ?? '',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              );
-                            },
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.1),
+                            width: 1,
                           ),
                         ),
-                    ],
-                  ),
-
-                  Gap(40),
-
-                  // Upload Button
-                  Container(
-                    width: double.infinity,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.white,
-                          Colors.grey.shade300,
-                        ],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.white.withValues(alpha: 0.3),
-                          blurRadius: 20,
-                          offset: Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: _isUploading ? null : _uploadCar,
-                        borderRadius: BorderRadius.circular(16),
-                        child: Center(
-                          child: _isUploading
-                              ? SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              : Row(
-                                  mainAxisSize: MainAxisSize.min,
+                        child: _selectedImage != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(24),
+                                child: Stack(
                                   children: [
-                                    Icon(
-                                      Icons.upload_rounded,
-                                      color: Colors.black,
-                                      size: 22,
+                                    Image.file(
+                                      File(_selectedImage!.path),
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
                                     ),
-                                    Gap(12),
-                                    Text(
-                                      'UPLOAD CAR',
-                                      style: context.textTheme.bodyLarge
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 2,
-                                            color: Colors.black,
+                                    // Change image overlay
+                                    Positioned(
+                                      top: 12,
+                                      right: 12,
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.7,
                                           ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.edit,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                            Gap(6),
+                                            Text(
+                                              'CHANGE',
+                                              style: context.textTheme.bodySmall
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                    letterSpacing: 1,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
+                              )
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(24),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Colors.white.withValues(alpha: 0.15),
+                                          Colors.white.withValues(alpha: 0.05),
+                                        ],
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      Icons.add_photo_alternate_outlined,
+                                      size: 48,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.8,
+                                      ),
+                                    ),
+                                  ),
+                                  Gap(20),
+                                  Text(
+                                    'SELECT CAR IMAGE',
+                                    style: context.textTheme.bodyLarge
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          letterSpacing: 2,
+                                        ),
+                                  ),
+                                  Gap(8),
+                                  Text(
+                                    'Tap to choose from gallery',
+                                    style: context.textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.5,
+                                          ),
+                                          fontWeight: FontWeight.w300,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ),
+
+                    Gap(24),
+
+                    Text(
+                      "ADDRESS",
+                      style: context.textTheme.headlineSmall!.copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+
+                    // Address Input Section
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          controller: _addressController,
+                          enabled: !_isUploading,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Where did you spot this car?',
+                            hintStyle: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.4),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w300,
+                            ),
+                            suffixIcon: _isLoadingPredictions
+                                ? Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white.withValues(
+                                          alpha: 0.6,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : null,
+                          ),
+                          textCapitalization: TextCapitalization.words,
+                        ),
+
+                        // Address Suggestions
+                        if (_predictions.isNotEmpty)
+                          Container(
+                            margin: EdgeInsets.only(top: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.black,
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.1),
+                                width: 1,
+                              ),
+                            ),
+                            constraints: BoxConstraints(maxHeight: 250),
+                            child: ListView.separated(
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              itemCount: _predictions.length,
+                              separatorBuilder: (context, index) => Divider(
+                                height: 1,
+                                color: Colors.white.withValues(alpha: 0.1),
+                              ),
+                              itemBuilder: (context, index) {
+                                final prediction = _predictions[index];
+                                return ListTile(
+                                  dense: true,
+                                  onTap: () => _selectPrediction(prediction),
+                                  leading: Icon(
+                                    Icons.location_on_outlined,
+                                    color: Colors.white.withValues(alpha: 0.6),
+                                    size: 20,
+                                  ),
+                                  title: Text(
+                                    prediction.description ?? '',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                      ],
+                    ),
+
+                    Gap(40),
+
+                    // Upload Button
+                    Container(
+                      width: double.infinity,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white,
+                            Colors.grey.shade300,
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.white.withValues(alpha: 0.3),
+                            blurRadius: 20,
+                            offset: Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _isUploading ? null : _uploadCar,
+                          borderRadius: BorderRadius.circular(16),
+                          child: Center(
+                            child: _isUploading
+                                ? SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.black,
+                                    ),
+                                  )
+                                : Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.upload_rounded,
+                                        color: Colors.black,
+                                        size: 22,
+                                      ),
+                                      Gap(12),
+                                      Text(
+                                        'UPLOAD CAR',
+                                        style: context.textTheme.bodyLarge
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 2,
+                                              color: Colors.black,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
-                  Gap(20),
+                    Gap(20),
 
-                  // Info text
-                  Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Colors.white.withValues(alpha: 0.05),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          color: Colors.white.withValues(alpha: 0.6),
-                          size: 20,
-                        ),
-                        Gap(12),
-                        Expanded(
-                          child: Text(
-                            'Manual uploads do not earn XP points',
-                            style: context.textTheme.bodySmall?.copyWith(
-                              color: Colors.white.withValues(alpha: 0.6),
-                              fontWeight: FontWeight.w300,
-                              fontSize: 13,
+                    // Info text
+                    Container(
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.white.withValues(alpha: 0.05),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: Colors.white.withValues(alpha: 0.6),
+                            size: 20,
+                          ),
+                          Gap(12),
+                          Expanded(
+                            child: Text(
+                              'Manual uploads do not earn XP points',
+                              style: context.textTheme.bodySmall?.copyWith(
+                                color: Colors.white.withValues(alpha: 0.6),
+                                fontWeight: FontWeight.w300,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
 
-                  Gap(20),
-                ],
+                    Gap(20),
+                  ],
+                ),
               ),
             ),
-          ),
 
-          // Scanning overlay
-          if (_isUploading) ScanningOverlay(),
-        ],
+            // Scanning overlay
+            if (_isUploading) ScanningOverlay(),
+          ],
+        ),
       ),
     );
   }

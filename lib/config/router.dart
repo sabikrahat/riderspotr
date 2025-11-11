@@ -13,7 +13,9 @@ import '../presentation/pages/auth/your_experience_screen.dart';
 import '../presentation/pages/auth/your_location_screen.dart';
 import '../presentation/pages/capture/camera_screen.dart';
 import '../presentation/pages/capture/car_detail_screen.dart';
+import '../presentation/pages/capture/car_preview_screen.dart';
 import '../presentation/pages/capture/manual_upload_screen.dart';
+import '../presentation/pages/capture/report_car_screen.dart';
 import '../presentation/pages/capture/scan_detail_screen.dart';
 import '../presentation/pages/explore/explore_screen.dart';
 import '../presentation/pages/garage/garage_screen.dart';
@@ -183,6 +185,18 @@ final router = GoRouter(
       redirect: authHandler,
       builder: (_, state) =>
           CarDetailScreen(carSpot: state.extra as CarSpotModel?),
+    ),
+    GoRoute(
+      path: CarPreviewScreen.routeName,
+      redirect: authHandler,
+      builder: (_, state) =>
+          CarPreviewScreen(carSpot: state.extra as CarSpotModel),
+    ),
+    GoRoute(
+      path: ReportCarScreen.routeName,
+      redirect: authHandler,
+      builder: (_, state) =>
+          ReportCarScreen(carSpot: state.extra as CarSpotModel),
     ),
     GoRoute(
       path: PaymentScreen.routeName,

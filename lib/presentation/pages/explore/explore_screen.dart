@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
@@ -32,6 +35,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   geo.Position? _userPosition;
   List<CarSpotModel> _sortedCarSpots = [];
   late PageController _pageController;
+  double _currentZoom = 13.0;
+  List<MapMarkerModel> _currentMarkers = [];
+  Timer? _zoomMonitorTimer;
 
   @override
   void initState() {
@@ -43,6 +49,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   @override
   void dispose() {
     _pageController.dispose();
+    _zoomMonitorTimer?.cancel();
     super.dispose();
   }
 
@@ -116,6 +123,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     this.mapboxMap = mapboxMap;
     await _addCircleMarkers(spots);
 
+    // Start periodic zoom checking to update circle sizes
+    _startZoomMonitoring();
+
     // Focus on first car's location if available
     if (spots.isNotEmpty &&
         spots.first.latitude != null &&
@@ -147,7 +157,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
           .createCircleAnnotationManager();
     }
 
-    final markers = spots
+    _currentMarkers = spots
         .where((s) => s.latitude != null && s.longitude != null)
         .toList()
         .map(
@@ -178,11 +188,11 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     circleAnnotationManager!.tapEvents(
       onTap: (annotation) {
         // Find the marker that was tapped
-        final tappedMarker = markers.firstWhere(
+        final tappedMarker = _currentMarkers.firstWhere(
           (m) =>
               m.latitude == annotation.geometry.coordinates.lat &&
               m.longitude == annotation.geometry.coordinates.lng,
-          orElse: () => markers.first,
+          orElse: () => _currentMarkers.first,
         );
 
         // Find the index in the sorted car spots list
@@ -202,13 +212,15 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     );
 
     // Add simple, minimalistic circles for each marker
-    for (var marker in markers) {
-      // Simple circle with clean border - all same size
+    for (var marker in _currentMarkers) {
+      // Calculate radius that maintains constant geographical area
+      final radius = _calculateRadiusForZoom(_currentZoom);
+
       final circleOptions = CircleAnnotationOptions(
         geometry: Point(
           coordinates: Position(marker.longitude, marker.latitude),
         ),
-        circleRadius: 25.0, // Fixed size for all markers
+        circleRadius: radius,
         circleColor: marker.colorToInt(marker.borderColor),
         circleOpacity: 0.25,
         circleStrokeWidth: 2.0,
@@ -236,6 +248,73 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       case Rarity.common:
         return 10.0;
     }
+  }
+
+  /// Calculate circle radius that maintains constant geographical area
+  /// regardless of zoom level
+  double _calculateRadiusForZoom(double zoom) {
+    // Reference zoom level where we want a base radius
+    const double referenceZoom = 13.0;
+    const double baseRadius = 25.0;
+
+    // Scale radius with zoom to maintain constant geographical coverage
+    // When zoom increases (zooming in), radius increases
+    // When zoom decreases (zooming out), radius decreases
+    // Formula: radius = baseRadius * 2^(currentZoom - referenceZoom)
+    final double radius = baseRadius * pow(2, zoom - referenceZoom);
+
+    // Clamp radius to reasonable bounds
+    return radius.clamp(5.0, 200.0);
+  }
+
+  /// Update all circle radii when zoom level changes
+  Future<void> _updateCircleRadii() async {
+    if (circleAnnotationManager == null || _currentMarkers.isEmpty) return;
+
+    // Clear and recreate circles with new radii
+    await circleAnnotationManager!.deleteAll();
+
+    final radius = _calculateRadiusForZoom(_currentZoom);
+
+    for (var marker in _currentMarkers) {
+      final circleOptions = CircleAnnotationOptions(
+        geometry: Point(
+          coordinates: Position(marker.longitude, marker.latitude),
+        ),
+        circleRadius: radius,
+        circleColor: marker.colorToInt(marker.borderColor),
+        circleOpacity: 0.25,
+        circleStrokeWidth: 2.0,
+        circleStrokeColor: marker.colorToInt(marker.borderColor),
+        circleStrokeOpacity: 0.7,
+      );
+
+      await circleAnnotationManager!.create(circleOptions);
+    }
+  }
+
+  /// Start monitoring zoom level changes
+  void _startZoomMonitoring() {
+    _zoomMonitorTimer?.cancel();
+    _zoomMonitorTimer = Timer.periodic(
+      const Duration(milliseconds: 500),
+      (timer) async {
+        if (mapboxMap == null) return;
+
+        try {
+          final cameraState = await mapboxMap!.getCameraState();
+          final newZoom = cameraState.zoom;
+
+          // Only update if zoom changed significantly (prevents too many updates)
+          if ((newZoom - _currentZoom).abs() > 0.15) {
+            _currentZoom = newZoom;
+            await _updateCircleRadii();
+          }
+        } catch (e) {
+          debugPrint('Error monitoring zoom: $e');
+        }
+      },
+    );
   }
 
   Future<void> _focusOnCarSpot(CarSpotModel spot) async {

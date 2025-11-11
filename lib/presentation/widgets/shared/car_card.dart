@@ -9,7 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/extensions.dart';
 import '../../../core/toastification.dart';
 import '../../../models/car/car_spot_model.dart';
-import '../../pages/capture/car_detail_screen.dart';
+import '../../pages/capture/car_preview_screen.dart';
 import '../../providers/car/garage_provider.dart';
 
 class CarCard extends ConsumerWidget {
@@ -24,7 +24,7 @@ class CarCard extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         context.push(
-          CarDetailScreen.routeName,
+          CarPreviewScreen.routeName,
           extra: carSpot,
         );
       },

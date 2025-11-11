@@ -16,6 +16,7 @@ import '../../widgets/shared/back.dart';
 import '../../widgets/shared/rarity_badge.dart';
 import '../garage/garage_screen.dart';
 import 'car_detail_screen.dart';
+import 'report_car_screen.dart';
 
 class ScanDeatilScreen extends ConsumerStatefulWidget {
   static const String routeName = '/scan-detail';
@@ -113,6 +114,24 @@ class _ScanDeatilScreenState extends ConsumerState<ScanDeatilScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Back(),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.flag,
+              color: Colors.white.withValues(alpha: 0.9),
+              size: 24,
+            ),
+            onPressed: () {
+              if (widget.params.carSpot != null) {
+                context.push(
+                  ReportCarScreen.routeName,
+                  extra: widget.params.carSpot,
+                );
+              }
+            },
+            tooltip: 'Report car',
+          ),
+        ],
       ),
       body: Stack(
         children: [

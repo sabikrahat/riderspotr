@@ -1,6 +1,8 @@
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
@@ -12,6 +14,8 @@ import '../../widgets/capture/specs_part.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/rarity_badge.dart';
 import '../../widgets/shared/locked_content.dart';
+import 'car_preview_screen.dart';
+import 'report_car_screen.dart';
 
 class CarDetailScreen extends ConsumerStatefulWidget {
   static const String routeName = '/car-detail';
@@ -76,101 +80,167 @@ class _CarDetailScreenState extends ConsumerState<CarDetailScreen>
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Back(),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.flag,
+              color: Colors.white.withValues(alpha: 0.9),
+              size: 24,
+            ),
+            onPressed: () {
+              context.push(ReportCarScreen.routeName, extra: carSpot);
+            },
+            tooltip: 'Report car',
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             // Background Image
-            Stack(
-              children: [
-                Container(
-                  width: context.width,
-                  height: context.height * 0.5,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black.withValues(alpha: 1),
-                        Colors.black.withValues(alpha: 0.8),
-                        Colors.black.withValues(alpha: 0),
-                      ],
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => CarPreviewScreen(
+                      carSpot: carSpot,
+                      showDetailsButton: false,
                     ),
+                  ),
+                );
+              },
+              child: Stack(
+                children: [
+                  ClipRRect(
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(30),
                       bottomRight: Radius.circular(30),
                     ),
-                    image: DecorationImage(
-                      image: NetworkImage(widget.carSpot!.imageUrl),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ), // Title and rarity
-                Positioned(
-                  child: Container(
-                    width: context.width,
-                    height: context.height * 0.5,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withValues(alpha: 1),
-                          Colors.black.withValues(alpha: 0.8),
-                          Colors.black.withValues(alpha: 0.4),
-                          Colors.black.withValues(alpha: 0),
-                          Colors.black.withValues(alpha: 1),
-                        ],
+                    child: SizedBox(
+                      width: context.width,
+                      height: context.height * 0.5,
+                      child: FastCachedImage(
+                        key: Key(carSpot.id),
+                        url: widget.carSpot!.imageUrl,
+                        fit: BoxFit.cover,
+                        fadeInDuration: const Duration(milliseconds: 300),
+                        errorBuilder: (context, exception, stacktrace) {
+                          return Container(
+                            color: Colors.grey.shade900,
+                            child: Center(
+                              child: Icon(
+                                Icons.broken_image,
+                                color: Colors.white24,
+                                size: 48,
+                              ),
+                            ),
+                          );
+                        },
+                        loadingBuilder: (context, progress) {
+                          return Container(
+                            color: Colors.grey.shade900,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                color: Colors.white24,
+                                value: progress.progressPercentage.value,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                    child: SafeArea(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            RarityBadge(rarity: carSpot.car!.rarity),
-                            const Gap(16),
-                            Text(
-                              carSpot.car!.make!.name.toUpperCase(),
-                              style: context.textTheme.headlineMedium?.copyWith(
-                                fontWeight: FontWeight.w300,
-                                letterSpacing: 3,
-                                fontSize: 18,
-                                color: Colors.white.withValues(alpha: 0.7),
-                              ),
-                            ),
-                            const Gap(2),
-                            Text(
-                              carSpot.car!.model!.toUpperCase(),
-                              style: context.textTheme.headlineLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 1,
-                                fontSize: 28,
-                                height: 1.1,
-                              ),
-                            ),
+                  ),
+                  // Gradient overlay
+                  // Container(
+                  //   width: context.width,
+                  //   height: context.height * 0.2,
+                  //   decoration: BoxDecoration(
+                  //     gradient: LinearGradient(
+                  //       begin: Alignment.topCenter,
+                  //       end: Alignment.bottomCenter,
+                  //       colors: [
+                  //         // Colors.black.withValues(alpha: 1),
+                  //         Colors.black.withValues(alpha: 0),
+                  //         Colors.black.withValues(alpha: 0),
+                  //       ],
+                  //     ),
+                  //     borderRadius: const BorderRadius.only(
+                  //       bottomLeft: Radius.circular(30),
+                  //       bottomRight: Radius.circular(30),
+                  //     ),
+                  //   ),
+                  // ), // Title and rarity
+                  Positioned(
+                    child: Container(
+                      width: context.width,
+                      height: context.height * 0.5,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 1),
+                            Colors.black.withValues(alpha: 0.8),
+                            Colors.black.withValues(alpha: 0.4),
+                            Colors.black.withValues(alpha: 0),
+                            Colors.black.withValues(alpha: 1),
                           ],
+                        ),
+                      ),
+                      child: SafeArea(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RarityBadge(rarity: carSpot.car!.rarity),
+                              const Gap(16),
+                              Text(
+                                carSpot.car!.make!.name.toUpperCase(),
+                                style: context.textTheme.headlineMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w300,
+                                      letterSpacing: 3,
+                                      fontSize: 18,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.7,
+                                      ),
+                                    ),
+                              ),
+                              const Gap(2),
+                              Text(
+                                carSpot.car!.model!.toUpperCase(),
+                                style: context.textTheme.headlineLarge
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 1,
+                                      fontSize: 28,
+                                      height: 1.1,
+                                    ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                // Bottom Slider
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: CarDetailTabBar(
-                    selectedIndex: selectedIndex,
-                    onSelect: (newIndex) {
-                      setState(() {
-                        selectedIndex = newIndex;
-                      });
-                    },
+                  // Bottom Slider
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: CarDetailTabBar(
+                      selectedIndex: selectedIndex,
+                      onSelect: (newIndex) {
+                        setState(() {
+                          selectedIndex = newIndex;
+                        });
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             // Tab Views
             hasStatsAccess
