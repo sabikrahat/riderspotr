@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../models/leaderboard/user_leaderboard_model.dart';
-import '../../pages/profile/user_profile_screen.dart';
+import '../../pages/profile/profile_screen.dart';
 
 class LeaderboardComparisonBar extends StatelessWidget {
   final UserLeaderboardModel? firstPlace;
@@ -104,7 +104,7 @@ class LeaderboardComparisonBar extends StatelessWidget {
 
     return GestureDetector(
       onTap: () async => await context.push(
-        UserProfileScreen.routeName,
+        ProfileScreen.userProfileRouteName,
         extra: user.user,
       ),
       child: Column(

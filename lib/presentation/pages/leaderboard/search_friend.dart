@@ -10,7 +10,7 @@ import '../../widgets/shared/back.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/page_padding.dart';
 import '../../widgets/shared/user_tile.dart';
-import '../profile/user_profile_screen.dart';
+import '../profile/profile_screen.dart';
 
 class SearchFriendScreen extends ConsumerStatefulWidget {
   const SearchFriendScreen({super.key});
@@ -154,7 +154,7 @@ class _SearchFriendScreenState extends ConsumerState<SearchFriendScreen> {
                                 user: user,
                                 onTap: () async {
                                   await context.push(
-                                    UserProfileScreen.routeName,
+                                    ProfileScreen.userProfileRouteName,
                                     extra: user.id,
                                   );
                                 },

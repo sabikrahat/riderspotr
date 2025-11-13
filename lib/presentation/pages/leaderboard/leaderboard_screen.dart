@@ -7,15 +7,16 @@ import 'package:ridespotr/presentation/providers/leaderboard/leaderboard_provide
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/extensions.dart';
+import '../../providers/auth/user_provider.dart';
+import '../../providers/leaderboard/user_current_rank_provider.dart';
 import '../../providers/subscription/subscription_provider.dart';
 import '../../widgets/shared/locked_content.dart';
 import '../../widgets/leaderboard/comparison_bar.dart';
-import '../../widgets/leaderboard/summary_card.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/filter_chips.dart';
 import '../../widgets/shared/page_padding.dart';
-import '../profile/user_profile_screen.dart';
-import 'search_friend.dart';
+import '../../widgets/shared/profile_xp_card.dart';
+import '../profile/profile_screen.dart';
 
 class LeaderboardScreen extends ConsumerStatefulWidget {
   const LeaderboardScreen({super.key});
@@ -81,6 +82,31 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
     final currentUserId = Supabase.instance.client.auth.currentUser?.id;
     final subscription = ref.watch(subscriptionProvider.notifier);
     final hasLeaderboardAccess = subscription.hasLeaderboardAccess;
+    final user = ref.watch(userProvider).value;
+
+    // Determine rank icon and title based on filter
+    IconData rankIcon;
+    String rankTitle;
+
+    switch (selectedFilter) {
+      case 'Country':
+        rankIcon = Icons.flag_rounded;
+        rankTitle = 'Country';
+        break;
+      case 'State':
+        rankIcon = Icons.location_city_rounded;
+        rankTitle = 'State';
+        break;
+      case 'Friends':
+        rankIcon = Icons.people_rounded;
+        rankTitle = 'Friends';
+        break;
+      case 'Global':
+      default:
+        rankIcon = Icons.language;
+        rankTitle = 'Global';
+        break;
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -103,7 +129,6 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                             'LEADERBOARD',
                             style: context.textTheme.headlineMedium?.copyWith(
                               fontWeight: FontWeight.w300,
-                              // letterSpacing: -0.5,
                             ),
                           ),
                           Gap(4),
@@ -119,39 +144,29 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                           ),
                         ],
                       ),
-                      GestureDetector(
-                        onTap: () async => await context.push(
-                          SearchFriendScreen.routeName,
-                        ),
-                        child: Container(
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.white.withValues(alpha: 0.08),
-                                Colors.white.withValues(alpha: 0.03),
-                              ],
+                      // Rank Badge
+                      ref
+                          .watch(userCurrentRankProvider(selectedFilter))
+                          .when(
+                            loading: () => _RankBadge(
+                              icon: rankIcon,
+                              title: rankTitle,
+                              rank: null,
+                              isLoading: true,
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(
-                                  alpha: 0.3,
-                                ),
-                                blurRadius: 10,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
+                            error: (_, __) => _RankBadge(
+                              icon: rankIcon,
+                              title: rankTitle,
+                              rank: null,
+                              isLoading: false,
+                            ),
+                            data: (rank) => _RankBadge(
+                              icon: rankIcon,
+                              title: rankTitle,
+                              rank: rank,
+                              isLoading: false,
+                            ),
                           ),
-                          child: Icon(
-                            Icons.person_add_alt_1_rounded,
-                            color: Colors.white.withValues(alpha: 0.9),
-                            size: 20,
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                   Gap(32),
@@ -164,10 +179,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                   ),
                   Gap(24),
 
-                  // Summary Card
-                  LeaderboardSummaryCard(
-                    selectedFilter: selectedFilter,
-                  ),
+                  // Profile XP Card
+                  ProfileXPCard(user: user),
                   Gap(16),
 
                   // Leaderboard content with separate loading
@@ -247,7 +260,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                       isCurrentUser: isCurrentUser,
                                       onTap: () async {
                                         await context.push(
-                                          UserProfileScreen.routeName,
+                                          ProfileScreen.userProfileRouteName,
                                           extra: user.user,
                                         );
                                       },
@@ -395,6 +408,85 @@ class _LeaderboardUserTile extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _RankBadge extends StatelessWidget {
+  const _RankBadge({
+    required this.icon,
+    required this.title,
+    required this.rank,
+    this.isLoading = false,
+  });
+
+  final IconData icon;
+  final String title;
+  final int? rank;
+  final bool isLoading;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: 0.08),
+            Colors.white.withValues(alpha: 0.03),
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title.toUpperCase(),
+            style: context.textTheme.bodySmall?.copyWith(
+              color: Colors.white.withValues(alpha: 0.4),
+              fontSize: 8,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 1,
+            ),
+          ),
+          Gap(2),
+          isLoading
+              ? SizedBox(
+                  width: 24,
+                  height: 16,
+                  child: Center(
+                    child: SizedBox(
+                      width: 12,
+                      height: 12,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ),
+                )
+              : Text(
+                  rank == null ? 'N/A' : '#$rank',
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w300,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+        ],
       ),
     );
   }

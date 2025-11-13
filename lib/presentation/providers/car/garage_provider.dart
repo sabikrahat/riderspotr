@@ -236,6 +236,13 @@ class GarageNotifier extends _$GarageNotifier {
           return carNameB.compareTo(carNameA);
         });
         break;
+      case SortOptions.rarity:
+        sortedCars.sort((a, b) {
+          final rarityA = a.car?.rarity.index ?? -1;
+          final rarityB = b.car?.rarity.index ?? -1;
+          return rarityB.compareTo(rarityA); // Higher rarity first
+        });
+        break;
     }
 
     return sortedCars;

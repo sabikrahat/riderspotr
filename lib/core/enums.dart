@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../presentation/pages/garage/garage_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
 import '../presentation/pages/leaderboard/leaderboard_screen.dart';
-import '../presentation/pages/profile/own_profile_screen.dart';
+import '../presentation/pages/profile/profile_screen.dart';
 
 enum KNavItem { home, garage, leaderboard, profile }
 
@@ -26,14 +26,14 @@ extension KDrawerExtension on KNavItem {
     KNavItem.home => const HomeScreen(),
     KNavItem.garage => const GarageScreen(),
     KNavItem.leaderboard => const LeaderboardScreen(),
-    KNavItem.profile => const OwnProfileScreen(),
+    KNavItem.profile => const ProfileScreen(),
   };
 
   String get route => switch (this) {
     KNavItem.home => HomeScreen.routeName,
     KNavItem.garage => GarageScreen.routeName,
     KNavItem.leaderboard => LeaderboardScreen.routeName,
-    KNavItem.profile => OwnProfileScreen.routeName,
+    KNavItem.profile => ProfileScreen.routeName,
   };
 
   bool get isHome => this == KNavItem.home;
@@ -112,6 +112,7 @@ enum SortOptions {
   oldest,
   alphabetical,
   alphabeticalReverse,
+  rarity,
 }
 
 extension SortOptionsExtension on SortOptions {
@@ -125,6 +126,8 @@ extension SortOptionsExtension on SortOptions {
         return 'A-Z';
       case SortOptions.alphabeticalReverse:
         return 'Z-A';
+      case SortOptions.rarity:
+        return 'Rarity';
     }
   }
 }

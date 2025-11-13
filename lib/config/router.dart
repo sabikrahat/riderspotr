@@ -25,8 +25,9 @@ import '../presentation/pages/leaderboard/search_friend.dart';
 import '../presentation/pages/nav_screen.dart';
 import '../presentation/pages/payment/payment_screen.dart';
 import '../presentation/pages/payment/upgrade_required_screen.dart';
-import '../presentation/pages/profile/own_profile_screen.dart';
-import '../presentation/pages/profile/user_profile_screen.dart';
+import '../presentation/pages/profile/edit_bio_screen.dart';
+import '../presentation/pages/profile/followers_following_screen.dart';
+import '../presentation/pages/profile/profile_screen.dart';
 import '../presentation/pages/settings/settings_screen.dart';
 import '../services/auth/user_service.dart';
 
@@ -137,21 +138,38 @@ final router = GoRouter(
           pageBuilder: (_, __) => NoTransitionPage(child: LeaderboardScreen()),
         ),
         GoRoute(
-          path: OwnProfileScreen.routeName,
+          path: ProfileScreen.routeName,
           pageBuilder: (_, __) => NoTransitionPage(
-            child: OwnProfileScreen(),
+            child: ProfileScreen(),
           ),
+        ),
+        GoRoute(
+          path: ProfileScreen.userProfileRouteName,
+          builder: (_, state) => ProfileScreen(id: state.extra as String),
         ),
       ],
     ),
-    GoRoute(
-      path: UserProfileScreen.routeName,
-      builder: (_, state) => UserProfileScreen(id: state.extra as String),
-    ),
+
     GoRoute(
       path: SettingsScreen.routeName,
       redirect: authHandler,
       builder: (_, _) => SettingsScreen(),
+    ),
+    GoRoute(
+      path: EditBioScreen.routeName,
+      redirect: authHandler,
+      builder: (_, _) => EditBioScreen(),
+    ),
+    GoRoute(
+      path: FollowersFollowingScreen.routeName,
+      redirect: authHandler,
+      builder: (_, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return FollowersFollowingScreen(
+          userId: extra['userId'] as String,
+          initialTab: extra['initialTab'] as FollowersFollowingTab,
+        );
+      },
     ),
     GoRoute(
       path: CameraScreen.routeName,

@@ -38,12 +38,17 @@ class UserModel {
   final String? state;
   final String? profilePictureUrl;
   final String? bannerUrl;
+  final String? bio;
   final DateTime createdAt;
   final bool isGaragePrivate;
   @JsonKey(includeToJson: false)
   final UserStatsModel? stats;
   @JsonKey(includeToJson: false)
   final List<AchievementModel>? achievements;
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  final int? followersCount;
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  final int? followingCount;
 
   UserModel({
     required this.id,
@@ -62,14 +67,41 @@ class UserModel {
     this.state,
     this.profilePictureUrl,
     this.bannerUrl,
+    this.bio,
     required this.createdAt,
     required this.isGaragePrivate,
     required this.stats,
     this.achievements,
+    this.followersCount,
+    this.followingCount,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) =>
-      _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    final model = _$UserModelFromJson(json);
+
+    // Parse followers_count from Supabase count query
+    int? followersCount;
+    if (json['followers_count'] != null && json['followers_count'] is List) {
+      final followersList = json['followers_count'] as List;
+      if (followersList.isNotEmpty && followersList.first is Map) {
+        followersCount = followersList.first['count'] as int?;
+      }
+    }
+
+    // Parse following_count from Supabase count query
+    int? followingCount;
+    if (json['following_count'] != null && json['following_count'] is List) {
+      final followingList = json['following_count'] as List;
+      if (followingList.isNotEmpty && followingList.first is Map) {
+        followingCount = followingList.first['count'] as int?;
+      }
+    }
+
+    return model.copyWith(
+      followersCount: followersCount,
+      followingCount: followingCount,
+    );
+  }
 
   Map<String, dynamic> toJson() => _$UserModelToJson(this);
 
@@ -99,10 +131,13 @@ class UserModel {
     String? state,
     String? profilePictureUrl,
     String? bannerUrl,
+    String? bio,
     DateTime? createdAt,
     bool? isGaragePrivate,
     UserStatsModel? stats,
     List<AchievementModel>? achievements,
+    int? followersCount,
+    int? followingCount,
   }) => UserModel(
     id: id,
     email: email,
@@ -120,13 +155,22 @@ class UserModel {
     state: state ?? this.state,
     profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
     bannerUrl: bannerUrl ?? this.bannerUrl,
+    bio: bio ?? this.bio,
     createdAt: createdAt ?? this.createdAt,
     isGaragePrivate: isGaragePrivate ?? this.isGaragePrivate,
     stats: stats ?? this.stats,
     achievements: achievements ?? this.achievements,
+    followersCount: followersCount ?? this.followersCount,
+    followingCount: followingCount ?? this.followingCount,
   );
 
-  String get fullName => "$firstName$lastName";
+  String get fullName => "$firstName $lastName";
 
-  static const query = '*, stats: user_stats(*), achievements: achievements(*)';
+  static const query = '''
+    *, 
+    stats: user_stats(*), 
+    achievements: achievements(*),
+    followers_count:user_following!user_following_followed_user_fkey(count),
+    following_count:user_following!user_following_user_fkey(count)
+  ''';
 }

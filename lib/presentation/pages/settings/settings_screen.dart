@@ -13,6 +13,7 @@ import '../auth/login_screen.dart';
 import '../auth/your_experience_screen.dart';
 import '../auth/your_location_screen.dart';
 import '../payment/payment_screen.dart';
+import '../profile/edit_bio_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -41,27 +42,42 @@ class SettingsScreen extends StatelessWidget {
                     _Tile(
                       icon: Icons.person,
                       title: 'ACCOUNT',
-                      onTap: () async => await context.push(AboutYouScreen.routeName, extra: true),
+                      onTap: () async => await context.push(
+                        AboutYouScreen.routeName,
+                        extra: true,
+                      ),
+                    ),
+                    Gap(8),
+                    _Tile(
+                      icon: Icons.edit_note,
+                      title: 'EDIT BIO',
+                      onTap: () async =>
+                          await context.push(EditBioScreen.routeName),
                     ),
                     Gap(8),
                     _Tile(
                       icon: Icons.checklist_rounded,
                       title: 'YOUR EXPERIENCE',
-                      onTap: () async =>
-                          await context.push(YourExperienceScreen.routeName, extra: true),
+                      onTap: () async => await context.push(
+                        YourExperienceScreen.routeName,
+                        extra: true,
+                      ),
                     ),
                     Gap(8),
                     _Tile(
                       icon: Icons.location_on,
                       title: 'YOUR LOCATION',
-                      onTap: () async =>
-                          await context.push(YourLocationScreen.routeName, extra: true),
+                      onTap: () async => await context.push(
+                        YourLocationScreen.routeName,
+                        extra: true,
+                      ),
                     ),
                     Gap(8),
                     _Tile(
                       icon: Icons.payment,
                       title: 'PAYMENT METHODS',
-                      onTap: () async => await context.push(PaymentScreen.routeName),
+                      onTap: () async =>
+                          await context.push(PaymentScreen.routeName),
                     ),
                   ],
                 ),
@@ -116,7 +132,9 @@ class _Tile extends StatelessWidget {
           children: [
             Icon(icon, color: Colors.white, size: 28),
             Gap(16),
-            Expanded(child: Text(title, style: context.textTheme.headlineSmall)),
+            Expanded(
+              child: Text(title, style: context.textTheme.headlineSmall),
+            ),
           ],
         ),
       ),
