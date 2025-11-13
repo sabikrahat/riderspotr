@@ -130,8 +130,8 @@ final router = GoRouter(
           ),
         ),
         GoRoute(
-          path: GarageScreen.routeName,
-          pageBuilder: (_, __) => NoTransitionPage(child: GarageScreen()),
+          path: MarketplaceScreen.routeName,
+          pageBuilder: (_, __) => NoTransitionPage(child: MarketplaceScreen()),
         ),
         GoRoute(
           path: LeaderboardScreen.routeName,
@@ -143,13 +143,12 @@ final router = GoRouter(
             child: ProfileScreen(),
           ),
         ),
-        GoRoute(
-          path: ProfileScreen.userProfileRouteName,
-          builder: (_, state) => ProfileScreen(id: state.extra as String),
-        ),
       ],
     ),
-
+    GoRoute(
+      path: ProfileScreen.userProfileRouteName,
+      builder: (_, state) => ProfileScreen(id: state.extra as String),
+    ),
     GoRoute(
       path: SettingsScreen.routeName,
       redirect: authHandler,

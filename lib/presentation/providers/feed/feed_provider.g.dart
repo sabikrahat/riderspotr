@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'garage_provider.dart';
+part of 'feed_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,39 +9,39 @@ part of 'garage_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(GarageNotifier)
-const garageProvider = GarageNotifierFamily._();
+@ProviderFor(Feed)
+const feedProvider = FeedFamily._();
 
-final class GarageNotifierProvider
-    extends $AsyncNotifierProvider<GarageNotifier, List<CarSpotModel>> {
-  const GarageNotifierProvider._({
-    required GarageNotifierFamily super.from,
-    required String? super.argument,
+final class FeedProvider
+    extends $AsyncNotifierProvider<Feed, List<CarSpotModel>> {
+  const FeedProvider._({
+    required FeedFamily super.from,
+    required (FeedType, String?) super.argument,
   }) : super(
          retry: null,
-         name: r'garageProvider',
-         isAutoDispose: false,
+         name: r'feedProvider',
+         isAutoDispose: true,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
 
   @override
-  String debugGetCreateSourceHash() => _$garageNotifierHash();
+  String debugGetCreateSourceHash() => _$feedHash();
 
   @override
   String toString() {
-    return r'garageProvider'
+    return r'feedProvider'
         ''
-        '($argument)';
+        '$argument';
   }
 
   @$internal
   @override
-  GarageNotifier create() => GarageNotifier();
+  Feed create() => Feed();
 
   @override
   bool operator ==(Object other) {
-    return other is GarageNotifierProvider && other.argument == argument;
+    return other is FeedProvider && other.argument == argument;
   }
 
   @override
@@ -50,42 +50,43 @@ final class GarageNotifierProvider
   }
 }
 
-String _$garageNotifierHash() => r'42f00e3fa444a961d17bcfeb3536fe94dd119b6e';
+String _$feedHash() => r'070ca67a701f589b5a4c5eb734483fb90cf5e30d';
 
-final class GarageNotifierFamily extends $Family
+final class FeedFamily extends $Family
     with
         $ClassFamilyOverride<
-          GarageNotifier,
+          Feed,
           AsyncValue<List<CarSpotModel>>,
           List<CarSpotModel>,
           FutureOr<List<CarSpotModel>>,
-          String?
+          (FeedType, String?)
         > {
-  const GarageNotifierFamily._()
+  const FeedFamily._()
     : super(
         retry: null,
-        name: r'garageProvider',
+        name: r'feedProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: false,
+        isAutoDispose: true,
       );
 
-  GarageNotifierProvider call(String? arg) =>
-      GarageNotifierProvider._(argument: arg, from: this);
+  FeedProvider call(FeedType feedType, String? userCountry) =>
+      FeedProvider._(argument: (feedType, userCountry), from: this);
 
   @override
-  String toString() => r'garageProvider';
+  String toString() => r'feedProvider';
 }
 
-abstract class _$GarageNotifier extends $AsyncNotifier<List<CarSpotModel>> {
-  late final _$args = ref.$arg as String?;
-  String? get arg => _$args;
+abstract class _$Feed extends $AsyncNotifier<List<CarSpotModel>> {
+  late final _$args = ref.$arg as (FeedType, String?);
+  FeedType get feedType => _$args.$1;
+  String? get userCountry => _$args.$2;
 
-  FutureOr<List<CarSpotModel>> build(String? arg);
+  FutureOr<List<CarSpotModel>> build(FeedType feedType, String? userCountry);
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(_$args);
+    final created = build(_$args.$1, _$args.$2);
     final ref =
         this.ref as $Ref<AsyncValue<List<CarSpotModel>>, List<CarSpotModel>>;
     final element =

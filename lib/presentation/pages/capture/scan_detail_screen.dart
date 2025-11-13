@@ -14,7 +14,7 @@ import '../../providers/auth/xp_level_provider.dart';
 import '../../widgets/capture/xp_progression_card.dart';
 import '../../widgets/shared/back.dart';
 import '../../widgets/shared/rarity_badge.dart';
-import '../garage/garage_screen.dart';
+import '../profile/profile_screen.dart';
 import 'car_detail_screen.dart';
 import 'report_car_screen.dart';
 
@@ -448,8 +448,8 @@ class _ScanDeatilScreenState extends ConsumerState<ScanDeatilScreen> {
                                         'Car spot claimed successfully!',
                                       );
                                       if (!context.mounted) return;
-                                      // Pop all screens and navigate to garage
-                                      context.go(GarageScreen.routeName);
+                                      // Pop all screens and navigate to profile
+                                      context.go(ProfileScreen.routeName);
                                     } catch (e) {
                                       showErrorMessage(
                                         'Error claiming car spot: $e',

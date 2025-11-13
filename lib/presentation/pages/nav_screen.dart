@@ -18,8 +18,8 @@ class NavScreen extends StatelessWidget {
     switch (path.toLowerCase()) {
       case 'home':
         return KNavItem.home;
-      case 'garage':
-        return KNavItem.garage;
+      case 'marketplace':
+        return KNavItem.marketplace;
       case 'leaderboard':
         return KNavItem.leaderboard;
       case 'profile':

@@ -370,29 +370,28 @@ class _FeedCardState extends ConsumerState<FeedCard>
                     const Gap(24),
 
                     // Comment button
-                    GestureDetector(
-                      onTap: () {
-                        // TODO: Navigate to comments
-                      },
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.chat_bubble_outline,
-                            color: Colors.white.withValues(alpha: 0.9),
-                            size: 22,
-                          ),
-                          const Gap(8),
-                          Text(
-                            '0',
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white.withValues(alpha: 0.9),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     // TODO: Navigate to comments
+                    //   },
+                    //   child: Row(
+                    //     children: [
+                    //       Icon(
+                    //         Icons.chat_bubble_outline,
+                    //         color: Colors.white.withValues(alpha: 0.9),
+                    //         size: 22,
+                    //       ),
+                    //       const Gap(8),
+                    //       Text(
+                    //         '0',
+                    //         style: context.textTheme.bodyMedium?.copyWith(
+                    //           fontWeight: FontWeight.w600,
+                    //           color: Colors.white.withValues(alpha: 0.9),
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                     const Spacer(),
 
                     // Timestamp
