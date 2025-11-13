@@ -104,11 +104,7 @@ final router = GoRouter(
       builder: (_, state) =>
           YourLocationScreen(fromUpdateProfile: state.extra as bool? ?? false),
     ),
-    GoRoute(
-      path: ExploreScreen.routeName,
-      // redirect: authHandler,
-      builder: (_, _) => ExploreScreen(),
-    ),
+
     GoRoute(
       path: SearchFriendScreen.routeName,
       // redirect: authHandler,
@@ -129,13 +125,22 @@ final router = GoRouter(
             ),
           ),
         ),
-        GoRoute(
-          path: MarketplaceScreen.routeName,
-          pageBuilder: (_, __) => NoTransitionPage(child: MarketplaceScreen()),
-        ),
+
         GoRoute(
           path: LeaderboardScreen.routeName,
           pageBuilder: (_, __) => NoTransitionPage(child: LeaderboardScreen()),
+        ),
+        GoRoute(
+          path: ExploreScreen.routeName,
+          pageBuilder: (_, __) => NoTransitionPage(child: ExploreScreen()),
+        ),
+        GoRoute(
+          path: CameraScreen.routeName,
+          pageBuilder: (_, __) => NoTransitionPage(child: CameraScreen()),
+        ),
+        GoRoute(
+          path: MarketplaceScreen.routeName,
+          pageBuilder: (_, __) => NoTransitionPage(child: MarketplaceScreen()),
         ),
         GoRoute(
           path: ProfileScreen.routeName,
@@ -169,11 +174,6 @@ final router = GoRouter(
           initialTab: extra['initialTab'] as FollowersFollowingTab,
         );
       },
-    ),
-    GoRoute(
-      path: CameraScreen.routeName,
-      redirect: authHandler,
-      builder: (_, _) => CameraScreen(),
     ),
     GoRoute(
       path: ManualUploadScreen.routeName,

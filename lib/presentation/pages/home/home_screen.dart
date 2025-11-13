@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridespotr/presentation/pages/leaderboard/search_friend.dart';
 
 import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
@@ -88,11 +89,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       SizedBox(width: 200, child: Logo()),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () => context.push(SearchFriendScreen.routeName),
+                        child: Icon(
+                          Icons.search,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Gap(16),
                       Icon(
-                        Icons.person_add_alt_1_rounded,
+                        Icons.notifications,
                         color: Colors.white,
                       ),
                     ],

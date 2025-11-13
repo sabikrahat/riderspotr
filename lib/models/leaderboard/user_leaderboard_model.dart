@@ -9,6 +9,7 @@ class UserLeaderboardModel {
   final int totalXp;
   final String firstName;
   final String lastName;
+  final String? username;
   final String? profilePictureUrl;
 
   UserLeaderboardModel({
@@ -17,6 +18,7 @@ class UserLeaderboardModel {
     required this.totalXp,
     required this.firstName,
     required this.lastName,
+    this.username,
     required this.profilePictureUrl,
   });
 

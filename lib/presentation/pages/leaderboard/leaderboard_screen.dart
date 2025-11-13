@@ -230,6 +230,31 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                             }
 
                             // Full leaderboard for paid users
+                            final currentUserInList = leaderboardUsers
+                                .firstWhere(
+                                  (u) =>
+                                      currentUserId != null &&
+                                      u.user == currentUserId,
+                                  orElse: () => leaderboardUsers.first,
+                                );
+                            final currentUserRank = currentUserId != null
+                                ? leaderboardUsers.indexWhere(
+                                    (u) => u.user == currentUserId,
+                                  )
+                                : -1;
+                            final isCurrentUserInTop10 =
+                                currentUserRank != -1 && currentUserRank < 10;
+
+                            // Show top 10 users (4-10 after podium)
+                            final top10Users = leaderboardUsers.length > 3
+                                ? leaderboardUsers.sublist(
+                                    3,
+                                    leaderboardUsers.length < 10
+                                        ? leaderboardUsers.length
+                                        : 10,
+                                  )
+                                : <dynamic>[];
+
                             return Column(
                               children: [
                                 // Leaderboard Bar
@@ -241,32 +266,67 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                                   ),
                                 if (leaderboardUsers.length >= 3) const Gap(16),
 
-                                // Leaderboard List
-                                ...List.generate(
-                                  leaderboardUsers.length > 3
-                                      ? leaderboardUsers.length - 3
-                                      : 0,
-                                  (i) {
-                                    final user = leaderboardUsers[i + 3];
-                                    final isCurrentUser =
-                                        currentUserId != null &&
-                                        user.user == currentUserId;
-                                    return _LeaderboardUserTile(
-                                      rank: user.rank,
-                                      name: '${user.firstName} ${user.lastName}'
-                                          .trim(),
-                                      xp: user.totalXp,
-                                      profilePictureUrl: user.profilePictureUrl,
-                                      isCurrentUser: isCurrentUser,
-                                      onTap: () async {
-                                        await context.push(
-                                          ProfileScreen.userProfileRouteName,
-                                          extra: user.user,
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
+                                // Top 10 Leaderboard List
+                                ...top10Users.map((user) {
+                                  final isCurrentUser =
+                                      currentUserId != null &&
+                                      user.user == currentUserId;
+                                  return _LeaderboardUserTile(
+                                    rank: user.rank,
+                                    username: user.username,
+                                    name: '${user.firstName} ${user.lastName}'
+                                        .trim(),
+                                    xp: user.totalXp,
+                                    profilePictureUrl: user.profilePictureUrl,
+                                    isCurrentUser: isCurrentUser,
+                                    onTap: () async {
+                                      await context.push(
+                                        ProfileScreen.userProfileRouteName,
+                                        extra: user.user,
+                                      );
+                                    },
+                                  );
+                                }),
+
+                                // Show current user if outside top 10
+                                if (!isCurrentUserInTop10 &&
+                                    currentUserRank != -1) ...[
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12.0,
+                                    ),
+                                    child: Text(
+                                      '...',
+                                      style: context.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.3,
+                                            ),
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                            letterSpacing: 4,
+                                          ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  _LeaderboardUserTile(
+                                    rank: currentUserInList.rank,
+                                    username: currentUserInList.username,
+                                    name:
+                                        '${currentUserInList.firstName} ${currentUserInList.lastName}'
+                                            .trim(),
+                                    xp: currentUserInList.totalXp,
+                                    profilePictureUrl:
+                                        currentUserInList.profilePictureUrl,
+                                    isCurrentUser: true,
+                                    onTap: () async {
+                                      await context.push(
+                                        ProfileScreen.routeName,
+                                      );
+                                    },
+                                  ),
+                                ],
+                                const Gap(48),
                               ],
                             );
                           },
@@ -285,6 +345,7 @@ class _LeaderboardUserTile extends StatelessWidget {
   const _LeaderboardUserTile({
     required this.rank,
     required this.name,
+    this.username,
     required this.xp,
     this.profilePictureUrl,
     this.isCurrentUser = false,
@@ -293,6 +354,7 @@ class _LeaderboardUserTile extends StatelessWidget {
 
   final int rank;
   final String name;
+  final String? username;
   final int xp;
   final String? profilePictureUrl;
   final bool isCurrentUser;
@@ -300,113 +362,75 @@ class _LeaderboardUserTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 16,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isCurrentUser
-                  ? [
-                      Colors.white.withValues(alpha: 0.12),
-                      Colors.white.withValues(alpha: 0.06),
-                    ]
-                  : [
-                      Colors.white.withValues(alpha: 0.06),
-                      Colors.white.withValues(alpha: 0.02),
-                    ],
-            ),
-            border: isCurrentUser
-                ? Border.all(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    width: 1,
-                  )
-                : null,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(
-                  alpha: isCurrentUser ? 0.5 : 0.4,
-                ),
-                blurRadius: isCurrentUser ? 20 : 16,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              // Rank Number
-              SizedBox(
-                width: 40,
-                child: Text(
-                  '$rank',
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.6),
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              // Profile Picture
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: CircleAvatar(
-                  radius: 24,
-                  backgroundImage: profilePictureUrl != null
-                      ? FastCachedImageProvider(profilePictureUrl!)
-                            as ImageProvider
-                      : AssetImage('assets/images/user-placeholder.png')
-                            as ImageProvider,
-                ),
-              ),
-              Gap(16),
-              // User Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      name.isNotEmpty ? name : 'User',
-                      style: context.textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w300,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              const Gap(16),
-              // XP
-              Text(
-                '$xp XP',
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        color: isCurrentUser
+            ? Colors.white.withValues(alpha: 0.05)
+            : Colors.transparent,
+        child: Row(
+          children: [
+            // Rank Number
+            SizedBox(
+              width: 32,
+              child: Text(
+                '$rank',
                 style: context.textTheme.bodyMedium?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.7),
+                  color: Colors.white.withValues(alpha: 0.5),
                   fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            ],
-          ),
+            ),
+            // Profile Picture
+            CircleAvatar(
+              radius: 16,
+              backgroundImage: profilePictureUrl != null
+                  ? FastCachedImageProvider(profilePictureUrl!) as ImageProvider
+                  : AssetImage('assets/images/user-placeholder.png')
+                        as ImageProvider,
+            ),
+            Gap(10),
+            // User Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name.isNotEmpty ? name : 'User',
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    '@${username ?? 'user'}',
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.5),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Gap(8),
+            // XP
+            Text(
+              '$xp XP',
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: Colors.white.withValues(alpha: 0.6),
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );

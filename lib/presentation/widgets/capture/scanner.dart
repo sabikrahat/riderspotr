@@ -25,10 +25,13 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final centerY = context.height / 2;
+    final crosshairSize = 60.0;
+
     _scannerAnimation =
         Tween<double>(
-            begin: context.height * 0.25,
-            end: context.height * 0.75,
+            begin: centerY - crosshairSize,
+            end: centerY + crosshairSize,
           ).animate(_scannerController)
           ..addListener(() {
             setState(() {});
@@ -53,23 +56,25 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // Crosshairs
         CustomPaint(
           size: Size.infinite,
-          painter: CameraOverlayPainter(),
+          painter: CrosshairsPainter(),
         ),
+        // Scanning bar
         Positioned(
-          left: (context.width - context.width * 0.85) / 2,
+          left: context.width / 2 - 60,
           top: _scannerAnimation.value,
           child: Container(
-            height: 1,
-            width: context.width * 0.85,
+            height: 2,
+            width: 120,
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.white.withValues(alpha: 0.5),
-                  blurRadius: 10,
-                  spreadRadius: 5,
+                  color: Colors.white.withValues(alpha: 0.8),
+                  blurRadius: 15,
+                  spreadRadius: 3,
                   offset: const Offset(0, 0),
                 ),
               ],
@@ -81,58 +86,75 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
   }
 }
 
-class CameraOverlayPainter extends CustomPainter {
+class CrosshairsPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.5)
-      ..style = PaintingStyle.fill;
-
-    final framePaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.3)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-
-    // Frame dimensions
-    final frameWidth = size.width * 0.85;
-    final frameHeight = size.height * 0.50;
-    final frameLeft = (size.width - frameWidth) / 2;
-    final frameTop = (size.height - frameHeight) / 2;
-
-    final frameRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(frameLeft, frameTop, frameWidth, frameHeight),
-      const Radius.circular(30),
-    );
-
-    // Draw dark overlay outside the frame
-    final path = Path()
-      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..addRRect(frameRect)
-      ..fillType = PathFillType.evenOdd;
-
-    canvas.drawPath(path, paint);
-
-    // Draw frame border
-    canvas.drawRRect(frameRect, framePaint);
-
-    // Draw center circle guide
     final centerX = size.width / 2;
     final centerY = size.height / 2;
-    final circleRadius = 60.0;
+    final crosshairSize = 60.0;
+    final lineLength = 20.0;
+    final strokeWidth = 2.5;
 
-    final circlePaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.4)
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.9)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
 
-    canvas.drawCircle(Offset(centerX, centerY), circleRadius, circlePaint);
+    // Top-left corner
+    canvas.drawLine(
+      Offset(centerX - crosshairSize, centerY - crosshairSize),
+      Offset(centerX - crosshairSize + lineLength, centerY - crosshairSize),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(centerX - crosshairSize, centerY - crosshairSize),
+      Offset(centerX - crosshairSize, centerY - crosshairSize + lineLength),
+      paint,
+    );
 
-    // Draw center dot
+    // Top-right corner
+    canvas.drawLine(
+      Offset(centerX + crosshairSize, centerY - crosshairSize),
+      Offset(centerX + crosshairSize - lineLength, centerY - crosshairSize),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(centerX + crosshairSize, centerY - crosshairSize),
+      Offset(centerX + crosshairSize, centerY - crosshairSize + lineLength),
+      paint,
+    );
+
+    // Bottom-left corner
+    canvas.drawLine(
+      Offset(centerX - crosshairSize, centerY + crosshairSize),
+      Offset(centerX - crosshairSize + lineLength, centerY + crosshairSize),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(centerX - crosshairSize, centerY + crosshairSize),
+      Offset(centerX - crosshairSize, centerY + crosshairSize - lineLength),
+      paint,
+    );
+
+    // Bottom-right corner
+    canvas.drawLine(
+      Offset(centerX + crosshairSize, centerY + crosshairSize),
+      Offset(centerX + crosshairSize - lineLength, centerY + crosshairSize),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(centerX + crosshairSize, centerY + crosshairSize),
+      Offset(centerX + crosshairSize, centerY + crosshairSize - lineLength),
+      paint,
+    );
+
+    // Center dot
     final dotPaint = Paint()
-      ..color = Colors.white
+      ..color = Colors.white.withValues(alpha: 0.8)
       ..style = PaintingStyle.fill;
 
-    canvas.drawCircle(Offset(centerX, centerY), 6, dotPaint);
+    canvas.drawCircle(Offset(centerX, centerY), 3, dotPaint);
   }
 
   @override

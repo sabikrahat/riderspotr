@@ -36,6 +36,10 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
   bool _isUploading = false;
   XFile? _capturedImage;
 
+  double _currentZoomLevel = 1.0;
+  double _minZoomLevel = 1.0;
+  double _maxZoomLevel = 5.0;
+
   @override
   void initState() {
     super.initState();
@@ -59,6 +63,14 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
       _initializeControllerFuture = _controller!.initialize();
       await _initializeControllerFuture;
 
+      // Get zoom capabilities
+      _minZoomLevel = await _controller!.getMinZoomLevel();
+      _maxZoomLevel = await _controller!.getMaxZoomLevel();
+      // Cap max zoom to 5x
+      if (_maxZoomLevel > 5.0) {
+        _maxZoomLevel = 5.0;
+      }
+
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -70,6 +82,16 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
     }
   }
 
+  Future<void> _setZoom(double zoom) async {
+    if (_controller == null) return;
+
+    final clampedZoom = zoom.clamp(_minZoomLevel, _maxZoomLevel);
+    await _controller!.setZoomLevel(clampedZoom);
+    setState(() {
+      _currentZoomLevel = clampedZoom;
+    });
+  }
+
   @override
   void dispose() {
     _controller?.dispose();
@@ -79,11 +101,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Back(),
-      ),
+      backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
@@ -122,41 +140,104 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
           else
             Stack(
               children: [
+                // Crosshairs and Scanner
                 Scanner(),
+                // Bottom gradient overlay
                 Positioned(
-                  child: SizedBox(
-                    height: context.height * 0.25,
-                    width: context.width,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 24,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            'CAPTURE',
-                            style: context.textTheme.headlineMedium,
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Keep the car within the boundaries of the frame',
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              color: Colors.white70,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    height: context.height * 0.35,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.9),
+                          Colors.black.withValues(alpha: 0.7),
+                          Colors.black.withValues(alpha: 0.4),
+                          Colors.transparent,
                         ],
+                        stops: [0.0, 0.4, 0.7, 1.0],
                       ),
                     ),
                   ),
                 ),
-                // Widget below the camera view
+                // Back button
                 Positioned(
-                  top: context.height * 0.75 + 20,
+                  top: MediaQuery.of(context).padding.top + 8,
+                  left: 8,
+                  child: Back(),
+                ),
+                // Zoom slider
+                if (_controller != null && _controller!.value.isInitialized)
+                  Positioned(
+                    right: 20,
+                    top: context.height * 0.3,
+                    bottom: context.height * 0.35 + 20,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Zoom level indicator
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            '${_currentZoomLevel.toStringAsFixed(1)}x',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        // Zoom slider
+                        Expanded(
+                          child: RotatedBox(
+                            quarterTurns: 3,
+                            child: SliderTheme(
+                              data: SliderThemeData(
+                                trackHeight: 3,
+                                thumbShape: RoundSliderThumbShape(
+                                  enabledThumbRadius: 8,
+                                ),
+                                overlayShape: RoundSliderOverlayShape(
+                                  overlayRadius: 16,
+                                ),
+                                activeTrackColor: Colors.white,
+                                inactiveTrackColor: Colors.white.withValues(
+                                  alpha: 0.3,
+                                ),
+                                thumbColor: Colors.white,
+                                overlayColor: Colors.white.withValues(
+                                  alpha: 0.2,
+                                ),
+                              ),
+                              child: Slider(
+                                value: _currentZoomLevel,
+                                min: _minZoomLevel,
+                                max: _maxZoomLevel,
+                                onChanged: (value) => _setZoom(value),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                // Bottom controls
+                Positioned(
                   left: 0,
                   right: 0,
+                  bottom: MediaQuery.of(context).padding.bottom + 20,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -234,27 +315,28 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                           }
                         },
                         child: Container(
-                          width: 80,
-                          height: 80,
+                          width: 75,
+                          height: 75,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.3),
-                                blurRadius: 30,
-                                offset: const Offset(0, 10),
+                                color: Colors.white.withValues(alpha: 0.4),
+                                blurRadius: 20,
+                                spreadRadius: 2,
+                                offset: const Offset(0, 0),
                               ),
                             ],
                           ),
                           child: const Icon(
-                            Icons.camera_alt,
+                            Icons.camera_alt_rounded,
                             color: Colors.black,
-                            size: 32,
+                            size: 30,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       // Manual Upload Button
                       GestureDetector(
                         onTap: () {
@@ -262,36 +344,30 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
+                            horizontal: 24,
+                            vertical: 12,
                           ),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(25),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              width: 1,
-                            ),
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.white.withValues(alpha: 0.1),
-                                Colors.white.withValues(alpha: 0.05),
-                              ],
+                              color: Colors.white.withValues(alpha: 0.4),
+                              width: 1.5,
                             ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                Icons.upload_file,
-                                color: Colors.white.withValues(alpha: 0.8),
-                                size: 18,
+                                Icons.upload_file_rounded,
+                                color: Colors.white.withValues(alpha: 0.9),
+                                size: 20,
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 10),
                               Text(
-                                'MANUAL UPLOAD',
+                                'UPLOAD FROM GALLERY',
                                 style: context.textTheme.bodySmall?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.8),
-                                  letterSpacing: 1.2,
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  letterSpacing: 1.0,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 11,
                                 ),

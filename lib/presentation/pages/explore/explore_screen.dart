@@ -489,84 +489,33 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       ],
                     ),
                   ),
-                  // Draggable Car Cards
+                  // Fixed Car Cards at Bottom
                   if (_sortedCarSpots.isNotEmpty)
-                    DraggableScrollableSheet(
-                      initialChildSize: 0.28,
-                      minChildSize: 0.08,
-                      maxChildSize: 0.45,
-                      snap: true,
-                      snapSizes: [0.08, 0.28, 0.45],
-                      builder: (context, scrollController) {
-                        return SafeArea(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                            ),
-                            child: SingleChildScrollView(
-                              controller: scrollController,
-                              physics: ClampingScrollPhysics(),
-                              child: Column(
-                                children: [
-                                  // Drag Handle - Always visible
-                                  GestureDetector(
-                                    onTap: () {
-                                      // Tap to expand to default size
-                                      if (scrollController.hasClients) {
-                                        scrollController.animateTo(
-                                          0,
-                                          duration: Duration(milliseconds: 300),
-                                          curve: Curves.easeInOut,
-                                        );
-                                      }
-                                    },
-                                    child: Container(
-                                      color: Colors.transparent,
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 12,
-                                      ),
-                                      child: Center(
-                                        child: Container(
-                                          width: 40,
-                                          height: 4,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              2,
-                                            ),
-                                            color: Colors.white.withValues(
-                                              alpha: 0.4,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  // Car Cards
-                                  SizedBox(
-                                    height: context.height * 0.25,
-                                    child: PageView.builder(
-                                      controller: _pageController,
-                                      onPageChanged: _onPageChanged,
-                                      itemCount: _sortedCarSpots.length,
-                                      itemBuilder: (context, index) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 16,
-                                          ),
-                                          child: CarCard(
-                                            carSpot: _sortedCarSpots[index],
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(height: 24),
-                                ],
-                              ),
-                            ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 100),
+                        child: SizedBox(
+                          height: context.height * 0.25,
+                          child: PageView.builder(
+                            controller: _pageController,
+                            onPageChanged: _onPageChanged,
+                            itemCount: _sortedCarSpots.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                child: CarCard(
+                                  carSpot: _sortedCarSpots[index],
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
+                        ),
+                      ),
                     ),
                 ],
               );
