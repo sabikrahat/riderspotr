@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../user/user_model.dart';
 import 'car_model.dart';
 
 part 'car_spot_model.g.dart';
@@ -9,7 +10,8 @@ part 'car_spot_model.g.dart';
 class CarSpotModel {
   final String id;
   DateTime createdAt;
-  String user;
+  @JsonKey(name: 'user')
+  UserModel? userProfile;
   CarModel? car;
   String imageUrl;
   // dynamic latLng, stored as 'POINT(lon lat)' in Supabase
@@ -21,7 +23,7 @@ class CarSpotModel {
   CarSpotModel({
     required this.id,
     required this.createdAt,
-    required this.user,
+    this.userProfile,
     this.car,
     required this.imageUrl,
     this.latLng,
@@ -36,13 +38,16 @@ class CarSpotModel {
   Map<String, dynamic> toJson() => _$CarSpotModelToJson(this);
 
   static const query =
-      '*, car(*, make(*), production: car_production(*), specs: car_specs(*), history: car_history(*))';
+      '*, car(*, make(*), production: car_production(*), specs: car_specs(*), history: car_history(*)), user: users(*)';
+
+  // Getter for backward compatibility - returns user ID
+  String get user => userProfile?.id ?? '';
 
   // Create a copy with method
   CarSpotModel copyWith({
     String? id,
     DateTime? createdAt,
-    String? user,
+    UserModel? userProfile,
     CarModel? car,
     String? imageUrl,
     dynamic latLng,
@@ -53,7 +58,7 @@ class CarSpotModel {
     return CarSpotModel(
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
-      user: user ?? this.user,
+      userProfile: userProfile ?? this.userProfile,
       car: car ?? this.car,
       imageUrl: imageUrl ?? this.imageUrl,
       latLng: latLng ?? this.latLng,

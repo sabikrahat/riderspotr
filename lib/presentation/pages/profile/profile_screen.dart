@@ -15,6 +15,7 @@ import '../../widgets/profile/profile_garage_tab.dart';
 import '../../widgets/profile/profile_stats_tab.dart';
 import '../../widgets/shared/loading_overlay.dart';
 import 'edit_bio_screen.dart';
+import 'edit_socials_screen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key, this.id});
@@ -113,6 +114,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
     context.push(EditBioScreen.routeName);
   }
 
+  void _navigateToEditSocials(BuildContext context) {
+    context.push(EditSocialsScreen.routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
     // Watch the appropriate provider based on whether it's own profile or not
@@ -190,6 +195,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                         username: user?.username ?? 'username',
                         userId: user?.id ?? '',
                         bio: user?.bio,
+                        instagramUrl: user?.instagramUrl,
+                        tiktokUrl: user?.tiktokUrl,
                         totalSpots: user?.stats?.totalSpots ?? 0,
                         followersCount: user?.followersCount ?? 0,
                         followingCount: user?.followingCount ?? 0,
@@ -224,6 +231,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                             : null,
                         onEditBio: _isOwnProfile
                             ? () => _navigateToEditBio(context)
+                            : null,
+                        onEditSocials: _isOwnProfile
+                            ? () => _navigateToEditSocials(context)
                             : null,
                       ),
 

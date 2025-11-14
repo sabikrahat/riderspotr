@@ -148,7 +148,6 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
   }
 
   void _onVerticalDragEnd(DragEndDetails details) {
-
     // If dragged down more than 150 pixels, dismiss
     if (_dragOffset > 150) {
       Navigator.of(context).pop();
@@ -433,8 +432,9 @@ class _StoryContent extends StatelessWidget {
               ),
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.max,
               children: [
                 Text(
                   story.carMake.toUpperCase(),
@@ -442,6 +442,7 @@ class _StoryContent extends StatelessWidget {
                     color: Colors.white,
                     fontWeight: FontWeight.w300,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 const Gap(4),
                 Text(
@@ -451,10 +452,13 @@ class _StoryContent extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 if (story.address.isNotEmpty) ...[
                   const Gap(8),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
                         Icons.location_on,
@@ -462,7 +466,7 @@ class _StoryContent extends StatelessWidget {
                         color: Colors.white.withValues(alpha: 0.7),
                       ),
                       const Gap(4),
-                      Expanded(
+                      Flexible(
                         child: Text(
                           story.address,
                           style: context.textTheme.bodySmall?.copyWith(
@@ -470,6 +474,7 @@ class _StoryContent extends StatelessWidget {
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ],

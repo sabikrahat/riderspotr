@@ -26,6 +26,7 @@ import '../presentation/pages/nav_screen.dart';
 import '../presentation/pages/payment/payment_screen.dart';
 import '../presentation/pages/payment/upgrade_required_screen.dart';
 import '../presentation/pages/profile/edit_bio_screen.dart';
+import '../presentation/pages/profile/edit_socials_screen.dart';
 import '../presentation/pages/profile/followers_following_screen.dart';
 import '../presentation/pages/profile/profile_screen.dart';
 import '../presentation/pages/settings/settings_screen.dart';
@@ -163,6 +164,11 @@ final router = GoRouter(
       path: EditBioScreen.routeName,
       redirect: authHandler,
       builder: (_, _) => EditBioScreen(),
+    ),
+    GoRoute(
+      path: EditSocialsScreen.routeName,
+      redirect: authHandler,
+      builder: (_, _) => EditSocialsScreen(),
     ),
     GoRoute(
       path: FollowersFollowingScreen.routeName,

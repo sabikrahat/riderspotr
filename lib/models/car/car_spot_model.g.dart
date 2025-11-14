@@ -9,7 +9,9 @@ part of 'car_spot_model.dart';
 CarSpotModel _$CarSpotModelFromJson(Map<String, dynamic> json) => CarSpotModel(
   id: json['id'] as String,
   createdAt: DateTime.parse(json['created_at'] as String),
-  user: json['user'] as String,
+  userProfile: json['user'] == null
+      ? null
+      : UserModel.fromJson(json['user'] as Map<String, dynamic>),
   car: json['car'] == null
       ? null
       : CarModel.fromJson(json['car'] as Map<String, dynamic>),
@@ -24,7 +26,7 @@ Map<String, dynamic> _$CarSpotModelToJson(CarSpotModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'created_at': instance.createdAt.toIso8601String(),
-      'user': instance.user,
+      'user': instance.userProfile,
       'car': instance.car,
       'image_url': instance.imageUrl,
       'lat_lng': instance.latLng,

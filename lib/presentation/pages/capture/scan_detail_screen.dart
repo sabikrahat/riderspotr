@@ -203,24 +203,22 @@ class _ScanDeatilScreenState extends ConsumerState<ScanDeatilScreen> {
                       // Rarity Badge
                       if (rarity != null) RarityBadge(rarity: rarity),
                       Gap(16),
-                      // Car Make
                       Text(
                         car?.make?.name.toUpperCase() ?? 'UNKNOWN',
                         style: context.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w300,
+                          fontWeight: FontWeight.w700,
                           letterSpacing: 3,
-                          fontSize: 18,
-                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: 24,
                         ),
                       ),
-                      Gap(2),
-                      // Car Model
+                      const Gap(4),
+                      // Car Model (Normal weight)
                       Text(
-                        car?.model?.toUpperCase() ?? '',
+                        car?.model?.toUpperCase() ?? 'UNKNOWN',
                         style: context.textTheme.headlineLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w200,
                           letterSpacing: 1,
-                          fontSize: 28,
+                          fontSize: 16,
                           height: 1.1,
                         ),
                       ),

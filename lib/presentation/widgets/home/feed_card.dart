@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:like_button/like_button.dart';
+import 'package:ridespotr/presentation/widgets/shared/rarity_badge.dart';
+import 'package:ridespotr/presentation/widgets/shared/xp_badge.dart';
 
 import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../pages/capture/car_preview_screen.dart';
-import '../../providers/auth/profile_provider.dart';
 
 class FeedCard extends ConsumerStatefulWidget {
   const FeedCard({
@@ -102,8 +104,6 @@ class _FeedCardState extends ConsumerState<FeedCard>
 
   @override
   Widget build(BuildContext context) {
-    final profileAsync = ref.watch(profileProvider(widget.carSpot.user));
-
     return GestureDetector(
       onTap: () {
         context.push(
@@ -169,17 +169,35 @@ class _FeedCardState extends ConsumerState<FeedCard>
                 right: 0,
                 height: 140,
                 child: Container(
+                  padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withValues(alpha: 0.9),
-                        Colors.black.withValues(alpha: 0.7),
-                        Colors.black.withValues(alpha: 0.3),
+                        Colors.black.withValues(alpha: 0.95),
+                        Colors.black.withValues(alpha: 0.8),
+                        Colors.black.withValues(alpha: 0.4),
                         Colors.transparent,
                       ],
                     ),
+                  ),
+                  child: Column(
+                    spacing: 16,
+                    children: [
+                      _buildUserHeader(widget.carSpot.userProfile?.username),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          RarityBadge(
+                            rarity: widget.carSpot.car?.rarity ?? Rarity.common,
+                            style: BadgeStyle.solid,
+                          ),
+                          XpBadge(points: widget.carSpot.car?.points ?? 0),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -191,6 +209,8 @@ class _FeedCardState extends ConsumerState<FeedCard>
                 bottom: 0,
                 height: 240,
                 child: Container(
+                  alignment: Alignment.bottomCenter,
+                  padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
@@ -202,6 +222,100 @@ class _FeedCardState extends ConsumerState<FeedCard>
                         Colors.black.withValues(alpha: 0.95),
                       ],
                     ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Car Make (Bold & Large)
+                      Text(
+                        (widget.carSpot.car?.make?.name ?? '').toUpperCase(),
+                        style: context.textTheme.headlineSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      // Car Model (Normal weight)
+                      Text(
+                        (widget.carSpot.car?.model ?? '').toUpperCase(),
+                        style: context.textTheme.titleMedium?.copyWith(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w200,
+                          letterSpacing: 0.5,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Gap(12),
+                      // Stats Row
+                      Row(
+                        children: [
+                          // 0-100 km/h
+                          if (widget.carSpot.car?.specs?.acceleration0100 !=
+                              null)
+                            Expanded(
+                              child: _StatItem(
+                                label: '0-100',
+                                value:
+                                    '${widget.carSpot.car!.specs!.acceleration0100!.toStringAsFixed(1)}s',
+                                icon: Icons.speed,
+                              ),
+                            ),
+                          // Horsepower
+                          if (widget.carSpot.car?.specs?.powerKw != null)
+                            Expanded(
+                              child: _StatItem(
+                                label: 'POWER',
+                                value:
+                                    '${(widget.carSpot.car!.specs!.powerKw! * 1.34102).toInt()}hp',
+                                icon: Icons.flash_on,
+                              ),
+                            ),
+                          // Top Speed
+                          if (widget.carSpot.car?.specs?.topSpeedKmh != null)
+                            Expanded(
+                              child: _StatItem(
+                                label: 'TOP SPEED',
+                                value:
+                                    '${widget.carSpot.car!.specs!.topSpeedKmh}km/h',
+                                icon: Icons.speed,
+                              ),
+                            ),
+                        ],
+                      ),
+                      const Gap(12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: _handleLikeTap,
+                            child: Row(
+                              children: [
+                                LikeButton(
+                                  isLiked: _isLiked,
+                                  size: 24,
+                                ),
+                                const Gap(4),
+                                Text(
+                                  '0', // TODO: Get actual like count from backend
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            _formatTimestamp(widget.carSpot.createdAt),
+                            style: context.textTheme.bodySmall?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.6),
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -218,193 +332,6 @@ class _FeedCardState extends ConsumerState<FeedCard>
                     ),
                   ),
                 ),
-
-              // User Header (Top)
-              Positioned(
-                top: 16,
-                left: 16,
-                right: 16,
-                child: profileAsync.when(
-                  loading: () => _buildUserHeader(null),
-                  error: (_, __) => _buildUserHeader(null),
-                  data: (_) {
-                    final user = ref
-                        .read(profileProvider(widget.carSpot.user).notifier)
-                        .user;
-                    return _buildUserHeader(user?.username);
-                  },
-                ),
-              ),
-
-              // Rarity Badge (Top Right)
-              Positioned(
-                top: 70,
-                right: 16,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.black.withValues(alpha: 0.6),
-                  ),
-                  child: Text(
-                    widget.carSpot.car?.rarity.name.toUpperCase() ?? 'COMMON',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1,
-                      color: widget.carSpot.car?.rarity.color,
-                    ),
-                  ),
-                ),
-              ),
-
-              // Car Info (Bottom)
-              Positioned(
-                left: 16,
-                right: 16,
-                bottom: 60,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      (widget.carSpot.car?.make?.name ?? '').toUpperCase(),
-                      style: context.textTheme.headlineSmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w300,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    const Gap(2),
-                    Text(
-                      (widget.carSpot.car?.model ?? '').toUpperCase(),
-                      style: context.textTheme.titleMedium?.copyWith(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const Gap(12),
-                    // Stats Row
-                    Row(
-                      children: [
-                        // 0-100 km/h
-                        if (widget.carSpot.car?.specs?.acceleration0100 != null)
-                          Expanded(
-                            child: _StatItem(
-                              label: '0-100',
-                              value:
-                                  '${widget.carSpot.car!.specs!.acceleration0100!.toStringAsFixed(1)}s',
-                              icon: Icons.speed,
-                            ),
-                          ),
-                        // Horsepower
-                        if (widget.carSpot.car?.specs?.powerKw != null)
-                          Expanded(
-                            child: _StatItem(
-                              label: 'POWER',
-                              value:
-                                  '${(widget.carSpot.car!.specs!.powerKw! * 1.34102).toInt()}hp',
-                              icon: Icons.flash_on,
-                            ),
-                          ),
-                        // Top Speed
-                        if (widget.carSpot.car?.specs?.topSpeedKmh != null)
-                          Expanded(
-                            child: _StatItem(
-                              label: 'TOP SPEED',
-                              value:
-                                  '${widget.carSpot.car!.specs!.topSpeedKmh}km/h',
-                              icon: Icons.speed,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // Action Bar (Bottom)
-              Positioned(
-                left: 16,
-                right: 16,
-                bottom: 16,
-                child: Row(
-                  children: [
-                    // Like button
-                    GestureDetector(
-                      onTap: _handleLikeTap,
-                      child: Row(
-                        children: [
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 200),
-                            transitionBuilder: (child, animation) {
-                              return ScaleTransition(
-                                scale: animation,
-                                child: child,
-                              );
-                            },
-                            child: Icon(
-                              _isLiked ? Icons.favorite : Icons.favorite_border,
-                              key: ValueKey(_isLiked),
-                              color: _isLiked
-                                  ? Colors.red.shade400
-                                  : Colors.white.withValues(alpha: 0.9),
-                              size: 24,
-                            ),
-                          ),
-                          const Gap(8),
-                          Text(
-                            '0', // TODO: Get actual like count from backend
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white.withValues(alpha: 0.9),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Gap(24),
-
-                    // Comment button
-                    // GestureDetector(
-                    //   onTap: () {
-                    //     // TODO: Navigate to comments
-                    //   },
-                    //   child: Row(
-                    //     children: [
-                    //       Icon(
-                    //         Icons.chat_bubble_outline,
-                    //         color: Colors.white.withValues(alpha: 0.9),
-                    //         size: 22,
-                    //       ),
-                    //       const Gap(8),
-                    //       Text(
-                    //         '0',
-                    //         style: context.textTheme.bodyMedium?.copyWith(
-                    //           fontWeight: FontWeight.w600,
-                    //           color: Colors.white.withValues(alpha: 0.9),
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    const Spacer(),
-
-                    // Timestamp
-                    Text(
-                      _formatTimestamp(widget.carSpot.createdAt),
-                      style: context.textTheme.bodySmall?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.6),
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
@@ -417,8 +344,8 @@ class _FeedCardState extends ConsumerState<FeedCard>
       children: [
         // User avatar
         Container(
-          width: 36,
-          height: 36,
+          width: 40,
+          height: 40,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: LinearGradient(
@@ -464,10 +391,9 @@ class _FeedCardState extends ConsumerState<FeedCard>
                       child: Text(
                         widget.carSpot.address,
                         style: context.textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.7),
+                          fontWeight: FontWeight.w300,
                           fontSize: 11,
                         ),
-                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

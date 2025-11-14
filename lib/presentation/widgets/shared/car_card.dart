@@ -140,43 +140,50 @@ class CarCard extends ConsumerWidget {
                         else
                           const SizedBox.shrink(),
                         // Rarity Badge
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.black.withValues(alpha: 0.6),
-                          ),
-                          child: Text(
-                            carSpot.car?.rarity.name.toUpperCase() ?? 'COMMON',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1,
-                              color: carSpot.car?.rarity.color,
+                        Row(
+                          children: [
+                            Column(
+                              children: [],
                             ),
-                          ),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Colors.black.withValues(alpha: 0.6),
+                              ),
+                              child: Text(
+                                carSpot.car?.rarity.name.toUpperCase() ??
+                                    'COMMON',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 1,
+                                  color: carSpot.car?.rarity.color,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                     Spacer(),
-                    // Car Name
+                    // Car Make (Bold & Large)
                     Text(
                       (carSpot.car?.make?.name ?? '').toUpperCase(),
                       style: context.textTheme.headlineSmall?.copyWith(
                         color: Colors.white,
-                        fontWeight: FontWeight.w300,
+                        fontWeight: FontWeight.w700,
                         letterSpacing: 1,
                       ),
                     ),
-                    Gap(2),
                     Text(
                       (carSpot.car?.model ?? '').toUpperCase(),
                       style: context.textTheme.titleMedium?.copyWith(
                         fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w200,
                         letterSpacing: 0.5,
                         color: Colors.white,
                       ),

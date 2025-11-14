@@ -182,7 +182,7 @@ class _CarDetailScreenState extends ConsumerState<CarDetailScreen>
                           colors: [
                             Colors.black.withValues(alpha: 1),
                             Colors.black.withValues(alpha: 0.8),
-                            Colors.black.withValues(alpha: 0.4),
+                            Colors.black.withValues(alpha: 0.6),
                             Colors.black.withValues(alpha: 0),
                             Colors.black.withValues(alpha: 1),
                           ],
@@ -197,25 +197,25 @@ class _CarDetailScreenState extends ConsumerState<CarDetailScreen>
                               RarityBadge(rarity: carSpot.car!.rarity),
                               const Gap(16),
                               Text(
-                                carSpot.car!.make!.name.toUpperCase(),
+                                carSpot.car?.make?.name.toUpperCase() ??
+                                    'UNKNOWN',
                                 style: context.textTheme.headlineMedium
                                     ?.copyWith(
-                                      fontWeight: FontWeight.w300,
+                                      fontWeight: FontWeight.w700,
                                       letterSpacing: 3,
-                                      fontSize: 18,
-                                      color: Colors.white.withValues(
-                                        alpha: 0.7,
-                                      ),
+                                      fontSize: 24,
                                     ),
                               ),
-                              const Gap(2),
+                              const Gap(4),
+
+                              // Car Model (Normal weight)
                               Text(
-                                carSpot.car!.model!.toUpperCase(),
+                                carSpot.car?.model?.toUpperCase() ?? 'UNKNOWN',
                                 style: context.textTheme.headlineLarge
                                     ?.copyWith(
-                                      fontWeight: FontWeight.w600,
+                                      fontWeight: FontWeight.w200,
                                       letterSpacing: 1,
-                                      fontSize: 28,
+                                      fontSize: 16,
                                       height: 1.1,
                                     ),
                               ),

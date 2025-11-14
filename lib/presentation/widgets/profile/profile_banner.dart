@@ -1,9 +1,11 @@
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridespotr/presentation/pages/profile/followers_following_screen.dart';
 import 'package:ridespotr/presentation/pages/settings/settings_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileBanner extends StatelessWidget {
   final String? profilePictureUrl;
@@ -12,6 +14,8 @@ class ProfileBanner extends StatelessWidget {
   final String username;
   final String userId;
   final String? bio;
+  final String? instagramUrl;
+  final String? tiktokUrl;
   final int totalSpots;
   final int followersCount;
   final int followingCount;
@@ -21,6 +25,7 @@ class ProfileBanner extends StatelessWidget {
   final VoidCallback? onEditProfilePicture;
   final VoidCallback? onEditBanner;
   final VoidCallback? onEditBio;
+  final VoidCallback? onEditSocials;
 
   const ProfileBanner({
     super.key,
@@ -30,6 +35,8 @@ class ProfileBanner extends StatelessWidget {
     required this.username,
     required this.userId,
     this.bio,
+    this.instagramUrl,
+    this.tiktokUrl,
     required this.totalSpots,
     required this.followersCount,
     required this.followingCount,
@@ -39,7 +46,15 @@ class ProfileBanner extends StatelessWidget {
     this.onEditProfilePicture,
     this.onEditBanner,
     this.onEditBio,
+    this.onEditSocials,
   });
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -303,6 +318,101 @@ class ProfileBanner extends StatelessWidget {
                     Gap(4),
                     Text(
                       'Edit bio',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.white.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            // Social Links Section
+            if ((instagramUrl != null && instagramUrl!.isNotEmpty) ||
+                (tiktokUrl != null && tiktokUrl!.isNotEmpty)) ...[
+              Gap(12),
+              Row(
+                children: [
+                  if (instagramUrl != null && instagramUrl!.isNotEmpty)
+                    GestureDetector(
+                      onTap: () => _launchUrl(instagramUrl!),
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.white.withValues(alpha: 0.08),
+                              Colors.white.withValues(alpha: 0.03),
+                            ],
+                          ),
+                        ),
+                        child: SvgPicture.asset(
+                          'assets/icons/instagram.svg',
+                          width: 18,
+                          height: 18,
+                          // colorFilter: ColorFilter.mode(
+                          //   Colors.white.withValues(alpha: 0.8),
+                          //   BlendMode.srcIn,
+                          // ),
+                        ),
+                      ),
+                    ),
+                  if (instagramUrl != null &&
+                      instagramUrl!.isNotEmpty &&
+                      tiktokUrl != null &&
+                      tiktokUrl!.isNotEmpty)
+                    Gap(12),
+                  if (tiktokUrl != null && tiktokUrl!.isNotEmpty)
+                    GestureDetector(
+                      onTap: () => _launchUrl(tiktokUrl!),
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.white.withValues(alpha: 0.08),
+                              Colors.white.withValues(alpha: 0.03),
+                            ],
+                          ),
+                        ),
+                        child: SvgPicture.asset(
+                          'assets/icons/tiktok.svg',
+                          width: 18,
+                          height: 18,
+                          colorFilter: ColorFilter.mode(
+                            Colors.white.withValues(alpha: 0.8),
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+            // Edit socials button for own profile
+            if (isOwnProfile) ...[
+              Gap(12),
+              GestureDetector(
+                onTap: onEditSocials,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.link,
+                      size: 14,
+                      color: Colors.white.withValues(alpha: 0.5),
+                    ),
+                    Gap(4),
+                    Text(
+                      ((instagramUrl != null && instagramUrl!.isNotEmpty) ||
+                              (tiktokUrl != null && tiktokUrl!.isNotEmpty))
+                          ? 'Edit socials'
+                          : 'Add socials',
                       style: TextStyle(
                         fontSize: 11,
                         color: Colors.white.withValues(alpha: 0.5),

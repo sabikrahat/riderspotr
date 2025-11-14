@@ -39,6 +39,8 @@ class UserModel {
   final String? profilePictureUrl;
   final String? bannerUrl;
   final String? bio;
+  final String? instagramUrl;
+  final String? tiktokUrl;
   final DateTime createdAt;
   final bool isGaragePrivate;
   @JsonKey(includeToJson: false)
@@ -68,6 +70,8 @@ class UserModel {
     this.profilePictureUrl,
     this.bannerUrl,
     this.bio,
+    this.instagramUrl,
+    this.tiktokUrl,
     required this.createdAt,
     required this.isGaragePrivate,
     required this.stats,
@@ -132,6 +136,8 @@ class UserModel {
     String? profilePictureUrl,
     String? bannerUrl,
     String? bio,
+    String? instagramUrl,
+    String? tiktokUrl,
     DateTime? createdAt,
     bool? isGaragePrivate,
     UserStatsModel? stats,
@@ -156,6 +162,8 @@ class UserModel {
     profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
     bannerUrl: bannerUrl ?? this.bannerUrl,
     bio: bio ?? this.bio,
+    instagramUrl: instagramUrl ?? this.instagramUrl,
+    tiktokUrl: tiktokUrl ?? this.tiktokUrl,
     createdAt: createdAt ?? this.createdAt,
     isGaragePrivate: isGaragePrivate ?? this.isGaragePrivate,
     stats: stats ?? this.stats,

@@ -63,7 +63,7 @@ class KBottomNavbar extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.grey.shade900,
+        color: Colors.black,
         borderRadius: BorderRadius.circular(100),
         border: Border.all(
           color: Colors.white.withValues(alpha: 0.1),

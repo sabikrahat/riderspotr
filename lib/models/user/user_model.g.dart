@@ -36,6 +36,8 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
   profilePictureUrl: json['profile_picture_url'] as String?,
   bannerUrl: json['banner_url'] as String?,
   bio: json['bio'] as String?,
+  instagramUrl: json['instagram_url'] as String?,
+  tiktokUrl: json['tiktok_url'] as String?,
   createdAt: DateTime.parse(json['created_at'] as String),
   isGaragePrivate: json['is_garage_private'] as bool,
   stats: json['stats'] == null
@@ -64,6 +66,8 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
   'profile_picture_url': instance.profilePictureUrl,
   'banner_url': instance.bannerUrl,
   'bio': instance.bio,
+  'instagram_url': instance.instagramUrl,
+  'tiktok_url': instance.tiktokUrl,
   'created_at': instance.createdAt.toIso8601String(),
   'is_garage_private': instance.isGaragePrivate,
 };

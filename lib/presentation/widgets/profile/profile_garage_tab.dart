@@ -168,7 +168,7 @@ class _ProfileGarageTabState extends ConsumerState<ProfileGarageTab> {
                         crossAxisCount: 3,
                         crossAxisSpacing: 2,
                         mainAxisSpacing: 2,
-                        childAspectRatio: 4 / 5,
+                        childAspectRatio: 0.6,
                       ),
                       itemCount: sortedCars.length,
                       itemBuilder: (context, index) {

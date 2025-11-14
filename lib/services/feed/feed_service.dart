@@ -36,11 +36,14 @@ class FeedService {
   }
 
   /// Fetch global feed - all car spots ordered by most recent
+  /// Filtered to epic, legendary, or mythic rarity only
   Future<List<CarSpotModel>> _fetchGlobalFeed(int page, int pageSize) async {
     try {
       final response = await _supabase
           .from('car_spots')
           .select(CarSpotModel.query)
+          .eq('is_claimed', true)
+          .inFilter('car.rarity', ['epic', 'legendary', 'mythic'])
           .order('created_at', ascending: false)
           .range(
             page * pageSize,
@@ -56,6 +59,7 @@ class FeedService {
   }
 
   /// Fetch country feed - spots filtered by country
+  /// Filtered to epic, legendary, or mythic rarity only
   Future<List<CarSpotModel>> _fetchCountryFeed(
     int page,
     int pageSize,
@@ -66,6 +70,8 @@ class FeedService {
       final response = await _supabase
           .from('car_spots')
           .select(CarSpotModel.query)
+          .eq('is_claimed', true)
+          .inFilter('car.rarity', ['epic', 'legendary', 'mythic'])
           // TODO: Implement country filter
           // .eq('country', country)
           .order('created_at', ascending: false)
@@ -83,6 +89,7 @@ class FeedService {
   }
 
   /// Fetch friends feed - spots from users that the current user follows
+  /// Filtered to epic, legendary, or mythic rarity only
   Future<List<CarSpotModel>> _fetchFriendsFeed(
     int page,
     int pageSize,
@@ -109,7 +116,9 @@ class FeedService {
       final response = await _supabase
           .from('car_spots')
           .select(CarSpotModel.query)
+          .eq('is_claimed', true)
           .inFilter('user', followedUserIds)
+          .inFilter('car.rarity', ['epic', 'legendary', 'mythic'])
           .order('created_at', ascending: false)
           .range(
             page * pageSize,

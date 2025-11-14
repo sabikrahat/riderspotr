@@ -1,7 +1,9 @@
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridespotr/presentation/widgets/shared/xp_badge.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/extensions.dart';
@@ -34,7 +36,7 @@ class GarageGridCard extends ConsumerWidget {
             }
           : null,
       child: AspectRatio(
-        aspectRatio: 4 / 5, // 4:5 aspect ratio
+        aspectRatio: 5 / 6, // 4:5 aspect ratio
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
@@ -82,75 +84,156 @@ class GarageGridCard extends ConsumerWidget {
                     );
                   },
                 ),
-                // Gradient Overlay
+
+                // Top Gradient Overlay
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 60,
+                  child: Container(
+                    padding: EdgeInsets.all(4),
+                    alignment: Alignment.topRight,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.8),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                    child: XpBadge(
+                      points: carSpot.car?.points ?? 0,
+                      iconSize: 10,
+                      fontSize: 8,
+                    ),
+                  ),
+                ),
+
+                // Bottom Gradient Overlay
                 Positioned(
                   left: 0,
                   right: 0,
                   bottom: 0,
                   height: 60,
                   child: Container(
+                    padding: EdgeInsets.all(4),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Colors.black.withValues(alpha: 0.8),
+                          Colors.black.withValues(alpha: 0.85),
                         ],
                       ),
                     ),
-                  ),
-                ),
-                // Car Info (bottom)
-                Positioned(
-                  left: 6,
-                  right: 6,
-                  bottom: 6,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${carSpot.car?.make?.name ?? ''} ${carSpot.car?.model ?? ''}',
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.2,
+                    child: Column(
+                      spacing: 2,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          (carSpot.car?.make?.name ?? '').toUpperCase(),
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                            height: 1.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          if (carSpot.car?.production?.yearStart != null)
-                            Text(
-                              '${carSpot.car!.production!.yearStart}',
-                              style: context.textTheme.bodySmall?.copyWith(
-                                color: Colors.white.withValues(alpha: 0.7),
-                                fontSize: 8,
-                              ),
-                            ),
-                          if (carSpot.car?.points != null)
-                            Text(
-                              '${carSpot.car!.points} XP',
-                              style: context.textTheme.bodySmall?.copyWith(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontSize: 8,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
+                        Text(
+                          (carSpot.car?.model ?? '').toUpperCase(),
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            color: Colors.white,
+                            fontSize: 10,
+                            letterSpacing: 0.5,
+                            height: 1.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
+
+                // Car Make (top left)
+                // Positioned(
+                //   top: 8,
+                //   left: 8,
+                //   right: 60,
+                //   child: Text(
+                //     (carSpot.car?.make?.name ?? '').toUpperCase(),
+                //     style: context.textTheme.bodyMedium?.copyWith(
+                //       color: Colors.white,
+                //       fontSize: 9,
+                //       fontWeight: FontWeight.w600,
+                //       letterSpacing: 1.2,
+                //     ),
+                //     maxLines: 1,
+                //     overflow: TextOverflow.ellipsis,
+                //   ),
+                // ),
+
+                // XP Badge (top right)
+                // Positioned(
+                //   top: 6,
+                //   right: 6,
+                //   child: _buildXPBadge(carSpot.car?.points ?? 0),
+                // ),
+
+                // Car Model (bottom)
+                // Positioned(
+                //   left: 8,
+                //   right: 8,
+                //   bottom: 8,
+                //   child: Text(
+                //     (carSpot.car?.model ?? '').toUpperCase(),
+                //     style: context.textTheme.bodyMedium?.copyWith(
+                //       color: Colors.white,
+                //       fontSize: 11,
+                //       fontWeight: FontWeight.w700,
+                //       letterSpacing: 0.5,
+                //       height: 1.2,
+                //     ),
+                //     maxLines: 2,
+                //     overflow: TextOverflow.ellipsis,
+                //   ),
+                // ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildXPBadge(int points) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.stars_rounded,
+          size: 10,
+          color: Colors.white.withValues(alpha: 0.9),
+        ),
+        const Gap(3),
+        Text(
+          '$points',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            fontSize: 9,
+            letterSpacing: 0.3,
+          ),
+        ),
+      ],
     );
   }
 
