@@ -363,62 +363,74 @@ class _CarPreviewScreenState extends ConsumerState<CarPreviewScreen> {
   }
 
   Widget _buildSpotterContent(String? username) {
-    return Row(
-      children: [
-        // Elegant circular avatar with gradient
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.2),
-                Colors.white.withValues(alpha: 0.08),
+    final userId = widget.carSpot.userProfile?.id;
+
+    return GestureDetector(
+      onTap: userId != null
+          ? () {
+              context.push(
+                '/user-profile',
+                extra: userId,
+              );
+            }
+          : null,
+      child: Row(
+        children: [
+          // Elegant circular avatar with gradient
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withValues(alpha: 0.2),
+                  Colors.white.withValues(alpha: 0.08),
+                ],
+              ),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.15),
+                width: 1.5,
+              ),
+            ),
+            child: Icon(
+              Icons.person,
+              color: Colors.white.withValues(alpha: 0.7),
+              size: 20,
+            ),
+          ),
+          const Gap(12),
+          // Username with label
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'SPOTTED BY',
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1.5,
+                    color: Colors.white.withValues(alpha: 0.5),
+                  ),
+                ),
+                const Gap(4),
+                Text(
+                  username ?? 'Unknown User',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                    color: Colors.white,
+                  ),
+                ),
               ],
             ),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.15),
-              width: 1.5,
-            ),
           ),
-          child: Icon(
-            Icons.person,
-            color: Colors.white.withValues(alpha: 0.7),
-            size: 20,
-          ),
-        ),
-        const Gap(12),
-        // Username with label
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'SPOTTED BY',
-                style: TextStyle(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1.5,
-                  color: Colors.white.withValues(alpha: 0.5),
-                ),
-              ),
-              const Gap(4),
-              Text(
-                username ?? 'Unknown User',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

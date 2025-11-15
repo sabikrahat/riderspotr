@@ -18,6 +18,7 @@ import '../presentation/pages/capture/manual_upload_screen.dart';
 import '../presentation/pages/capture/report_car_screen.dart';
 import '../presentation/pages/capture/scan_detail_screen.dart';
 import '../presentation/pages/explore/explore_screen.dart';
+import '../presentation/pages/explore/region_detail_screen.dart';
 import '../presentation/pages/garage/garage_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
 import '../presentation/pages/leaderboard/leaderboard_screen.dart';
@@ -110,6 +111,18 @@ final router = GoRouter(
       path: SearchFriendScreen.routeName,
       // redirect: authHandler,
       builder: (_, _) => SearchFriendScreen(),
+    ),
+    GoRoute(
+      path: RegionDetailScreen.routeName,
+      redirect: authHandler,
+      builder: (_, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return RegionDetailScreen(
+          carsInRegion: extra['carsInRegion'] as List<CarSpotModel>,
+          centerLatitude: extra['centerLatitude'] as double,
+          centerLongitude: extra['centerLongitude'] as double,
+        );
+      },
     ),
     ShellRoute(
       redirect: authHandler,

@@ -11,27 +11,28 @@ import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../pages/capture/car_preview_screen.dart';
+import '../../providers/likes/likes_provider.dart';
 
 class FeedCard extends ConsumerStatefulWidget {
   const FeedCard({
     super.key,
     required this.carSpot,
-    required this.onLike,
   });
 
   final CarSpotModel carSpot;
-  final VoidCallback onLike;
 
   @override
   ConsumerState<FeedCard> createState() => _FeedCardState();
 }
 
 class _FeedCardState extends ConsumerState<FeedCard>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late AnimationController _likeAnimationController;
   late Animation<double> _likeScaleAnimation;
   bool _showHeartAnimation = false;
-  bool _isLiked = false; // TODO: Get from backend
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -54,31 +55,27 @@ class _FeedCardState extends ConsumerState<FeedCard>
     super.dispose();
   }
 
-  void _handleDoubleTap() {
-    if (!_isLiked) {
-      widget.onLike();
-      setState(() {
-        _isLiked = true;
-        _showHeartAnimation = true;
-      });
-      _likeAnimationController.forward().then((_) {
-        Future.delayed(const Duration(milliseconds: 300), () {
-          if (mounted) {
-            _likeAnimationController.reverse();
-            setState(() {
-              _showHeartAnimation = false;
-            });
-          }
+  void _handleDoubleTap() async {
+    final likeAsync = ref.read(likeProvider(widget.carSpot.id));
+    if (likeAsync is AsyncData<LikeState>) {
+      final likeState = likeAsync.value;
+      if (!likeState.isLiked) {
+        await ref.read(likeProvider(widget.carSpot.id).notifier).toggleLike();
+        setState(() {
+          _showHeartAnimation = true;
         });
-      });
+        _likeAnimationController.forward().then((_) {
+          Future.delayed(const Duration(milliseconds: 300), () {
+            if (mounted) {
+              _likeAnimationController.reverse();
+              setState(() {
+                _showHeartAnimation = false;
+              });
+            }
+          });
+        });
+      }
     }
-  }
-
-  void _handleLikeTap() {
-    setState(() {
-      _isLiked = !_isLiked;
-    });
-    widget.onLike();
   }
 
   String _formatTimestamp(DateTime timestamp) {
@@ -104,6 +101,7 @@ class _FeedCardState extends ConsumerState<FeedCard>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
     return GestureDetector(
       onTap: () {
         context.push(
@@ -287,24 +285,81 @@ class _FeedCardState extends ConsumerState<FeedCard>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          GestureDetector(
-                            onTap: _handleLikeTap,
-                            child: Row(
-                              children: [
-                                LikeButton(
-                                  isLiked: _isLiked,
-                                  size: 24,
+                          Consumer(
+                            builder: (context, ref, child) {
+                              final likeAsync = ref.watch(
+                                likeProvider(widget.carSpot.id),
+                              );
+                              return likeAsync.when(
+                                data: (likeState) => Row(
+                                  children: [
+                                    LikeButton(
+                                      isLiked: likeState.isLiked,
+                                      size: 24,
+                                      onTap: (isLiked) async {
+                                        await ref
+                                            .read(
+                                              likeProvider(
+                                                widget.carSpot.id,
+                                              ).notifier,
+                                            )
+                                            .toggleLike();
+                                        return !isLiked;
+                                      },
+                                    ),
+                                    const Gap(4),
+                                    Text(
+                                      '${likeState.count}',
+                                      style: context.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white.withValues(
+                                              alpha: 0.9,
+                                            ),
+                                          ),
+                                    ),
+                                  ],
                                 ),
-                                const Gap(4),
-                                Text(
-                                  '0', // TODO: Get actual like count from backend
-                                  style: context.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                  ),
+                                loading: () => Row(
+                                  children: [
+                                    LikeButton(
+                                      isLiked: false,
+                                      size: 24,
+                                    ),
+                                    const Gap(4),
+                                    Text(
+                                      '0',
+                                      style: context.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white.withValues(
+                                              alpha: 0.9,
+                                            ),
+                                          ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                                error: (_, __) => Row(
+                                  children: [
+                                    LikeButton(
+                                      isLiked: false,
+                                      size: 24,
+                                    ),
+                                    const Gap(4),
+                                    Text(
+                                      '0',
+                                      style: context.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white.withValues(
+                                              alpha: 0.9,
+                                            ),
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
                           Text(
                             _formatTimestamp(widget.carSpot.createdAt),
@@ -340,70 +395,82 @@ class _FeedCardState extends ConsumerState<FeedCard>
   }
 
   Widget _buildUserHeader(String? username) {
-    return Row(
-      children: [
-        // User avatar
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.15),
-                Colors.white.withValues(alpha: 0.05),
+    final userId = widget.carSpot.userProfile?.id;
+
+    return GestureDetector(
+      onTap: userId != null
+          ? () {
+              context.push(
+                '/user-profile',
+                extra: userId,
+              );
+            }
+          : null,
+      child: Row(
+        children: [
+          // User avatar
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withValues(alpha: 0.15),
+                  Colors.white.withValues(alpha: 0.05),
+                ],
+              ),
+            ),
+            child: Icon(
+              Icons.person,
+              color: Colors.white.withValues(alpha: 0.6),
+              size: 18,
+            ),
+          ),
+          const Gap(12),
+          // Username and location
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  username ?? 'Unknown User',
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                if (widget.carSpot.address.isNotEmpty) ...[
+                  const Gap(2),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        size: 11,
+                        color: Colors.white.withValues(alpha: 0.7),
+                      ),
+                      const Gap(4),
+                      Expanded(
+                        child: Text(
+                          widget.carSpot.address,
+                          style: context.textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w300,
+                            fontSize: 11,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
-          child: Icon(
-            Icons.person,
-            color: Colors.white.withValues(alpha: 0.6),
-            size: 18,
-          ),
-        ),
-        const Gap(12),
-        // Username and location
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                username ?? 'Unknown User',
-                style: context.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              if (widget.carSpot.address.isNotEmpty) ...[
-                const Gap(2),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.location_on,
-                      size: 11,
-                      color: Colors.white.withValues(alpha: 0.7),
-                    ),
-                    const Gap(4),
-                    Expanded(
-                      child: Text(
-                        widget.carSpot.address,
-                        style: context.textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.w300,
-                          fontSize: 11,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

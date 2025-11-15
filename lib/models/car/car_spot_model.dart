@@ -38,7 +38,7 @@ class CarSpotModel {
   Map<String, dynamic> toJson() => _$CarSpotModelToJson(this);
 
   static const query =
-      '*, car(*, make(*), production: car_production(*), specs: car_specs(*), history: car_history(*)), user: users(*)';
+      '*, car(*, make(*), production: car_production(*), specs: car_specs(*), history: car_history(*)), user: users!car_spots_user_fkey(*)';
 
   // Getter for backward compatibility - returns user ID
   String get user => userProfile?.id ?? '';

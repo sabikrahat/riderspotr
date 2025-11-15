@@ -9,4 +9,4 @@ const usersTbl = 'users';
 const googleMapKey = 'AIzaSyBVLKzXc8b-kYbfpIYjHOV4cNbJmTP89_c';
 
 const mapBoxAccessToken =
-    'pk.eyJ1Ijoic2FtaHVuZzQxMSIsImEiOiJjbWZwMW8wbWcwYjYxMmxweDBsYWxpcng0In0.VKdPmqyZ3ONKWC6ex_kkLw';
+    'pk.eyJ1Ijoic2FtaHVuZzA0MTEiLCJhIjoiY21pMDVyZWt6MGlqNzJqcHk0M2doMjg0YyJ9.n8tZhXXpqwVwhQqp_mQJtg';

@@ -39,20 +39,36 @@ class FeedService {
   /// Filtered to epic, legendary, or mythic rarity only
   Future<List<CarSpotModel>> _fetchGlobalFeed(int page, int pageSize) async {
     try {
+      // Fetch more records to account for filtering
+      final fetchSize = pageSize * 3;
       final response = await _supabase
           .from('car_spots')
           .select(CarSpotModel.query)
           .eq('is_claimed', true)
-          .inFilter('car.rarity', ['epic', 'legendary', 'mythic'])
           .order('created_at', ascending: false)
           .range(
-            page * pageSize,
-            (page + 1) * pageSize - 1,
+            page * fetchSize,
+            (page + 1) * fetchSize - 1,
           );
 
-      return (response as List)
+      final allSpots = (response as List)
           .map((json) => CarSpotModel.fromJson(json))
           .toList();
+
+      // Client-side filtering to ensure we only show cars with complete data
+      final filteredSpots = allSpots.where((spot) {
+        final car = spot.car;
+        final rarity = car?.rarity;
+
+        // Only include spots that have a car with valid rarity
+        return car != null &&
+            rarity != null &&
+            (rarity == Rarity.epic ||
+                rarity == Rarity.legendary ||
+                rarity == Rarity.mythic);
+      }).toList();
+
+      return filteredSpots.take(pageSize).toList();
     } catch (e) {
       throw Exception('Failed to fetch global feed: $e');
     }
@@ -66,23 +82,38 @@ class FeedService {
     String country,
   ) async {
     try {
-      // First, get the user's country from the users table
+      // Fetch more records to account for filtering
+      final fetchSize = pageSize * 3;
       final response = await _supabase
           .from('car_spots')
           .select(CarSpotModel.query)
           .eq('is_claimed', true)
-          .inFilter('car.rarity', ['epic', 'legendary', 'mythic'])
           // TODO: Implement country filter
           // .eq('country', country)
           .order('created_at', ascending: false)
           .range(
-            page * pageSize,
-            (page + 1) * pageSize - 1,
+            page * fetchSize,
+            (page + 1) * fetchSize - 1,
           );
 
-      return (response as List)
+      final allSpots = (response as List)
           .map((json) => CarSpotModel.fromJson(json))
           .toList();
+
+      // Client-side filtering to ensure we only show cars with complete data
+      final filteredSpots = allSpots.where((spot) {
+        final car = spot.car;
+        final rarity = car?.rarity;
+
+        // Only include spots that have a car with valid rarity
+        return car != null &&
+            rarity != null &&
+            (rarity == Rarity.epic ||
+                rarity == Rarity.legendary ||
+                rarity == Rarity.mythic);
+      }).toList();
+
+      return filteredSpots.take(pageSize).toList();
     } catch (e) {
       throw Exception('Failed to fetch country feed: $e');
     }
@@ -110,24 +141,37 @@ class FeedService {
         return [];
       }
 
-      // Fetch car spots from followed users
-      // We need to use a raw query or construct the query properly
-      // For Supabase, we can use the 'in' operator
+      // Fetch more records to account for filtering
+      final fetchSize = pageSize * 3;
       final response = await _supabase
           .from('car_spots')
           .select(CarSpotModel.query)
           .eq('is_claimed', true)
           .inFilter('user', followedUserIds)
-          .inFilter('car.rarity', ['epic', 'legendary', 'mythic'])
           .order('created_at', ascending: false)
           .range(
-            page * pageSize,
-            (page + 1) * pageSize - 1,
+            page * fetchSize,
+            (page + 1) * fetchSize - 1,
           );
 
-      return (response as List)
+      final allSpots = (response as List)
           .map((json) => CarSpotModel.fromJson(json))
           .toList();
+
+      // Client-side filtering to ensure we only show cars with complete data
+      final filteredSpots = allSpots.where((spot) {
+        final car = spot.car;
+        final rarity = car?.rarity;
+
+        // Only include spots that have a car with valid rarity
+        return car != null &&
+            rarity != null &&
+            (rarity == Rarity.epic ||
+                rarity == Rarity.legendary ||
+                rarity == Rarity.mythic);
+      }).toList();
+
+      return filteredSpots.take(pageSize).toList();
     } catch (e) {
       throw Exception('Failed to fetch friends feed: $e');
     }

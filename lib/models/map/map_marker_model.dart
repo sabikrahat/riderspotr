@@ -29,6 +29,13 @@ class MapMarkerModel {
         (color.b * 255).toInt();
   }
 
+  static int staticColorToInt(Color color) {
+    return ((color.a * 255).toInt() << 24) |
+        ((color.r * 255).toInt() << 16) |
+        ((color.g * 255).toInt() << 8) |
+        (color.b * 255).toInt();
+  }
+
   Map<String, dynamic> toCircleAnnotationOptions() {
     return {
       'circleRadius': radius,

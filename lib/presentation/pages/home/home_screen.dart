@@ -240,9 +240,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   padding: const EdgeInsets.only(bottom: 24),
                   child: FeedCard(
                     carSpot: carSpots[index],
-                    onLike: () {
-                      // TODO: Implement like functionality with backend
-                    },
                   ),
                 );
               },

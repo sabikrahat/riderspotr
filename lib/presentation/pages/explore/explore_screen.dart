@@ -1,10 +1,9 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gap/gap.dart';
 import 'package:geolocator/geolocator.dart' as geo;
+import 'package:go_router/go_router.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 import '../../../core/enums.dart';
@@ -13,9 +12,7 @@ import '../../../core/location_utils.dart';
 import '../../../models/car/car_spot_model.dart';
 import '../../../models/map/map_marker_model.dart';
 import '../../providers/car/map_provider.dart';
-import '../../widgets/shared/back.dart';
-import '../../widgets/shared/car_card.dart';
-import '../../widgets/shared/search_text_field.dart';
+import 'region_detail_screen.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
@@ -26,30 +23,36 @@ class ExploreScreen extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _ExploreScreenState();
 }
 
-class _ExploreScreenState extends ConsumerState<ExploreScreen> {
-  final searchController = TextEditingController();
+class _ExploreScreenState extends ConsumerState<ExploreScreen>
+    with SingleTickerProviderStateMixin {
   List<String> availableTimes = ['24 HR', '7 DAYS', 'ALL TIME'];
   String selectedTime = '24 HR';
   MapboxMap? mapboxMap;
   CircleAnnotationManager? circleAnnotationManager;
+  PolygonAnnotationManager? polygonAnnotationManager;
   geo.Position? _userPosition;
   List<CarSpotModel> _sortedCarSpots = [];
-  late PageController _pageController;
-  double _currentZoom = 13.0;
+  late TabController _tabController;
   List<MapMarkerModel> _currentMarkers = [];
-  Timer? _zoomMonitorTimer;
+  Map<String, List<CarSpotModel>> _hexagonClusters = {};
+  Map<String, Position> _hexagonCenters = {}; // Store center of each hexagon
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) return;
+      setState(() {
+        selectedTime = availableTimes[_tabController.index];
+      });
+    });
     _getUserLocation();
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
-    _zoomMonitorTimer?.cancel();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -121,10 +124,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   ) async {
     debugPrint('Map created with ${spots.length} spots');
     this.mapboxMap = mapboxMap;
-    await _addCircleMarkers(spots);
+    await _addLuxuryMarkers(spots);
 
-    // Start periodic zoom checking to update circle sizes
-    _startZoomMonitoring();
+    // Hexagons use fixed size for perfect grid alignment - no zoom updates needed
 
     // Focus on first car's location if available
     if (spots.isNotEmpty &&
@@ -145,16 +147,22 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     }
   }
 
-  Future<void> _addCircleMarkers(List<CarSpotModel> spots) async {
+  Future<void> _addLuxuryMarkers(List<CarSpotModel> spots) async {
     if (mapboxMap == null) return;
 
-    // Clear existing markers if they exist
+    // Clear existing annotations
     if (circleAnnotationManager != null) {
       await circleAnnotationManager!.deleteAll();
     } else {
-      // Create circle annotation manager if it doesn't exist
       circleAnnotationManager = await mapboxMap!.annotations
           .createCircleAnnotationManager();
+    }
+
+    if (polygonAnnotationManager != null) {
+      await polygonAnnotationManager!.deleteAll();
+    } else {
+      polygonAnnotationManager = await mapboxMap!.annotations
+          .createPolygonAnnotationManager();
     }
 
     _currentMarkers = spots
@@ -162,14 +170,11 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
         .toList()
         .map(
           (spot) {
-            // Calculate radius based on rarity for glowing orbs
-            final baseRadius = _getRadiusForRarity(spot.car!.rarity);
-
-            // Randomize coordinates for privacy (within ~100m radius)
+            // Randomize coordinates for privacy (within ~300m radius for better privacy)
             final randomizedCoords = LocationUtils.randomizeCoordinates(
               latitude: spot.latitude!,
               longitude: spot.longitude!,
-              radiusInMeters: 100.0,
+              radiusInMeters: 300.0,
             );
 
             return MapMarkerModel(
@@ -177,169 +182,268 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               latitude: randomizedCoords['latitude']!,
               longitude: randomizedCoords['longitude']!,
               borderColor: spot.car!.rarity.color,
-              radius: baseRadius,
+              radius: 8.0,
               carName: spot.car?.model,
             );
           },
         )
         .toList();
 
-    // Listen to tap events on circles
-    circleAnnotationManager!.tapEvents(
+    // Create hexagonal regions for ALL markers (including single spots)
+    final clusters = _createHexagonalClusters(_currentMarkers, spots);
+    for (var entry in clusters.entries) {
+      await _createHexagonalRegion(entry.value, entry.key);
+    }
+
+    // Listen to tap events on polygons (hexagons)
+    polygonAnnotationManager!.tapEvents(
       onTap: (annotation) {
-        // Find the marker that was tapped
-        final tappedMarker = _currentMarkers.firstWhere(
-          (m) =>
-              m.latitude == annotation.geometry.coordinates.lat &&
-              m.longitude == annotation.geometry.coordinates.lng,
-          orElse: () => _currentMarkers.first,
-        );
+        // Get the center of the tapped polygon
+        final geometry = annotation.geometry;
+        if (geometry.coordinates.isEmpty ||
+            geometry.coordinates.first.isEmpty) {
+          return;
+        }
 
-        // Find the index in the sorted car spots list
-        final index = _sortedCarSpots.indexWhere(
-          (s) => s.id == tappedMarker.id,
-        );
+        // Calculate centroid of the polygon
+        final points = geometry.coordinates.first;
+        double sumLat = 0;
+        double sumLng = 0;
+        for (var point in points) {
+          sumLat += point.lat;
+          sumLng += point.lng;
+        }
+        final centerLat = sumLat / points.length;
+        final centerLng = sumLng / points.length;
 
-        if (index != -1) {
-          // Animate to the corresponding page
-          _pageController.animateToPage(
-            index,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
+        // Find the closest hexagon key
+        String? closestHexKey;
+        double minDistance = double.infinity;
+
+        for (var entry in _hexagonCenters.entries) {
+          final hexCenter = entry.value;
+          final distance = sqrt(
+            pow(hexCenter.lat - centerLat, 2) +
+                pow(hexCenter.lng - centerLng, 2),
           );
-        }
-      },
-    );
 
-    // Add simple, minimalistic circles for each marker
-    for (var marker in _currentMarkers) {
-      // Calculate radius that maintains constant geographical area
-      final radius = _calculateRadiusForZoom(_currentZoom);
-
-      final circleOptions = CircleAnnotationOptions(
-        geometry: Point(
-          coordinates: Position(marker.longitude, marker.latitude),
-        ),
-        circleRadius: radius,
-        circleColor: marker.colorToInt(marker.borderColor),
-        circleOpacity: 0.25,
-        circleStrokeWidth: 2.0,
-        circleStrokeColor: marker.colorToInt(marker.borderColor),
-        circleStrokeOpacity: 0.7,
-      );
-
-      await circleAnnotationManager!.create(circleOptions);
-    }
-  }
-
-  // Get radius based on rarity for consistent sizing
-  double _getRadiusForRarity(Rarity rarity) {
-    switch (rarity) {
-      case Rarity.mythic:
-        return 30.0;
-      case Rarity.legendary:
-        return 25.0;
-      case Rarity.epic:
-        return 20.0;
-      case Rarity.rare:
-        return 16.0;
-      case Rarity.uncommon:
-        return 13.0;
-      case Rarity.common:
-        return 10.0;
-    }
-  }
-
-  /// Calculate circle radius that maintains constant geographical area
-  /// regardless of zoom level
-  double _calculateRadiusForZoom(double zoom) {
-    // Reference zoom level where we want a base radius
-    const double referenceZoom = 13.0;
-    const double baseRadius = 25.0;
-
-    // Scale radius with zoom to maintain constant geographical coverage
-    // When zoom increases (zooming in), radius increases
-    // When zoom decreases (zooming out), radius decreases
-    // Formula: radius = baseRadius * 2^(currentZoom - referenceZoom)
-    final double radius = baseRadius * pow(2, zoom - referenceZoom);
-
-    // Clamp radius to reasonable bounds
-    return radius.clamp(5.0, 200.0);
-  }
-
-  /// Update all circle radii when zoom level changes
-  Future<void> _updateCircleRadii() async {
-    if (circleAnnotationManager == null || _currentMarkers.isEmpty) return;
-
-    // Clear and recreate circles with new radii
-    await circleAnnotationManager!.deleteAll();
-
-    final radius = _calculateRadiusForZoom(_currentZoom);
-
-    for (var marker in _currentMarkers) {
-      final circleOptions = CircleAnnotationOptions(
-        geometry: Point(
-          coordinates: Position(marker.longitude, marker.latitude),
-        ),
-        circleRadius: radius,
-        circleColor: marker.colorToInt(marker.borderColor),
-        circleOpacity: 0.25,
-        circleStrokeWidth: 2.0,
-        circleStrokeColor: marker.colorToInt(marker.borderColor),
-        circleStrokeOpacity: 0.7,
-      );
-
-      await circleAnnotationManager!.create(circleOptions);
-    }
-  }
-
-  /// Start monitoring zoom level changes
-  void _startZoomMonitoring() {
-    _zoomMonitorTimer?.cancel();
-    _zoomMonitorTimer = Timer.periodic(
-      const Duration(milliseconds: 500),
-      (timer) async {
-        if (mapboxMap == null) return;
-
-        try {
-          final cameraState = await mapboxMap!.getCameraState();
-          final newZoom = cameraState.zoom;
-
-          // Only update if zoom changed significantly (prevents too many updates)
-          if ((newZoom - _currentZoom).abs() > 0.15) {
-            _currentZoom = newZoom;
-            await _updateCircleRadii();
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestHexKey = entry.key;
           }
-        } catch (e) {
-          debugPrint('Error monitoring zoom: $e');
+        }
+
+        if (closestHexKey != null) {
+          final carsInRegion = _hexagonClusters[closestHexKey] ?? [];
+          if (carsInRegion.isNotEmpty) {
+            _showRegionDetail(carsInRegion, closestHexKey);
+          }
         }
       },
     );
+
+    // Create elegant white dot markers for each spot
+    for (var marker in _currentMarkers) {
+      await _createLuxuryDot(marker);
+    }
   }
 
-  Future<void> _focusOnCarSpot(CarSpotModel spot) async {
-    if (mapboxMap == null || spot.latitude == null || spot.longitude == null) {
-      return;
+  /// Create hexagonal clusters from markers - ALL markers get a hexagon
+  Map<String, List<MapMarkerModel>> _createHexagonalClusters(
+    List<MapMarkerModel> markers,
+    List<CarSpotModel> originalSpots,
+  ) {
+    if (markers.isEmpty) return {};
+
+    // Use FIXED hexagon size for stable clustering (independent of zoom)
+    // This prevents hexagons from changing when zooming
+    const double fixedHexSize = 0.006; // Fixed clustering grid size
+
+    // Group markers into hexagonal grid
+    final Map<String, List<MapMarkerModel>> hexGrid = {};
+
+    for (var marker in markers) {
+      // Calculate hex coordinates using fixed size
+      final hexCoord = _getHexCoordinate(
+        marker.latitude,
+        marker.longitude,
+        fixedHexSize,
+      );
+      final key = '${hexCoord['q']},${hexCoord['r']}';
+
+      if (!hexGrid.containsKey(key)) {
+        hexGrid[key] = [];
+      }
+      hexGrid[key]!.add(marker);
     }
 
-    await mapboxMap!.flyTo(
-      CameraOptions(
-        center: Point(
-          coordinates: Position(
-            spot.longitude!,
-            spot.latitude!,
-          ),
+    // Store car spots by hexagon key for later retrieval
+    _hexagonClusters.clear();
+    for (var entry in hexGrid.entries) {
+      final hexKey = entry.key;
+      final markersInHex = entry.value;
+
+      // Map markers back to car spots
+      final spotsInHex = markersInHex
+          .map(
+            (marker) => originalSpots.firstWhere(
+              (spot) => spot.id == marker.id,
+              orElse: () => originalSpots.first,
+            ),
+          )
+          .toList();
+
+      _hexagonClusters[hexKey] = spotsInHex;
+    }
+
+    // Return ALL hexagons (even single markers)
+    return hexGrid;
+  }
+
+  /// Get hexagonal coordinate for a lat/lng point
+  Map<String, int> _getHexCoordinate(double lat, double lng, double hexSize) {
+    // Simplified cubic hex coordinate system
+    final x = lng / hexSize;
+    final y = lat / hexSize;
+
+    final q = (x * 2 / 3).round();
+    final r = ((-x / 3) + (y * sqrt(3) / 3)).round();
+
+    return {'q': q, 'r': r};
+  }
+
+  /// Convert hexagonal coordinates back to lat/lng for perfect grid alignment
+  Map<String, double> _hexCoordinateToLatLng(int q, int r, double hexSize) {
+    // Reverse the hex coordinate transformation
+    final lng = hexSize * (3.0 / 2.0 * q);
+    final lat = hexSize * (sqrt(3) / 2.0 * q + sqrt(3) * r);
+
+    return {'lat': lat, 'lng': lng};
+  }
+
+  /// Create a hexagonal region polygon
+  Future<void> _createHexagonalRegion(
+    List<MapMarkerModel> cluster,
+    String hexKey,
+  ) async {
+    if (polygonAnnotationManager == null || cluster.isEmpty) return;
+
+    // Parse hex coordinates from the key
+    final coords = hexKey.split(',');
+    final q = int.parse(coords[0]);
+    final r = int.parse(coords[1]);
+
+    // Use FIXED hex size for perfect grid alignment
+    const double fixedHexSize = 0.006;
+
+    // Calculate center position on the hexagonal grid (this ensures no overlap)
+    final gridCenter = _hexCoordinateToLatLng(q, r, fixedHexSize);
+    final centerLat = gridCenter['lat']!;
+    final centerLng = gridCenter['lng']!;
+
+    // Store the center for later tap detection
+    _hexagonCenters[hexKey] = Position(centerLng, centerLat);
+
+    // Generate hexagon vertices with proper flat-top orientation
+    // Use the SAME fixed size for visual rendering to ensure perfect tiling
+    final hexSize = fixedHexSize;
+
+    // Account for latitude/longitude scaling
+    // At the equator, 1 degree lat ≈ 1 degree lng
+    // As we move away from equator, longitude degrees get smaller
+    final latScale = 1.0;
+    final lngScale = 1.0 / cos(centerLat * pi / 180);
+
+    final vertices = <Position>[];
+
+    // Generate flat-top hexagon (more natural looking)
+    for (int i = 0; i < 6; i++) {
+      final angle = (pi / 3) * i + (pi / 6); // Start at 30° for flat-top
+      final latOffset = hexSize * sin(angle) * latScale;
+      final lngOffset = hexSize * cos(angle) * lngScale;
+
+      vertices.add(
+        Position(
+          centerLng + lngOffset,
+          centerLat + latOffset,
         ),
-        zoom: 15.0,
+      );
+    }
+
+    // Close the polygon
+    vertices.add(vertices.first);
+
+    // Determine dominant rarity color in cluster
+    final rarityColors = cluster.map((m) => m.borderColor).toList();
+    final dominantColor = rarityColors.first;
+
+    // Create semi-transparent hexagonal region with prominent border
+    final polygonOptions = PolygonAnnotationOptions(
+      geometry: Polygon(coordinates: [vertices]),
+      fillColor: MapMarkerModel.staticColorToInt(
+        dominantColor.withValues(alpha: 0.12),
       ),
-      MapAnimationOptions(duration: 1000, startDelay: 0),
+      fillOutlineColor: MapMarkerModel.staticColorToInt(
+        dominantColor.withValues(alpha: 0.65),
+      ),
     );
+
+    await polygonAnnotationManager!.create(polygonOptions);
   }
 
-  void _onPageChanged(int page) {
-    if (_sortedCarSpots.isNotEmpty && page < _sortedCarSpots.length) {
-      _focusOnCarSpot(_sortedCarSpots[page]);
-    }
+  /// Create an elegant white dot marker
+  Future<void> _createLuxuryDot(MapMarkerModel marker) async {
+    if (circleAnnotationManager == null) return;
+
+    // Use fixed radius for consistency with fixed hexagon grid
+    const double radius = 4.0;
+
+    // Create outer glow circle
+    final glowOptions = CircleAnnotationOptions(
+      geometry: Point(
+        coordinates: Position(marker.longitude, marker.latitude),
+      ),
+      circleRadius: radius * 2.5,
+      circleColor: MapMarkerModel.staticColorToInt(Colors.white),
+      circleOpacity: 0.1,
+      circleBlur: 1.0,
+    );
+    await circleAnnotationManager!.create(glowOptions);
+
+    // Create main white dot with subtle rarity color tint
+    final dotOptions = CircleAnnotationOptions(
+      geometry: Point(
+        coordinates: Position(marker.longitude, marker.latitude),
+      ),
+      circleRadius: radius,
+      circleColor: MapMarkerModel.staticColorToInt(Colors.white),
+      circleOpacity: 0.95,
+      circleStrokeWidth: 1.5,
+      circleStrokeColor: MapMarkerModel.staticColorToInt(
+        marker.borderColor.withValues(alpha: 0.6),
+      ),
+      circleStrokeOpacity: 1.0,
+    );
+
+    await circleAnnotationManager!.create(dotOptions);
+  }
+
+  void _showRegionDetail(
+    List<CarSpotModel> carsInRegion,
+    String hexKey,
+  ) {
+    // Get the center coordinates for this hexagon
+    final hexCenter = _hexagonCenters[hexKey];
+    if (hexCenter == null) return;
+
+    context.push(
+      RegionDetailScreen.routeName,
+      extra: {
+        'carsInRegion': carsInRegion,
+        'centerLatitude': hexCenter.lat.toDouble(),
+        'centerLongitude': hexCenter.lng.toDouble(),
+      },
+    );
   }
 
   List<CarSpotModel> filtering(List<CarSpotModel> carSpots) {
@@ -365,17 +469,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       filteredList = carSpots;
     }
 
-    // Search filtering
-    final query = searchController.text.toLowerCase();
-    if (query.isNotEmpty && query.length >= 2) {
-      filteredList = filteredList.where((spot) {
-        final carModel = spot.car?.model?.toLowerCase() ?? '';
-        final carMake = spot.car?.make?.name.toLowerCase() ?? '';
-        return carModel.contains(query) || carMake.contains(query);
-      }).toList();
-    }
-
-    _addCircleMarkers(filteredList);
+    _addLuxuryMarkers(filteredList);
 
     return filteredList;
   }
@@ -387,15 +481,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: Back(),
         title: Text('EXPLORE', style: context.textTheme.headlineMedium),
         centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.tune_rounded, size: 28, color: Colors.white),
-          ),
-        ],
       ),
       body: ref
           .watch(mapProvider)
@@ -460,132 +547,58 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   // Interactive elements positioned separately
                   Positioned(
                     top:
-                        MediaQuery.of(context).padding.top +
-                        kToolbarHeight +
-                        16,
+                        MediaQuery.of(context).padding.top + kToolbarHeight + 8,
                     left: 16,
                     right: 16,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Filter Section
-                        _FilterSection(
-                          selectedTime: selectedTime,
-                          availableTimes: availableTimes,
-                          onTimeChanged: (value) {
-                            setState(() {
-                              selectedTime = value;
-                            });
-                          },
-                        ),
-                        Gap(16),
-                        SearchTextField(
-                          controller: searchController,
-                          onChanged: (value) {
-                            setState(() {});
-                          },
-                          hintText: 'Search for a car',
+                        // TabBar Filter Section
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: TabBar(
+                            controller: _tabController,
+                            indicator: UnderlineTabIndicator(
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 2,
+                              ),
+                              insets: EdgeInsets.symmetric(horizontal: 16),
+                            ),
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            dividerColor: Colors.transparent,
+                            labelColor: Colors.white,
+                            unselectedLabelColor: Colors.white.withValues(
+                              alpha: 0.4,
+                            ),
+                            labelStyle: context.textTheme.bodyMedium?.copyWith(
+                              fontSize: 11,
+                              letterSpacing: 1.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            unselectedLabelStyle: context.textTheme.bodyMedium
+                                ?.copyWith(
+                                  fontSize: 11,
+                                  letterSpacing: 1.5,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                            tabs: const [
+                              Tab(text: '24 HR'),
+                              Tab(text: '7 DAYS'),
+                              Tab(text: 'ALL TIME'),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  // Fixed Car Cards at Bottom
-                  if (_sortedCarSpots.isNotEmpty)
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 100),
-                        child: SizedBox(
-                          height: context.height * 0.25,
-                          child: PageView.builder(
-                            controller: _pageController,
-                            onPageChanged: _onPageChanged,
-                            itemCount: _sortedCarSpots.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                child: CarCard(
-                                  carSpot: _sortedCarSpots[index],
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
                 ],
               );
             },
           ),
-    );
-  }
-}
-
-// Filter Section Widget
-class _FilterSection extends StatelessWidget {
-  const _FilterSection({
-    required this.selectedTime,
-    required this.availableTimes,
-    required this.onTimeChanged,
-  });
-
-  final String selectedTime;
-  final List<String> availableTimes;
-  final Function(String) onTimeChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: availableTimes.map((option) {
-        final isSelected = selectedTime == option;
-        final isLast = option == availableTimes.last;
-        return Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(right: isLast ? 0 : 12),
-            child: GestureDetector(
-              onTap: () => onTimeChanged(option),
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  gradient: isSelected
-                      ? LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.white.withValues(alpha: 0.15),
-                            Colors.white.withValues(alpha: 0.05),
-                          ],
-                        )
-                      : null,
-                  border: Border.all(
-                    color: isSelected
-                        ? Colors.white.withValues(alpha: 0.3)
-                        : Colors.white.withValues(alpha: 0.1),
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  option,
-                  textAlign: TextAlign.center,
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    fontSize: 13,
-                    letterSpacing: 1.2,
-                    fontWeight: FontWeight.w500,
-                    color: isSelected
-                        ? Colors.white.withValues(alpha: 0.9)
-                        : Colors.white.withValues(alpha: 0.5),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 }
