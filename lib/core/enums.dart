@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:ridespotr/presentation/pages/leaderboard/search_friend.dart';
 
 import '../presentation/pages/capture/camera_screen.dart';
 import '../presentation/pages/explore/explore_screen.dart';
 import '../presentation/pages/garage/garage_screen.dart';
 import '../presentation/pages/home/home_screen.dart';
-import '../presentation/pages/leaderboard/leaderboard_screen.dart';
 import '../presentation/pages/profile/profile_screen.dart';
 
-enum KNavItem { home, leaderboard, map, camera, marketplace, profile }
+enum KNavItem { home, search, map, camera, marketplace, profile }
 
 extension KDrawerExtension on KNavItem {
   IconData get icon => switch (this) {
     KNavItem.home => Icons.home_rounded,
-    KNavItem.leaderboard => Icons.bar_chart_rounded,
+    KNavItem.search => Icons.search,
     KNavItem.map => Icons.map_rounded,
     KNavItem.camera => Icons.camera_alt_rounded,
     KNavItem.marketplace => Icons.shopping_bag_rounded,
@@ -21,7 +21,7 @@ extension KDrawerExtension on KNavItem {
 
   String get title => switch (this) {
     KNavItem.home => 'Home',
-    KNavItem.leaderboard => 'Leaderboard',
+    KNavItem.search => 'Search',
     KNavItem.map => 'Map',
     KNavItem.camera => 'Camera',
     KNavItem.marketplace => 'Marketplace',
@@ -30,7 +30,7 @@ extension KDrawerExtension on KNavItem {
 
   Widget get widget => switch (this) {
     KNavItem.home => const HomeScreen(),
-    KNavItem.leaderboard => const LeaderboardScreen(),
+    KNavItem.search => const SearchFriendScreen(),
     KNavItem.map => const ExploreScreen(),
     KNavItem.camera => const CameraScreen(),
     KNavItem.marketplace => const MarketplaceScreen(),
@@ -39,7 +39,7 @@ extension KDrawerExtension on KNavItem {
 
   String get route => switch (this) {
     KNavItem.home => HomeScreen.routeName,
-    KNavItem.leaderboard => LeaderboardScreen.routeName,
+    KNavItem.search => SearchFriendScreen.routeName,
     KNavItem.map => ExploreScreen.routeName,
     KNavItem.camera => CameraScreen.routeName,
     KNavItem.marketplace => MarketplaceScreen.routeName,
@@ -47,14 +47,14 @@ extension KDrawerExtension on KNavItem {
   };
 
   bool get isHome => this == KNavItem.home;
-  bool get isLeaderboard => this == KNavItem.leaderboard;
+  bool get isSearch => this == KNavItem.search;
   bool get isMap => this == KNavItem.map;
   bool get isCamera => this == KNavItem.camera;
   bool get isMarketplace => this == KNavItem.marketplace;
   bool get isProfile => this == KNavItem.profile;
 
   bool get isNotHome => !isHome;
-  bool get isNotLeaderboard => !isLeaderboard;
+  bool get isNotSearch => !isSearch;
   bool get isNotMap => !isMap;
   bool get isNotCamera => !isCamera;
   bool get isNotMarketplace => !isMarketplace;

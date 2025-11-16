@@ -108,11 +108,6 @@ final router = GoRouter(
     ),
 
     GoRoute(
-      path: SearchFriendScreen.routeName,
-      // redirect: authHandler,
-      builder: (_, _) => SearchFriendScreen(),
-    ),
-    GoRoute(
       path: RegionDetailScreen.routeName,
       redirect: authHandler,
       builder: (_, state) {
@@ -162,7 +157,24 @@ final router = GoRouter(
             child: ProfileScreen(),
           ),
         ),
+        GoRoute(
+          path: SearchFriendScreen.routeName,
+          pageBuilder: (_, _) => NoTransitionPage(
+            child: SearchFriendScreen(),
+          ),
+        ),
       ],
+    ),
+    GoRoute(
+      path: FollowersFollowingScreen.routeName,
+      redirect: authHandler,
+      builder: (_, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return FollowersFollowingScreen(
+          userId: extra['userId'] as String,
+          initialTab: extra['initialTab'] as FollowersFollowingTab,
+        );
+      },
     ),
     GoRoute(
       path: ProfileScreen.userProfileRouteName,
@@ -183,17 +195,7 @@ final router = GoRouter(
       redirect: authHandler,
       builder: (_, _) => EditSocialsScreen(),
     ),
-    GoRoute(
-      path: FollowersFollowingScreen.routeName,
-      redirect: authHandler,
-      builder: (_, state) {
-        final extra = state.extra as Map<String, dynamic>;
-        return FollowersFollowingScreen(
-          userId: extra['userId'] as String,
-          initialTab: extra['initialTab'] as FollowersFollowingTab,
-        );
-      },
-    ),
+
     GoRoute(
       path: ManualUploadScreen.routeName,
       redirect: authHandler,

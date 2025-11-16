@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridespotr/presentation/pages/leaderboard/search_friend.dart';
-
 import '../../../core/enums.dart';
 import '../../../core/extensions.dart';
 import '../../providers/auth/profile_provider.dart';
@@ -12,6 +10,7 @@ import '../../widgets/home/feed_card.dart';
 import '../../widgets/home/stories_row.dart';
 import '../../widgets/shared/carbon_background.dart';
 import '../../widgets/shared/logo.dart';
+import '../leaderboard/leaderboard_screen.dart';
 import '../payment/payment_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -94,9 +93,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       SizedBox(width: 200, child: Logo()),
                       const Spacer(),
                       GestureDetector(
-                        onTap: () => context.push(SearchFriendScreen.routeName),
+                        onTap: () => context.push(LeaderboardScreen.routeName),
                         child: Icon(
-                          Icons.search,
+                          Icons.leaderboard_rounded,
                           color: Colors.white,
                         ),
                       ),

@@ -62,7 +62,6 @@ class _SearchFriendScreenState extends ConsumerState<SearchFriendScreen>
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        leading: Back(),
         backgroundColor: Colors.black,
         elevation: 0,
         title: Text(
